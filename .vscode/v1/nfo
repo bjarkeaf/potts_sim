@@ -1,0 +1,2 @@
+speed for num_spins = 2500 to T=100 with dt = 0.01 is approx 120 us per step
+using '-Ofast', '-march=native', '-flto', '-funroll-loops'
