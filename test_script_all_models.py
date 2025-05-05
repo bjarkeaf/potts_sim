@@ -37,18 +37,9 @@ seed = 2
 
 #%% Load a coupling graph
 
-file_path = "graphs/band/band250_3_antiferro.col" 
-num_spins, num_edges, edges = parse_graph(file_path)
-
-# Extract optimums from comments
-opt_cut = None
-opt_energy = None
-with open(file_path, 'r') as f:
-    for line in f:
-        if line.startswith("c Optimum cut value (max3cut):"):
-            opt_cut = int(line.split(":")[1])
-        elif line.startswith("c Optimum energy (max3cut):"):
-            opt_energy = int(line.split(":")[1])
+# parse_graph now returns opt_cut, opt_energy
+file_path = "graphs/band/band250_3_antiferro.col"
+num_spins, num_edges, edges, opt_cut, opt_energy = parse_graph(file_path)
 
 # Define the initial alpha values for each spin
 #%% Test all model types

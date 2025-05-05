@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-to_build = True
+to_build = False
 if to_build:
     import subprocess
     import sys
@@ -20,7 +20,7 @@ if to_build:
     subprocess.check_call([sys.executable, setup_path, 'build_ext', '--inplace'])
 
 import potts_sim  # Import the custom module
-from graph_parser import parse_graph
+from graph_parser import parse_graph  # <— added
 
 #%% Set up the simulation parameters
 
@@ -39,18 +39,8 @@ seed = 2
 
 #%% Load a coupling graph
 
-file_path = "DSJC250.9.col" 
-num_spins, num_edges, edges = parse_graph(file_path)
-
-# Extract optimums from comments
-opt_cut = None
-opt_energy = None
-with open(file_path, 'r') as f:
-    for line in f:
-        if line.startswith("c Optimum cut value (max3cut):"):
-            opt_cut = int(line.split(":")[1])
-        elif line.startswith("c Optimum energy (max3cut):"):
-            opt_energy = int(line.split(":")[1])
+file_path = "graphs/dsjc/DSJC250.9.col" 
+num_spins, num_edges, edges, opt_cut, opt_energy = parse_graph(file_path)
 
 # Define the initial alpha values for each spin
 initial_alpha_arr = 1 * np.ones(num_spins)
@@ -84,15 +74,25 @@ cut_hist = result["cut_value"]             # new
 
 time_array = np.arange(num_steps) * dt
 
+# downsample for plotting
+if num_steps > 1000:
+    idxs = np.linspace(0, num_steps - 1, 1000, dtype=int)
+else:
+    idxs = np.arange(num_steps)
+t_plot     = time_array[idxs]
+amp_plot   = np.abs(cont_hist)[idxs]
+phase_plot = np.angle(cont_hist)[idxs]
+disc_plot  = disc_hist[idxs]
+energy_plot= energy_hist[idxs]
+cut_plot   = cut_hist[idxs]
+
 #%% Plotting 
 
 # Plot continuous states (amplitude & phase)
 fig1, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
-amp   = np.abs(cont_hist)
-phase = np.angle(cont_hist)
 for i in range(num_spins):
-    ax1.plot(time_array, amp[:, i],   lw=0.8)
-    ax2.plot(time_array, phase[:, i], lw=0.8)
+    ax1.plot(t_plot, amp_plot[:, i],   lw=0.8)
+    ax2.plot(t_plot, phase_plot[:, i], lw=0.8)
 ax1.set_ylabel("Amplitude")
 ax1.set_title("Spin Amplitudes vs Time")
 ax2.set_ylabel("Phase")
@@ -103,7 +103,7 @@ plt.tight_layout()
 # Plot discrete states
 fig2, ax3 = plt.subplots(figsize=(10, 4))
 for i in range(num_spins):
-    ax3.plot(time_array, disc_hist[:, i], lw=0.8, label=f"Spin {i}" if num_spins <= 10 else None)
+    ax3.plot(t_plot, disc_plot[:, i], lw=0.8, label=f"Spin {i}" if num_spins <= 10 else None)
 ax3.set_ylabel("Discrete State")
 ax3.set_xlabel("Time")
 ax3.set_title("Discrete States vs Time")
@@ -113,7 +113,7 @@ plt.tight_layout()
 
 # Plot system energy
 fig3, ax4 = plt.subplots(figsize=(10, 4))
-ax4.plot(time_array, energy_hist)
+ax4.plot(t_plot, energy_plot)
 if opt_energy is not None:
     ax4.axhline(opt_energy, color='red', linestyle='--', label='Optimum Energy')
     ax4.legend()
@@ -124,7 +124,7 @@ plt.tight_layout()
 
 # Plot cut value separately
 fig4, ax5 = plt.subplots(figsize=(10, 4))
-ax5.plot(time_array, cut_hist)
+ax5.plot(t_plot, cut_plot)
 if opt_cut is not None:
     ax5.axhline(opt_cut, color='red', linestyle='--', label='Optimum Cut Value')
     ax5.legend()

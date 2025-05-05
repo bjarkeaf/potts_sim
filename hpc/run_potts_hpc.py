@@ -17,7 +17,7 @@ noise_factor = 1e-4
 #%% Load a coupling graph
 
 file_path = "DSJC250.9.col" 
-num_spins, num_edges, edges = parse_graph(file_path)
+num_spins, num_edges, edges, opt_cut, opt_energy = parse_graph(file_path)
 
 # Define the initial alpha values for each spin
 initial_alpha_arr = 1 * np.ones(num_spins)

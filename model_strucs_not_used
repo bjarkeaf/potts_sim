@@ -1,0 +1,22 @@
+struct PolynomialModel : BaseModel {
+    int polynomial_order;
+    const std::vector<double>& beta_schedule;
+    const std::vector<double>& gamma_schedule;
+};
+
+struct NECModel : BaseModel {
+    double alpha_rate;
+    double gamma;
+    double r_target;
+    const std::vector<double>& initial_alpha_arr,
+};
+
+struct SigmoidModel: BaseModel {
+    double alpha;
+    const std::vector<double>& beta_schedule;
+    const std::vector<double>& gamma_schedule;
+};
+
+struct FixedAmplitudeModel: BaseModel {
+    const std::vector<double>& gamma_schedule;
+};

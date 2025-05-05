@@ -1,7 +1,8 @@
 def parse_graph(file_path, zero_based=False):
     """
-    Parses a graph file in DIMACS format to extract the number of spins, number of edges,
-    and the edges between spins (by pairs, no repeats).
+    Parses a graph file in DIMACS format to extract:
+      - num_spins, num_edges, edges
+      - optimum cut and energy (None if not found)
     """
     import numpy as np
 
@@ -11,10 +12,19 @@ def parse_graph(file_path, zero_based=False):
     num_spins = None
     num_edges = None
 
+    opt_cut = None
+    opt_energy = None
+
     with open(file_path, 'r') as f:
         for line in f:
             line = line.strip()
             if not line:
+                continue
+            if line.startswith("c Optimum cut value"):
+                opt_cut = int(line.split(":")[1])
+                continue
+            if line.startswith("c Optimum energy"):
+                opt_energy = int(line.split(":")[1])
                 continue
             if line.startswith("p"):
                 parts = line.split()
@@ -29,4 +39,4 @@ def parse_graph(file_path, zero_based=False):
                     coupling_strengths.append(int(parts[3]))
 
     edges = np.array([sources, targets])
-    return num_spins, num_edges, edges
+    return num_spins, num_edges, edges, opt_cut, opt_energy
