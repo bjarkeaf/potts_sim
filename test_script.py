@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-to_build = False
+to_build = True
 if to_build:
     import subprocess
     import sys
@@ -15,12 +15,14 @@ if to_build:
         import shutil
         shutil.rmtree(build_folder)
 
-    setup_path = os.path.join(os.path.dirname(__file__), 'setup.py')
+    setup_path = os.path.join(os.path.dirname(__file__), 'build_potts_sim.py')
     # Build extension in place so potts_sim.*.so or .pyd is created in the same folder
     subprocess.check_call([sys.executable, setup_path, 'build_ext', '--inplace'])
 
+    shutil.rmtree(build_folder) # Clean up build folder
+
 import potts_sim  # Import the custom module
-from graph_parser import parse_graph  # <— added
+from graph_parser import parse_graph 
 
 #%% Set up the simulation parameters
 

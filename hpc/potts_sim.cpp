@@ -482,9 +482,6 @@ py::object run(
             ptr_cut_value = static_cast<double*>(bi.ptr);
             ptr_cut_value[0] = best_cut_value;
         }
-        
-        // Add the step at which the best solution was found
-        out["step"] = best_step;
     }
     
     // Add the results to the output dictionary
@@ -492,6 +489,7 @@ py::object run(
     out["discrete_states"] = return_discrete_states ? py::object(discrete_state_history) : py::none();
     out["energy"] = return_energy ? py::object(energy_history) : py::none();
     out["cut_value"] = return_cut_value ? py::object(cut_value_history) : py::none();
+    out["step"] = return_best_only ? py::cast(best_step) : py::none();
     
     return out;
     

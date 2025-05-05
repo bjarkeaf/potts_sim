@@ -15,7 +15,7 @@ if to_build:
         import shutil
         shutil.rmtree(build_folder)
 
-    setup_path = os.path.join(os.path.dirname(__file__), 'setup.py')
+    setup_path = os.path.join(os.path.dirname(__file__), 'build_potts_sim.py')
     # Build extension in place so potts_sim.*.so or .pyd is created in the same folder
     subprocess.check_call([sys.executable, setup_path, 'build_ext', '--inplace'])
 
@@ -214,7 +214,7 @@ if not best_only:
 
     # invoke plots
     plot_model(res_poly, "Polynomial")
-    plot_model(res_nec_test, "NEC")
+    plot_model(res_nec, "NEC")
     plot_model(res_sig, "Sigmoid")
     plot_model(res_fix, "Fixed-Amplitude")
     plt.show()

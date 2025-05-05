@@ -1,7 +1,0 @@
-potts_sim.cpp
-setup.py
-potts_sim.egg-info/PKG-INFO
-potts_sim.egg-info/SOURCES.txt
-potts_sim.egg-info/dependency_links.txt
-potts_sim.egg-info/not-zip-safe
-potts_sim.egg-info/top_level.txt

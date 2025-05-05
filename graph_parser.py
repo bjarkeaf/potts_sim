@@ -21,10 +21,10 @@ def parse_graph(file_path, zero_based=False):
             if not line:
                 continue
             if line.startswith("c Optimum cut value"):
-                opt_cut = int(line.split(":")[1])
+                opt_cut = int(line.split(":")[1].strip())
                 continue
             if line.startswith("c Optimum energy"):
-                opt_energy = int(line.split(":")[1])
+                opt_energy = int(line.split(":")[1].strip())
                 continue
             if line.startswith("p"):
                 parts = line.split()
