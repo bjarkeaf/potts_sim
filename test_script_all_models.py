@@ -8,19 +8,21 @@ if to_build:
     import subprocess
     import sys
     import os
+    import shutil
 
     # Delete the build folder if it exists
     build_folder = os.path.join(os.path.dirname(__file__), 'build')
     if os.path.exists(build_folder):
-        import shutil
         shutil.rmtree(build_folder)
 
     setup_path = os.path.join(os.path.dirname(__file__), 'build_potts_sim.py')
     # Build extension in place so potts_sim.*.so or .pyd is created in the same folder
     subprocess.check_call([sys.executable, setup_path, 'build_ext', '--inplace'])
 
+    shutil.rmtree(build_folder) # Clean up build folder
+    
 import potts_sim  # Import the custom module
-from graph_parser import parse_graph
+from potts_utils import parse_graph
 
 #%% Set up the simulation parameters
 
@@ -39,7 +41,7 @@ seed = 2
 
 # parse_graph now returns opt_cut, opt_energy
 file_path = "graphs/band/band250_3_antiferro.col"
-num_spins, num_edges, edges, opt_cut, opt_energy = parse_graph(file_path)
+num_spins, num_edges, edges, opt_cut, opt_energy, mu_max = parse_graph(file_path)
 
 # Define the initial alpha values for each spin
 #%% Test all model types

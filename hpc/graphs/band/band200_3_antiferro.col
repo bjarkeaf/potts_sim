@@ -1,5 +1,6 @@
 c Optimum cut value (max3cut): 691
 c Optimum energy (max3cut): 99
+c Maximum eigenvalue: 3.0342599611746364
 p 200 790
 e 1 2 1
 e 1 3 1

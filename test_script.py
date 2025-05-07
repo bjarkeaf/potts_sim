@@ -8,11 +8,11 @@ if to_build:
     import subprocess
     import sys
     import os
+    import shutil
 
     # Delete the build folder if it exists
     build_folder = os.path.join(os.path.dirname(__file__), 'build')
     if os.path.exists(build_folder):
-        import shutil
         shutil.rmtree(build_folder)
 
     setup_path = os.path.join(os.path.dirname(__file__), 'build_potts_sim.py')
@@ -22,7 +22,7 @@ if to_build:
     shutil.rmtree(build_folder) # Clean up build folder
 
 import potts_sim  # Import the custom module
-from graph_parser import parse_graph 
+from potts_utils import parse_graph 
 
 #%% Set up the simulation parameters
 
@@ -41,8 +41,8 @@ seed = 2
 
 #%% Load a coupling graph
 
-file_path = "graphs/dsjc/DSJC250.9.col" 
-num_spins, num_edges, edges, opt_cut, opt_energy = parse_graph(file_path)
+file_path = "graphs/band/band250_3_antiferro.col" 
+num_spins, num_edges, edges, opt_cut, opt_energy, mu_max = parse_graph(file_path)
 
 # Define the initial alpha values for each spin
 initial_alpha_arr = 1 * np.ones(num_spins)

@@ -15,4 +15,4 @@ module load python3/3.13.2
 module load mpi4py/4.0.2-python-3.13.2-openmpi-5.0.6
 source potts-env/bin/activate
 
-mpirun python3 run_potts_sweep.py --config sweep_config.yaml
+mpirun python3 run_potts_sweep.py --config configs/250505_sweep.yaml

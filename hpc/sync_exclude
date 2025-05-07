@@ -1,0 +1,19 @@
+# Files to exclude
+sync_exclude
+osync.sh
+isync.sh
+
+potts_sim.cpython-313-x86_64-linux-gnu.so
+analyze_results.py
+run_local_test.sh
+run_local_test.sh.save
+
+# Directories to exclude (add trailing slash for clarity)
+.git/
+__pycache__/
+.vscode/
+plots/
+results_local/
+
+# You can also use patterns
+#*.log

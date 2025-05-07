@@ -10,7 +10,7 @@ import seaborn as sns
 def main():
     parser = argparse.ArgumentParser(description='Analyze Potts model parameter sweep results')
     parser.add_argument('--results', type=str, required=True, help='Path to results.parquet file')
-    parser.add_argument('--out-dir', type=str, default='analysis', help='Output directory for plots')
+    parser.add_argument('--out_dir', type=str, default='analysis', help='Output directory for plots')
     args = parser.parse_args()
     
     # Create output directory
@@ -25,12 +25,12 @@ def main():
     
     # Basic statistics
     print("\nOverall Statistics:")
-    print(f"Mean cut_diff from optimum: {results['cut_diff'].mean():.2f}")
-    print(f"Best cut_diff from optimum: {results['cut_diff'].min():.2f}")
+    print(f"Mean cut_diff: {results['cut_diff'].mean():.2f}")
+    print(f"Best cut_diff: {results['cut_diff'].max():.2f}")
     
     # Group by model and calculate statistics
     model_stats = results.groupby('model').agg({
-        'cut_diff': ['mean', 'min', 'std'],
+        'cut_diff': ['mean', 'max', 'min', 'std'],
         'runtime': ['mean', 'std']
     })
     
@@ -41,16 +41,42 @@ def main():
     param_stats = results.groupby(['model', 'param_id']).agg({
         'cut_diff': ['mean', 'min', 'std'],
         'runtime': 'mean'
-    }).reset_index()
+    })
     
-    best_params = param_stats.loc[param_stats.groupby('model')[('cut_diff', 'mean')].idxmin()]
+    # Reset index before flattening columns to preserve 'model' and 'param_id' as regular columns
+    param_stats = param_stats.reset_index()
+    
+    # Flatten the MultiIndex columns to make them easier to work with
+    new_columns = []
+    for col in param_stats.columns:
+        if isinstance(col, tuple):
+            # Join the tuple elements, but exclude empty strings
+            new_col = '_'.join([str(c) for c in col if c])
+            new_columns.append(new_col)
+        else:
+            new_columns.append(col)
+    
+    param_stats.columns = new_columns
+    
+    # Print column names for debugging
+    print("\nParameter stats columns:", param_stats.columns.tolist())
+    
+    # Find best parameters for each model
+    best_params_list = []
+    for model_name in results['model'].unique():
+        model_params = param_stats[param_stats['model'] == model_name]
+        if not model_params.empty:
+            best_idx = model_params['cut_diff_mean'].idxmin()
+            best_params_list.append(model_params.loc[best_idx])
+    
+    best_params = pd.DataFrame(best_params_list)
     
     print("\nBest Parameters by Model:")
     for _, row in best_params.iterrows():
         print(f"Model: {row['model']}, Param ID: {row['param_id']}")
-        print(f"  Mean cut_diff: {row[('cut_diff', 'mean')]:.2f}")
-        print(f"  Min cut_diff: {row[('cut_diff', 'min')]:.2f}")
-        print(f"  Mean runtime: {row[('runtime', 'mean')]:.2f}s")
+        print(f"  Mean cut_diff: {row['cut_diff_mean']:.2f}")
+        print(f"  Min cut_diff: {row['cut_diff_min']:.2f}")
+        print(f"  Mean runtime: {row['runtime_mean']:.2f}s")  # Changed 'runtime' to 'runtime_mean'
     
     # Create plots
     # 1. Distribution of cut_diff by model
@@ -97,116 +123,117 @@ def main():
     print("\nAnalyzing Success Rates...")
     
     # Define what constitutes success - exact match or within a tolerance
-    # Here we use exact match to optimum cut/energy
-    if 'opt_cut' in results.columns and 'opt_energy' in results.columns:
+    # Check if we have optimum values to compare against
+    if 'opt_cut' in results.columns and not results['opt_cut'].isna().all():
         results['reached_optimum_cut'] = results['cut_value'] == results['opt_cut']
-        results['reached_optimum_energy'] = results['energy'] == results['opt_energy']
         
-    # Calculate success rates by model
-    model_success = results.groupby('model').agg({
-        'reached_optimum_cut': 'mean',
-        'reached_optimum_energy': 'mean'
-    }).reset_index()
-    
-    # Convert to percentages
-    model_success['reached_optimum_cut'] *= 100
-    model_success['reached_optimum_energy'] *= 100
-    
-    print("\nSuccess Rates by Model:")
-    print(model_success)
-    
-    # Calculate success rates by model and parameter set
-    param_success = results.groupby(['model', 'param_id']).agg({
-        'reached_optimum_cut': 'mean',
-        'reached_optimum_energy': 'mean',
-        'cut_diff': 'mean',
-        'seed': 'count'  # number of runs
-    }).reset_index()
-    
-    # Convert to percentages
-    param_success['reached_optimum_cut'] *= 100
-    param_success['reached_optimum_energy'] *= 100
-    param_success.rename(columns={'seed': 'num_runs'}, inplace=True)
-    
-    print("\nTop 5 Parameter Sets by Success Rate:")
-    print(param_success.sort_values('reached_optimum_cut', ascending=False).head())
-    
-    # Create success rate bar chart
-    plt.figure(figsize=(12, 6))
-    bar_width = 0.35
-    x = np.arange(len(model_success))
-    
-    plt.bar(x - bar_width/2, model_success['reached_optimum_cut'], 
-            width=bar_width, label='Reached Optimum Cut')
-    plt.bar(x + bar_width/2, model_success['reached_optimum_energy'], 
-            width=bar_width, label='Reached Optimum Energy')
-    
-    plt.xlabel('Model')
-    plt.ylabel('Success Rate (%)')
-    plt.title('Success Rate by Model Type')
-    plt.xticks(x, model_success['model'])
-    plt.legend()
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.savefig(os.path.join(args.out_dir, 'success_rate_by_model.png'))
-    
-    # Create heatmap of success rates for each model's parameters
-    for model in results['model'].unique():
-        model_data = param_success[param_success['model'] == model]
+        # Calculate success rates by model
+        model_success = results.groupby('model').agg({
+            'reached_optimum_cut': 'mean'
+        }).reset_index()
         
-        if len(model_data) > 1:  # Only create heatmap if there are multiple parameter sets
-            # Extract key parameters for this model
-            if model == 'POLYNOMIAL':
-                if 'poly_order' in results.columns:
-                    pivot_table = create_success_heatmap(
-                        results[results['model'] == model], 
-                        'poly_order', 'gamma_schedule', 
-                        args.out_dir, f'{model.lower()}_success_heatmap.png'
-                    )
+        # Convert to percentages
+        model_success['reached_optimum_cut'] *= 100
+        
+        print("\nSuccess Rates by Model:")
+        print(model_success)
+        
+        # Calculate success rates by model and parameter set
+        param_success = results.groupby(['model', 'param_id']).agg({
+            'reached_optimum_cut': 'mean',
+            'cut_diff': 'mean',
+            'seed': 'count'  # number of runs
+        }).reset_index()
+        
+        # Convert to percentages
+        param_success['reached_optimum_cut'] *= 100
+        param_success.rename(columns={'seed': 'num_runs'}, inplace=True)
+        
+        print("\nTop 5 Parameter Sets by Success Rate:")
+        print(param_success.sort_values('reached_optimum_cut', ascending=False).head())
+        
+        # Create success rate bar chart
+        plt.figure(figsize=(12, 6))
+        x = np.arange(len(model_success))
+        
+        plt.bar(x, model_success['reached_optimum_cut'], width=0.6)
+        
+        plt.xlabel('Model')
+        plt.ylabel('Success Rate (%)')
+        plt.title('Success Rate by Model Type')
+        plt.xticks(x, model_success['model'])
+        plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.savefig(os.path.join(args.out_dir, 'success_rate_by_model.png'))
+        
+        # Create heatmap of success rates for each model's parameters
+        for model in results['model'].unique():
+            model_data = param_success[param_success['model'] == model]
             
-            elif model == 'NEC':
-                if 'alpha_rate' in results.columns and 'gamma' in results.columns:
-                    pivot_table = create_success_heatmap(
-                        results[results['model'] == model], 
-                        'alpha_rate', 'gamma',
-                        args.out_dir, f'{model.lower()}_success_heatmap.png'
-                    )
-            
-            elif model == 'SIGMOID':
-                if 'alpha' in results.columns:
-                    # For SIGMOID, we'll look at success rate by alpha value
-                    success_by_alpha = results[results['model'] == model].groupby('alpha').agg({
-                        'reached_optimum_cut': 'mean',
-                        'seed': 'count'
-                    }).reset_index()
-                    
-                    success_by_alpha['reached_optimum_cut'] *= 100
-                    plt.figure(figsize=(10, 6))
-                    plt.bar(success_by_alpha['alpha'].astype(str), success_by_alpha['reached_optimum_cut'])
-                    plt.xlabel('Alpha Value')
-                    plt.ylabel('Success Rate (%)')
-                    plt.title('SIGMOID Model: Success Rate by Alpha Value')
-                    plt.grid(axis='y', linestyle='--', alpha=0.7)
-                    plt.savefig(os.path.join(args.out_dir, 'sigmoid_alpha_success.png'))
+            if len(model_data) > 1:  # Only create heatmap if there are multiple parameter sets
+                # Extract key parameters for this model
+                if model == 'POLYNOMIAL':
+                    if 'poly_order' in results.columns and 'gamma_schedule' in results.columns:
+                        create_success_heatmap(
+                            results[results['model'] == model], 
+                            'poly_order', 'gamma_schedule', 
+                            args.out_dir, f'{model.lower()}_success_heatmap.png'
+                        )
+                
+                elif model == 'NEC':
+                    if 'alpha_rate' in results.columns and 'gamma' in results.columns:
+                        create_success_heatmap(
+                            results[results['model'] == model], 
+                            'alpha_rate', 'gamma',
+                            args.out_dir, f'{model.lower()}_success_heatmap.png'
+                        )
+                
+                elif model == 'SIGMOID':
+                    if 'alpha' in results.columns:
+                        # For SIGMOID, we'll look at success rate by alpha value
+                        success_by_alpha = results[results['model'] == model].groupby('alpha').agg({
+                            'reached_optimum_cut': 'mean',
+                            'seed': 'count'
+                        }).reset_index()
+                        
+                        success_by_alpha['reached_optimum_cut'] *= 100
+                        plt.figure(figsize=(10, 6))
+                        plt.bar(success_by_alpha['alpha'].astype(str), success_by_alpha['reached_optimum_cut'])
+                        plt.xlabel('Alpha Value')
+                        plt.ylabel('Success Rate (%)')
+                        plt.title('SIGMOID Model: Success Rate by Alpha Value')
+                        plt.grid(axis='y', linestyle='--', alpha=0.7)
+                        plt.savefig(os.path.join(args.out_dir, 'sigmoid_alpha_success.png'))
+    else:
+        print("\nNo optimum cut values available, skipping success rate analysis")
 
 def create_success_heatmap(data, param1, param2, output_dir, filename):
     """Create a heatmap showing success rates for combinations of two parameters"""
+    # Check if the required columns exist
+    if 'reached_optimum_cut' not in data.columns:
+        print(f"Warning: 'reached_optimum_cut' column not found, skipping {filename}")
+        return None
+        
     # Group by the two parameters and calculate success rate
-    pivot_data = data.groupby([param1, param2])['reached_optimum_cut'].mean().reset_index()
-    # Convert to percentage
-    pivot_data['reached_optimum_cut'] *= 100
-    
-    # Create pivot table for heatmap
-    pivot_table = pivot_data.pivot(index=param1, columns=param2, values='reached_optimum_cut')
-    
-    # Plot heatmap
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(pivot_table, annot=True, cmap='YlGnBu', fmt='.1f', 
-                cbar_kws={'label': 'Success Rate (%)'})
-    plt.title(f'Success Rate by {param1} and {param2}')
-    plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, filename))
-    
-    return pivot_table
+    try:
+        pivot_data = data.groupby([param1, param2])['reached_optimum_cut'].mean().reset_index()
+        # Convert to percentage
+        pivot_data['reached_optimum_cut'] *= 100
+        
+        # Create pivot table for heatmap
+        pivot_table = pivot_data.pivot(index=param1, columns=param2, values='reached_optimum_cut')
+        
+        # Plot heatmap
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(pivot_table, annot=True, cmap='YlGnBu', fmt='.1f', 
+                    cbar_kws={'label': 'Success Rate (%)'})
+        plt.title(f'Success Rate by {param1} and {param2}')
+        plt.tight_layout()
+        plt.savefig(os.path.join(output_dir, filename))
+        
+        return pivot_table
+    except Exception as e:
+        print(f"Error creating heatmap for {param1} and {param2}: {e}")
+        return None
 
 if __name__ == "__main__":
     main()

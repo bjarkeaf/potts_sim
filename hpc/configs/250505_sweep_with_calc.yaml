@@ -1,0 +1,58 @@
+# General configuration
+num_runs: 100  # Number of different seeds to run per parameter set
+# for band models, mu_max ~ 3
+graph_path: "graphs/band/"  # Can be a directory or single file
+out_dir: "results/"  # Directory to save results
+
+# Simulation parameters
+T: 500         # Total simulation time
+dt: 1e-3        # Time step
+# num_steps = 500e3
+num_states: 3   # Number of Potts states
+noise_factor: 1e-4  # Noise scaling
+
+# Parameter sweeps for each model type
+models:
+  POLYNOMIAL:
+    # dt = 1e-2
+    # poly_order = 3
+    poly_order: [3]  # Order of polynomial model
+    # Beta and gamma schedules use string notation that will be parsed
+    # beta = 1/mu_max:1e-3:1 => num_steps = (1-1/mu_max)/1e-3 = (1-1/3)/1e-3 = 667
+    # T = num_steps * dt = 6.67
+    beta_schedule: [??]  # Linear ramp from start to end
+    # gamma_factor = 0:0.1:8 (sweep)
+    gamma_schedule: [??]  # Linear ramp from start to end
+  
+  NEC:
+    # dt = 1e-2
+    # T = 5e3 (much more than 100, but maybe that's okay if dt is lower and alpha_rate is higher)
+    # alpha_rate = gain relaxation rate = 1e-2
+    # if we go T=5e3->500 and dt=1e-2->1e-3 we would have same num_steps, so alpha_rate=1e-1=0.1 would correspond
+    alpha_rate: [0.1]
+    # gamma = 0:0.2:4 (sweep)
+    gamma: [??]
+    # r_target = 2
+    r_target: [2.0]
+    # initial_alpha_arr will be generated with these values for all spins
+    # initial_alpha = -mu_max
+    initial_alpha: [??]
+  
+  SIGMOID:
+    # dt = 1e-3
+    # alpha -10:1:1 (sweep)
+    alpha: [??]
+    # beta_start = (1-alpha)/mu_max
+    # beta = beta_start:1e-3:(beta_start + 4) => num_steps = 4/1e-3 = 4000
+    # T = num_steps * dt = 4
+    beta_schedule: [?]
+    # gamma[i] = f*beta[i]
+    # f = 0:0.1:8 (sweep)
+    gamma_schedule: [??]
+  
+  FIXED_AMPLITUDE:
+    # dt = 1e-2, 
+    # gamma = 0:1e-3:2 => num_steps = 2/1e-3 = 2000
+    # T = num_steps * dt = 2e3 * 1e-2 = 20
+    # So using T=100, dt=1e-3 is fine
+    gamma_schedule: ["lin(0,2.0)"]
