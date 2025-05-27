@@ -504,6 +504,7 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     # Return results in a dictionary
     result = {
         "graph": graph['name'],
+        "num_spins": num_spins,
         "model": model_type.name,
         "param_id": param_set['id'],
         "seed": seed,
@@ -512,13 +513,13 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
         "step": best_step,
         "opt_cut": graph['opt_cut'],
         "opt_energy": graph['opt_energy'],
-        "cut_diff": best_cut - graph['opt_cut'] if graph['opt_cut'] is not None else None,
-        "energy_diff": best_energy - graph['opt_energy'] if graph['opt_energy'] is not None else None,
+        "cut_gap": best_cut - graph['opt_cut'] if graph['opt_cut'] is not None else None,
+        "energy_gap": best_energy - graph['opt_energy'] if graph['opt_energy'] is not None else None,
         "runtime": elapsed_time,
         "T": T,
         "dt": dt,
         "num_steps": num_steps,
-        "mu_max": mu_max
+        "mu_max": mu_max,
     }
     
     # Add model-specific parameters to the result

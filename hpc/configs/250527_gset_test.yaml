@@ -1,0 +1,43 @@
+# General configuration
+num_runs: 100  # Number of different seeds to run per parameter set
+graph_path: "graphs/gset/"  # Directory, file, or multiple directories/files
+out_dir: "results/"  # Directory to save results
+
+# Global simulation parameters (can be overridden per model)
+T: 500         # Total simulation time
+dt: 1e-3       # Time step
+num_states: 3  # Number of Potts states
+noise_factor: 1e-4  # Noise scaling
+
+# Parameter sweeps for each model type
+models:
+  POLYNOMIAL:
+    T: 10
+    dt: 1e-2
+    poly_order: [3]  # Order of polynomial model
+    beta_schedule: ["lin(1/mu_max, 1.0)"]  # Linear ramp from 1/mu_max to 1
+    gamma_schedule: # Gamma defined as a factor times beta
+      based_on: "beta_schedule"
+      factor: "0:0.1:8" # Matlab style: start:step:end
+  
+  NEC:
+    T: 5e3
+    dt: 1e-2
+    alpha_rate: [1e-2]
+    gamma: "0:0.2:4"
+    r_target: [2.0]
+    initial_alpha: "-mu_max"  # Will be evaluated for each graph
+  
+  SIGMOID:
+    T: 10
+    dt: 1e-3
+    alpha: "-10:1:1"
+    beta_schedule: ["lin((1-alpha)/mu_max, (1-alpha)/mu_max + 4)"]
+    gamma_schedule:
+      based_on: "beta_schedule"
+      factor: "0:0.1:8" 
+  
+  FIXED_AMPLITUDE:
+    T: 20
+    dt: 1e-2
+    gamma_schedule: ["lin(0,2.0)"]
