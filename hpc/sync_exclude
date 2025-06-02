@@ -8,12 +8,17 @@ analyze_results.py
 run_local_test.sh
 run_local_test.sh.save
 
+free_cores.sh
+best_packing.sh
+packing.sh
+
 # Directories to exclude (add trailing slash for clarity)
 .git/
 __pycache__/
 .vscode/
 plots/
 results_local/
+results/schedule_verification_*
 
 # You can also use patterns
 #*.log

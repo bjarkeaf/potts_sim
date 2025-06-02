@@ -15,8 +15,15 @@ from enum import Enum
 from datetime import datetime, timedelta
 from pathlib import Path
 
-# Constants for simulation and performance estimation
-ASSUMED_TIME_PER_STEP_US = 100  # Assumed processing time per step in microseconds
+"""
+Flags:
+- '--config': Path to the configuration YAML file.
+- `--estimate_wall_time`: Estimate wall time without running the sweep.
+    - If provided with a value, it specifies the number of ranks to use for estimation.
+    - If provided without a value, it uses the current MPI size.
+- `--plot_schedules`: Generate visualizations of the schedules that would be used in simulations.
+    - Saves plots to 'schedule_plots_{config name}/' directory.
+"""
 
 try:
     from mpi4py import MPI
@@ -39,6 +46,7 @@ from potts_utils import parse_graph
 
 class ModelType(Enum):
     """Enum for the different Potts model types"""
+    QPDC = "q-pdc" # alias for polynomial
     NEC = "nec"
     POLYNOMIAL = "polynomial" 
     SIGMOID = "sigmoid"
@@ -56,7 +64,7 @@ def get_git_revision():
 @functools.lru_cache(maxsize=32)
 def load_graph(graph_path):
     """Parse a graph file, cached to avoid repeated parsing"""
-    num_spins, num_edges, edges, opt_cut, opt_energy, mu_max = parse_graph(graph_path)
+    num_spins, num_edges, edges, opt_cut, opt_energy, mu_max, ave_abs_j = parse_graph(graph_path)
     return {
         'path': graph_path,
         'name': Path(graph_path).stem,
@@ -65,7 +73,8 @@ def load_graph(graph_path):
         'edges': edges,
         'opt_cut': opt_cut,
         'opt_energy': opt_energy,
-        'mu_max': mu_max,  # Now including mu_max in the graph dict
+        'mu_max': mu_max,
+        'ave_abs_j': ave_abs_j,
     }
 
 def safe_eval(expr, env):
@@ -134,6 +143,9 @@ def compile_schedule(expr):
             return exp_schedule
         else:
             raise ValueError(f"Exponential schedule needs 3 parameters: {expr}")
+    elif expr.startswith("const(") and expr.endswith(")"):
+        value_expr = expr[6:-1].strip()
+        return lambda n, env: [safe_eval(value_expr, env)] * n
     else:
         raise ValueError(f"Unknown schedule format: {expr}")
 
@@ -176,7 +188,7 @@ def expand_param_values(param_values, is_schedule=False):
             if isinstance(val, str):
                 if ':' in val:
                     expanded.extend(parse_range(val))
-                elif any(token in val for token in ['mu_max', 'alpha']):
+                elif any(token in val for token in ['mu_max', 'alpha', 'ave_abs_j']):
                     # This is an expression to be evaluated later with mu_max or alpha
                     expanded.append(val)  # Keep as string
                 else:
@@ -194,9 +206,9 @@ def generate_param_sets(model_type, model_params, T, dt):
     """Generate all parameter combinations for a model type"""
     num_steps = int(np.floor(T / dt))
     
-    # Common function to process schedule definitions including linked schedules
+    # Common function to process schedule definitions including linked and prototype schedules
     def process_schedule_param(param_name, default_value):
-        # Check if this is a linked schedule
+        # Check if this is a linked or prototype schedule
         if isinstance(model_params.get(param_name), dict):
             schedule_def = model_params[param_name]
             # This schedule is based on another with a factor
@@ -208,8 +220,17 @@ def generate_param_sets(model_type, model_params, T, dt):
                     'base_schedule': base_schedule,
                     'factors': factors
                 }
+            # This is a prototype schedule with a factor
+            elif 'prototype' in schedule_def and 'factor' in schedule_def:
+                prototype = schedule_def['prototype']
+                factors = expand_param_values(schedule_def['factor'])
+                return {
+                    'type': 'prototype',
+                    'prototype': prototype,
+                    'factors': factors
+                }
             else:
-                raise ValueError(f"Invalid linked schedule definition for {param_name}")
+                raise ValueError(f"Invalid schedule definition for {param_name}")
         else:
             # Store schedule expressions as strings, not compiled lambdas
             schedules = model_params.get(param_name, default_value)
@@ -221,7 +242,7 @@ def generate_param_sets(model_type, model_params, T, dt):
             }
     
     # For each model type, define how to generate parameter sets
-    if model_type == ModelType.POLYNOMIAL:
+    if model_type == ModelType.POLYNOMIAL or model_type == ModelType.QPDC:
         poly_orders = [int(po) for po in expand_param_values(model_params.get('poly_order', [3]))]
         
         # Process schedules
@@ -268,6 +289,34 @@ def generate_param_sets(model_type, model_params, T, dt):
                     'beta_based_on': 'gamma'
                 })
         
+        # Handle gamma as prototype with factors
+        elif beta_info['type'] == 'direct' and gamma_info['type'] == 'prototype':
+            for poly_order, beta_expr, factor in itertools.product(
+                    poly_orders, beta_info['schedules'], gamma_info['factors']):
+                param_id = f"po{poly_order}_b{beta_expr}_gpf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'beta_expr': beta_expr,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_factor': factor,
+                    'gamma_is_prototype': True
+                })
+        
+        # Handle beta as prototype with factors
+        elif gamma_info['type'] == 'direct' and beta_info['type'] == 'prototype':
+            for poly_order, gamma_expr, factor in itertools.product(
+                    poly_orders, gamma_info['schedules'], beta_info['factors']):
+                param_id = f"po{poly_order}_g{gamma_expr}_bpf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'gamma_expr': gamma_expr,
+                    'beta_prototype': beta_info['prototype'],
+                    'beta_factor': factor,
+                    'beta_is_prototype': True
+                })
+        
         else:
             raise ValueError("Invalid schedule linkage configuration")
             
@@ -276,26 +325,47 @@ def generate_param_sets(model_type, model_params, T, dt):
     elif model_type == ModelType.NEC:
         # Expand all parameter ranges
         alpha_rates = expand_param_values(model_params.get('alpha_rate', [1e-2]))
-        gammas = expand_param_values(model_params.get('gamma', [1.0]))
+        #gammas = expand_param_values(model_params.get('gamma', [1.0]))
         r_targets = expand_param_values(model_params.get('r_target', [2.0]))
         initial_alphas = expand_param_values(model_params.get('initial_alpha', [1.0]))
         
+        gamma_info = process_schedule_param('gamma_schedule', ["lin(0,2)"])
+
         param_sets = []
-        for alpha_rate, gamma, r_target, initial_alpha in itertools.product(
-                alpha_rates, gammas, r_targets, initial_alphas):
-            # Create a unique identifier for this parameter set
-            # Handle the case where initial_alpha is an expression string
-            ia_str = initial_alpha if isinstance(initial_alpha, str) else f"{initial_alpha}"
-            param_id = f"ar{alpha_rate:.2e}_g{gamma}_rt{r_target}_ia{ia_str}"
-            
-            param_sets.append({
-                'id': param_id,
-                'alpha_rate': alpha_rate,
-                'gamma': gamma,
-                'r_target': r_target,
-                'initial_alpha': initial_alpha,
-                'initial_alpha_expr': initial_alpha if isinstance(initial_alpha, str) else None
-            })
+
+        # Handle the case where gamma is directly specified
+        if gamma_info['type'] == 'direct':
+            for alpha_rate, r_target, initial_alpha, gamma_expr in itertools.product(
+                    alpha_rates, r_targets, initial_alphas, gamma_info['schedules']):
+                param_id = f"ar{alpha_rate:.2e}_rt{r_target}_ia{initial_alpha}_g{gamma_expr}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha_rate': alpha_rate,
+                    'gamma': gamma_expr,
+                    'r_target': r_target,
+                    'initial_alpha': initial_alpha,
+                    'initial_alpha_expr': initial_alpha if isinstance(initial_alpha, str) else None
+                })
+
+        # Handle gamma as prototype with factors
+        elif gamma_info['type'] == 'prototype':
+            for alpha_rate, r_target, initial_alpha, factor in itertools.product(
+                    alpha_rates, r_targets, initial_alphas, gamma_info['factors']):
+                param_id = f"ar{alpha_rate:.2e}_rt{r_target}_ia{initial_alpha}_gpf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha_rate': alpha_rate,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_factor': factor,
+                    'gamma_is_prototype': True,
+                    'r_target': r_target,
+                    'initial_alpha': initial_alpha,
+                    'initial_alpha_expr': initial_alpha if isinstance(initial_alpha, str) else None
+                })
+        
+        else:
+            raise ValueError("NEC model only supports direct or prototype gamma_schedule specification")
+
         return param_sets
         
     elif model_type == ModelType.SIGMOID:
@@ -319,7 +389,7 @@ def generate_param_sets(model_type, model_params, T, dt):
                     'beta_expr': beta_expr,
                     'gamma_expr': gamma_expr
                 })
-        
+    
         # Handle gamma based on beta with factor
         elif beta_info['type'] == 'direct' and gamma_info['type'] == 'linked' and gamma_info['base_schedule'] == 'beta_schedule':
             for alpha, beta_expr, factor in itertools.product(
@@ -332,7 +402,7 @@ def generate_param_sets(model_type, model_params, T, dt):
                     'gamma_factor': factor,
                     'gamma_based_on': 'beta'
                 })
-        
+    
         # Handle beta based on gamma with factor
         elif gamma_info['type'] == 'direct' and beta_info['type'] == 'linked' and beta_info['base_schedule'] == 'gamma_schedule':
             for alpha, gamma_expr, factor in itertools.product(
@@ -345,7 +415,35 @@ def generate_param_sets(model_type, model_params, T, dt):
                     'beta_factor': factor,
                     'beta_based_on': 'gamma'
                 })
-        
+    
+        # Handle gamma as prototype with factors
+        elif beta_info['type'] == 'direct' and gamma_info['type'] == 'prototype':
+            for alpha, beta_expr, factor in itertools.product(
+                    alphas, beta_info['schedules'], gamma_info['factors']):
+                param_id = f"a{alpha}_b{beta_expr}_gpf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'beta_expr': beta_expr,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_factor': factor,
+                    'gamma_is_prototype': True
+                })
+    
+        # Handle beta as prototype with factors
+        elif gamma_info['type'] == 'direct' and beta_info['type'] == 'prototype':
+            for alpha, gamma_expr, factor in itertools.product(
+                    alphas, gamma_info['schedules'], beta_info['factors']):
+                param_id = f"a{alpha}_g{gamma_expr}_bpf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'gamma_expr': gamma_expr,
+                    'beta_prototype': beta_info['prototype'],
+                    'beta_factor': factor,
+                    'beta_is_prototype': True
+                })
+    
         else:
             raise ValueError("Invalid schedule linkage configuration")
             
@@ -356,6 +454,8 @@ def generate_param_sets(model_type, model_params, T, dt):
         gamma_info = process_schedule_param('gamma_schedule', ["lin(0,2)"])
         
         param_sets = []
+
+        # Handle the case where gamma is directly specified
         if gamma_info['type'] == 'direct':
             for gamma_expr in gamma_info['schedules']:
                 param_id = f"g{gamma_expr}"
@@ -363,8 +463,19 @@ def generate_param_sets(model_type, model_params, T, dt):
                     'id': param_id,
                     'gamma_expr': gamma_expr
                 })
+
+        # Handle gamma as prototype with factors
+        elif gamma_info['type'] == 'prototype':
+            for factor in gamma_info['factors']:
+                param_id = f"gpf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_factor': factor,
+                    'gamma_is_prototype': True
+                })
         else:
-            raise ValueError("FIXED_AMPLITUDE model only supports direct gamma_schedule specification")
+            raise ValueError("FIXED_AMPLITUDE model only supports direct or prototype gamma_schedule specification")
             
         return param_sets
     
@@ -374,8 +485,10 @@ def generate_param_sets(model_type, model_params, T, dt):
 def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor):
     """Run a single task with the given parameters"""
     num_spins = graph['num_spins']
+    num_edges = graph['num_edges']
     edges = graph['edges']
     mu_max = graph['mu_max']
+    ave_abs_j = graph['ave_abs_j']
     start_time = time.time()
     
     # Calculate num_steps
@@ -387,16 +500,18 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     # Prepare environment for schedule evaluation
     env = {
         'mu_max': mu_max,
+        'ave_abs_j': ave_abs_j,
         'np': np
     }
     
     # Add model-specific parameters to environment
     for key, value in param_set.items():
-        if key not in ['id', 'beta_fn', 'gamma_fn', 'beta_factor', 'gamma_factor', 'beta_based_on', 'gamma_based_on']:
+        if key not in ['id', 'beta_fn', 'gamma_fn', 'beta_factor', 'gamma_factor', 'beta_based_on', 'gamma_based_on',
+                       'beta_is_prototype', 'gamma_is_prototype', 'beta_prototype', 'gamma_prototype']:
             env[key] = value
     
     # Evaluate schedules based on model type requirements
-    if model_type == ModelType.POLYNOMIAL:
+    if model_type == ModelType.POLYNOMIAL or model_type == ModelType.QPDC:
         # For POLYNOMIAL model
         if 'gamma_based_on' in param_set and param_set['gamma_based_on'] == 'beta':
             # gamma = factor * beta
@@ -406,6 +521,16 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             # beta = factor * gamma
             gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
             beta_schedule = [param_set['beta_factor'] * g for g in gamma_schedule]
+        elif 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            # gamma = prototype * factor
+            beta_schedule = compile_schedule(param_set['beta_expr'])(num_steps, env)
+            prototype_schedule = compile_schedule(param_set['gamma_prototype'])(num_steps, env)
+            gamma_schedule = [param_set['gamma_factor'] * p for p in prototype_schedule]
+        elif 'beta_is_prototype' in param_set and param_set['beta_is_prototype']:
+            # beta = prototype * factor
+            gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
+            prototype_schedule = compile_schedule(param_set['beta_prototype'])(num_steps, env)
+            beta_schedule = [param_set['beta_factor'] * p for p in prototype_schedule]
         else:
             # Both schedules directly defined
             beta_schedule = compile_schedule(param_set['beta_expr'])(num_steps, env)
@@ -426,6 +551,14 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     
     elif model_type == ModelType.NEC:
         # For NEC model
+        if 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            # gamma = prototype * factor
+            prototype_schedule = compile_schedule(param_set['gamma_prototype'])(num_steps, env)
+            gamma_schedule = [param_set['gamma_factor'] * p for p in prototype_schedule]
+        else:
+            # gamma schedule is directly defined
+            gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
+
         # Handle special case for initial_alpha if it's an expression
         if 'initial_alpha_expr' in param_set and param_set['initial_alpha_expr']:
             # Evaluate the expression (e.g., "mu_max * -1")
@@ -439,8 +572,8 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             T, dt, num_spins, num_states,
             edges,
             noise_factor, task_seed,
-            param_set['alpha_rate'], param_set['gamma'], param_set['r_target'],
-            initial_alpha_arr,
+            param_set['alpha_rate'], param_set['r_target'],
+            initial_alpha_arr, gamma_schedule,
             return_continuous_states=False,
             return_discrete_states=False,
             return_energy=True,
@@ -458,6 +591,16 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             # beta = factor * gamma
             gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
             beta_schedule = [param_set['beta_factor'] * g for g in gamma_schedule]
+        elif 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            # gamma = prototype * factor
+            beta_schedule = compile_schedule(param_set['beta_expr'])(num_steps, env)
+            prototype_schedule = compile_schedule(param_set['gamma_prototype'])(num_steps, env)
+            gamma_schedule = [param_set['gamma_factor'] * p for p in prototype_schedule]
+        elif 'beta_is_prototype' in param_set and param_set['beta_is_prototype']:
+            # beta = prototype * factor
+            gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
+            prototype_schedule = compile_schedule(param_set['beta_prototype'])(num_steps, env)
+            beta_schedule = [param_set['beta_factor'] * p for p in prototype_schedule]
         else:
             # Both schedules directly defined
             beta_schedule = compile_schedule(param_set['beta_expr'])(num_steps, env)
@@ -478,7 +621,13 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     
     elif model_type == ModelType.FIXED_AMPLITUDE:
         # For FIXED_AMPLITUDE model
-        gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
+        if 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            # gamma = prototype * factor
+            prototype_schedule = compile_schedule(param_set['gamma_prototype'])(num_steps, env)
+            gamma_schedule = [param_set['gamma_factor'] * p for p in prototype_schedule]
+        else:
+            # gamma schedule is directly defined
+            gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
         
         res = potts_sim.run_fixed_amplitude(
             T, dt, num_spins, num_states,
@@ -505,6 +654,7 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     result = {
         "graph": graph['name'],
         "num_spins": num_spins,
+        "num_edges": num_edges,
         "model": model_type.name,
         "param_id": param_set['id'],
         "seed": seed,
@@ -520,10 +670,11 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
         "dt": dt,
         "num_steps": num_steps,
         "mu_max": mu_max,
+        "ave_abs_j": ave_abs_j,
     }
     
     # Add model-specific parameters to the result
-    if model_type == ModelType.POLYNOMIAL:
+    if model_type == ModelType.POLYNOMIAL or model_type == ModelType.QPDC:
         result.update({
             "poly_order": param_set['poly_order']
         })
@@ -538,7 +689,20 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
                 "gamma_schedule": param_set['gamma_expr'],
                 "beta_factor": param_set['beta_factor']
             })
+        elif 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            result.update({
+                "beta_schedule": param_set['beta_expr'],
+                "gamma_prototype": param_set['gamma_prototype'],
+                "gamma_factor": param_set['gamma_factor']
+            })
+        elif 'beta_is_prototype' in param_set and param_set['beta_is_prototype']:
+            result.update({
+                "gamma_schedule": param_set['gamma_expr'],
+                "beta_prototype": param_set['beta_prototype'],
+                "beta_factor": param_set['beta_factor']
+            })
         else:
+            # Both schedules directly defined
             result.update({
                 "beta_schedule": param_set['beta_expr'],
                 "gamma_schedule": param_set['gamma_expr']
@@ -546,10 +710,19 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     elif model_type == ModelType.NEC:
         result.update({
             "alpha_rate": param_set['alpha_rate'],
-            "gamma": param_set['gamma'],
             "r_target": param_set['r_target'],
             "initial_alpha": param_set['initial_alpha']
         })
+        if 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            result.update({
+                "gamma_prototype": param_set['gamma_prototype'],
+                "gamma_factor": param_set['gamma_factor']
+            })
+        else:
+            # Directly specified gamma schedule
+            result.update({
+                "gamma_schedule": param_set['gamma_expr']
+            })
     elif model_type == ModelType.SIGMOID:
         result.update({
             "alpha": param_set['alpha']
@@ -565,17 +738,262 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
                 "gamma_schedule": param_set['gamma_expr'],
                 "beta_factor": param_set['beta_factor']
             })
+        elif 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            result.update({
+                "beta_schedule": param_set['beta_expr'],
+                "gamma_prototype": param_set['gamma_prototype'],
+                "gamma_factor": param_set['gamma_factor']
+            })
+        elif 'beta_is_prototype' in param_set and param_set['beta_is_prototype']:
+            result.update({
+                "gamma_schedule": param_set['gamma_expr'],
+                "beta_prototype": param_set['beta_prototype'],
+                "beta_factor": param_set['beta_factor']
+            })
         else:
+            # Both schedules directly defined
             result.update({
                 "beta_schedule": param_set['beta_expr'],
                 "gamma_schedule": param_set['gamma_expr']
             })
     elif model_type == ModelType.FIXED_AMPLITUDE:
-        result.update({
-            "gamma_schedule": param_set['gamma_expr']
-        })
+        if 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            result.update({
+                "gamma_prototype": param_set['gamma_prototype'],
+                "gamma_factor": param_set['gamma_factor']
+            })
+        else:
+            # Directly specified gamma schedule
+            result.update({
+                "gamma_schedule": param_set['gamma_expr']
+            })
     
     return result
+
+def sanitize_filename(name):
+    """Replace characters that are invalid in filenames with underscores"""
+    # Replace characters that are invalid in filenames
+    invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
+    for char in invalid_chars:
+        name = name.replace(char, '_')
+    return name
+
+def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
+    """Generate visualizations of schedules for a parameter set"""
+    import matplotlib.pyplot as plt # Only import matplotlib if needed
+    num_steps = int(np.floor(T / dt))
+    mu_max = graph['mu_max']
+    ave_abs_j = graph['ave_abs_j']
+    
+    # Prepare environment for schedule evaluation
+    env = {
+        'mu_max': mu_max,
+        'ave_abs_j': ave_abs_j,
+        'np': np
+    }
+    
+    # Add model-specific parameters to environment
+    for key, value in param_set.items():
+        if key not in ['id', 'beta_fn', 'gamma_fn', 'beta_factor', 'gamma_factor', 'beta_based_on', 'gamma_based_on',
+                       'beta_is_prototype', 'gamma_is_prototype', 'beta_prototype', 'gamma_prototype']:
+            env[key] = value
+    
+    # Create figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+    time_axis = np.linspace(0, T, num_steps)
+    
+    # Evaluate schedules based on model type
+    if model_type == ModelType.POLYNOMIAL or model_type == ModelType.QPDC:
+        # Evaluate beta schedule
+        if 'beta_is_prototype' in param_set and param_set['beta_is_prototype']:
+            prototype_schedule = compile_schedule(param_set['beta_prototype'])(num_steps, env)
+            beta_schedule = [param_set['beta_factor'] * p for p in prototype_schedule]
+            beta_label = f"Beta (prototype={param_set['beta_prototype']}, factor={param_set['beta_factor']})"
+        elif 'beta_based_on' in param_set and param_set['beta_based_on'] == 'gamma':
+            gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
+            beta_schedule = [param_set['beta_factor'] * g for g in gamma_schedule]
+            beta_label = f"Beta (based on gamma, factor={param_set['beta_factor']})"
+        else:
+            beta_schedule = compile_schedule(param_set['beta_expr'])(num_steps, env)
+            beta_label = f"Beta ({param_set['beta_expr']})"
+        
+        # Evaluate gamma schedule
+        if 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            prototype_schedule = compile_schedule(param_set['gamma_prototype'])(num_steps, env)
+            gamma_schedule = [param_set['gamma_factor'] * p for p in prototype_schedule]
+            gamma_label = f"Gamma (prototype={param_set['gamma_prototype']}, factor={param_set['gamma_factor']})"
+        elif 'gamma_based_on' in param_set and param_set['gamma_based_on'] == 'beta':
+            gamma_schedule = [param_set['gamma_factor'] * b for b in beta_schedule]
+            gamma_label = f"Gamma (based on beta, factor={param_set['gamma_factor']})"
+        else:
+            gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
+            gamma_label = f"Gamma ({param_set['gamma_expr']})"
+        
+        # Plot schedules
+        ax.plot(time_axis, beta_schedule, label=beta_label)
+        ax.plot(time_axis, gamma_schedule, label=gamma_label)
+        ax.set_title(f"{model_type.name} Model - Order: {param_set['poly_order']}")
+        
+    elif model_type == ModelType.NEC:
+        # For NEC model
+        if 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            prototype_schedule = compile_schedule(param_set['gamma_prototype'])(num_steps, env)
+            gamma_schedule = [param_set['gamma_factor'] * p for p in prototype_schedule]
+            gamma_label = f"Gamma (prototype={param_set['gamma_prototype']}, factor={param_set['gamma_factor']})"
+        else:
+            gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
+            gamma_label = f"Gamma ({param_set['gamma_expr']})"
+        
+        # Handle special case for initial_alpha if it's an expression
+        if 'initial_alpha_expr' in param_set and param_set['initial_alpha_expr']:
+            initial_alpha = safe_eval(param_set['initial_alpha_expr'], env)
+            alpha_label = f"Initial Alpha: {param_set['initial_alpha_expr']} = {initial_alpha}"
+        else:
+            initial_alpha = param_set['initial_alpha']
+            alpha_label = f"Initial Alpha: {initial_alpha}"
+        
+        # Plot gamma schedule
+        ax.plot(time_axis, gamma_schedule, label=gamma_label)
+        
+        # Add alpha rate and r_target as text annotations
+        alpha_rate_text = f"Alpha Rate: {param_set['alpha_rate']}"
+        r_target_text = f"R Target: {param_set['r_target']}"
+        
+        ax.text(0.02, 0.95, alpha_label, transform=ax.transAxes, verticalalignment='top')
+        ax.text(0.02, 0.90, alpha_rate_text, transform=ax.transAxes, verticalalignment='top')
+        ax.text(0.02, 0.85, r_target_text, transform=ax.transAxes, verticalalignment='top')
+        
+        ax.set_title(f"NEC Model")
+        
+    elif model_type == ModelType.SIGMOID:
+        # Evaluate beta schedule
+        if 'beta_is_prototype' in param_set and param_set['beta_is_prototype']:
+            prototype_schedule = compile_schedule(param_set['beta_prototype'])(num_steps, env)
+            beta_schedule = [param_set['beta_factor'] * p for p in prototype_schedule]
+            beta_label = f"Beta (prototype={param_set['beta_prototype']}, factor={param_set['beta_factor']})"
+        elif 'beta_based_on' in param_set and param_set['beta_based_on'] == 'gamma':
+            gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
+            beta_schedule = [param_set['beta_factor'] * g for g in gamma_schedule]
+            beta_label = f"Beta (based on gamma, factor={param_set['beta_factor']})"
+        else:
+            beta_schedule = compile_schedule(param_set['beta_expr'])(num_steps, env)
+            beta_label = f"Beta ({param_set['beta_expr']})"
+        
+        # Evaluate gamma schedule
+        if 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            prototype_schedule = compile_schedule(param_set['gamma_prototype'])(num_steps, env)
+            gamma_schedule = [param_set['gamma_factor'] * p for p in prototype_schedule]
+            gamma_label = f"Gamma (prototype={param_set['gamma_prototype']}, factor={param_set['gamma_factor']})"
+        elif 'gamma_based_on' in param_set and param_set['gamma_based_on'] == 'beta':
+            gamma_schedule = [param_set['gamma_factor'] * b for b in beta_schedule]
+            gamma_label = f"Gamma (based on beta, factor={param_set['gamma_factor']})"
+        else:
+            gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
+            gamma_label = f"Gamma ({param_set['gamma_expr']})"
+        
+        # Plot schedules
+        ax.plot(time_axis, beta_schedule, label=beta_label)
+        ax.plot(time_axis, gamma_schedule, label=gamma_label)
+        ax.text(0.02, 0.95, f"Alpha: {param_set['alpha']}", transform=ax.transAxes, verticalalignment='top')
+        ax.set_title(f"SIGMOID Model")
+        
+    elif model_type == ModelType.FIXED_AMPLITUDE:
+        # Evaluate gamma schedule
+        if 'gamma_is_prototype' in param_set and param_set['gamma_is_prototype']:
+            prototype_schedule = compile_schedule(param_set['gamma_prototype'])(num_steps, env)
+            gamma_schedule = [param_set['gamma_factor'] * p for p in prototype_schedule]
+            gamma_label = f"Gamma (prototype={param_set['gamma_prototype']}, factor={param_set['gamma_factor']})"
+        else:
+            gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
+            gamma_label = f"Gamma ({param_set['gamma_expr']})"
+        
+        # Plot schedule
+        ax.plot(time_axis, gamma_schedule, label=gamma_label)
+        ax.set_title(f"FIXED_AMPLITUDE Model")
+    
+    # Finalize the plot
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Parameter Value")
+    ax.legend()
+    ax.grid(True)
+    
+    # Save the plot with sanitized filename
+    sanitized_id = sanitize_filename(param_set['id'])
+    sanitized_model = sanitize_filename(model_type.name)
+    sanitized_graph = sanitize_filename(graph['name'])
+    
+    filename = f"{sanitized_model}_{sanitized_id}_{sanitized_graph}.png"
+    filepath = os.path.join(out_dir, filename)
+    fig.savefig(filepath, dpi=100, bbox_inches='tight')
+    plt.close(fig)
+    
+    return filepath
+
+def plot_config_schedules(config, graph_files, out_dir, config_basename):
+    """Plot all schedules in a configuration by generating visualizations"""
+
+    # Create output directory
+    plot_schedule_dir = os.path.join(out_dir, f"schedule_plots_{config_basename}")
+    os.makedirs(plot_schedule_dir, exist_ok=True)
+    
+    results = []
+    
+    # Use just the first graph file for visualizations to avoid redundancy
+    if graph_files:
+        graph = load_graph(graph_files[0])
+        
+        for model_name, model_params in config.get('models', {}).items():
+            try:
+                model_type = ModelType[model_name]
+            except KeyError:
+                print(f"Warning: Unknown model type {model_name}, skipping")
+                continue
+            
+            # Get model-specific simulation parameters
+            sim_params = get_model_specific_params(config, model_name)
+            
+            # Generate all parameter sets for this model
+            param_sets = generate_param_sets(model_type, model_params, sim_params['T'], sim_params['dt'])
+            
+            # Generate visualizations for each parameter set
+            for param_set in param_sets:
+                filepath = visualize_schedules(
+                    graph, model_type, param_set, 
+                    sim_params['T'], sim_params['dt'], 
+                    plot_schedule_dir
+                )
+                
+                results.append({
+                    'graph': graph['name'],
+                    'model': model_type.name,
+                    'param_id': param_set['id'],
+                    'visualization': filepath
+                })
+    
+    # Create an HTML index file for easy viewing
+    index_path = os.path.join(plot_schedule_dir, "index.html")
+    with open(index_path, 'w') as f:
+        f.write("<html><head><title>Schedule Verification</title></head><body>\n")
+        f.write("<h1>Schedule Verification Results</h1>\n")
+        
+        # Group by model type
+        for model_name in set(r['model'] for r in results):
+            f.write(f"<h2>{model_name} Model</h2>\n")
+            model_results = [r for r in results if r['model'] == model_name]
+            
+            for result in model_results:
+                rel_path = os.path.basename(result['visualization'])
+                f.write(f"<div><h3>{result['param_id']}</h3>\n")
+                f.write(f"<p>Graph: {result['graph']}</p>\n")
+                f.write(f"<img src='{rel_path}' style='max-width:800px;'><br>\n")
+                f.write("</div>\n")
+        
+        f.write("</body></html>")
+    
+    print(f"Schedule verification complete. {len(results)} visualizations generated.")
+    print(f"View results at: {index_path}")
+    
+    return index_path
 
 def main():
     # Initialize MPI or dummy
@@ -592,11 +1010,12 @@ def main():
     if rank == 0:
         parser = argparse.ArgumentParser(description='Run Potts model parameter sweep')
         parser.add_argument('--config', type=str, required=True, help='Path to configuration YAML file')
-        # Change how we store the argument to track when the flag is used
         parser.add_argument('--estimate_wall_time', nargs='?', const=True, type=int, metavar='RANKS',
                            help='Only estimate wall time without running the sweep; optionally specify number of ranks')
+        parser.add_argument('--plot_schedules', action='store_true',
+                           help='Generate visualizations of schedules without running simulations')
         args = parser.parse_args()
-        
+
         # Load configuration
         with open(args.config, 'r') as f:
             config = yaml.safe_load(f)
@@ -608,11 +1027,12 @@ def main():
         num_runs = int(config.get('num_runs', 100))
         graph_path_spec = config.get('graph_path', 'graphs/')
         out_dir = config.get('out_dir', 'results/')
+        assumed_time_per_step_us = config.get('assumed_time_per_step_us', 100)
         
         # Make sure output directory exists
         os.makedirs(out_dir, exist_ok=True)
         
-        # Identify graph files, handling both string and list specifications
+        # Identify graph files
         graph_files = []
         
         # Convert single path to list for uniform handling
@@ -641,6 +1061,17 @@ def main():
                 sys.exit(1)
             
         print(f"Found {len(graph_files)} graph files")
+        
+        # If schedule plot is requested, do that and exit
+        if args.plot_schedules:
+            plot_config_schedules(config, graph_files, out_dir, config_basename)
+            # Exit without running simulations
+            if use_mpi:
+                # Signal all ranks to exit
+                tasks = []  # Empty task list signals exit
+                out_dir = None
+            else:
+                sys.exit(0)
         
         # Build task list
         tasks = []
@@ -677,8 +1108,23 @@ def main():
         
         print(f"Generated {len(tasks)} tasks")
         
-        # Estimate total wall time
-        total_steps = sum(int(np.floor(task['T'] / task['dt'])) for task in tasks)
+        # Estimate total wall time, broken down by model type
+        model_steps = {}
+        model_tasks = {}
+        total_steps = 0
+        
+        for task in tasks:
+            model_name = task['model_type'].name
+            steps = int(np.floor(task['T'] / task['dt']))
+            
+            # Track steps by model type
+            if model_name not in model_steps:
+                model_steps[model_name] = 0
+                model_tasks[model_name] = 0
+            
+            model_steps[model_name] += steps
+            model_tasks[model_name] += 1
+            total_steps += steps
         
         # Determine number of ranks to use for estimation
         if args.estimate_wall_time is not None:
@@ -694,7 +1140,7 @@ def main():
         
         steps_per_rank = int(total_steps / max(1, estimation_ranks))
         
-        expected_runtime_us = steps_per_rank * ASSUMED_TIME_PER_STEP_US
+        expected_runtime_us = steps_per_rank * assumed_time_per_step_us
         expected_runtime_sec = expected_runtime_us / 1e6
         expected_runtime = timedelta(seconds=int(expected_runtime_sec))
         
@@ -706,8 +1152,18 @@ def main():
         print(f"Total steps          : {total_steps:,}")
         print(f"Ranks for estimate   : {estimation_ranks}")
         print(f"Steps per rank       : {steps_per_rank:,}")
-        print(f"Time per step        : {ASSUMED_TIME_PER_STEP_US} µs (assumed)")
+        print(f"Time per step        : {assumed_time_per_step_us} µs (assumed)")
         print(f"Expected runtime     : {expected_runtime}")
+        print("-"*80)
+        print("BREAKDOWN BY MODEL TYPE")
+        print("-"*80)
+        
+        # Sort models by number of steps (descending)
+        for model_name, steps in sorted(model_steps.items(), key=lambda x: x[1], reverse=True):
+            model_percent = (steps / total_steps) * 100 if total_steps > 0 else 0
+            model_runtime = timedelta(seconds=int((steps / estimation_ranks) * assumed_time_per_step_us / 1e6))
+            print(f"{model_name:16s}: {model_tasks[model_name]:,} tasks | {steps:,} steps ({model_percent:.1f}%) | ~{model_runtime}")
+        
         print("="*80 + "\n")
         
         # If only estimating wall time, exit here
@@ -729,7 +1185,7 @@ def main():
             'num_graphs': len(graph_files),
             'num_ranks': size,
             'estimated_runtime_seconds': expected_runtime_sec,
-            'assumed_time_per_step_us': ASSUMED_TIME_PER_STEP_US
+            'assumed_time_per_step_us': assumed_time_per_step_us
         }
         
         run_info_file = os.path.join(out_dir, f"run_info_{config_basename}.yaml")
@@ -742,11 +1198,13 @@ def main():
         run_info = None
         args = None
         config_basename = None
+        assumed_time_per_step_us = None
     
     # Broadcast task list, output directory and config basename to all ranks
     tasks = comm.bcast(tasks, root=0)
     out_dir = comm.bcast(out_dir, root=0)
     config_basename = comm.bcast(config_basename, root=0)
+    assumed_time_per_step_us = comm.bcast(assumed_time_per_step_us, root=0)
     
     # If tasks is empty and we're using MPI, it means we're just estimating wall time
     if use_mpi and not tasks:
@@ -878,7 +1336,7 @@ def main():
             'num_graphs': len(graph_files),
             'num_ranks': size,
             'total_steps_processed': total_steps,
-            'assumed_time_per_step_us': ASSUMED_TIME_PER_STEP_US,
+            'assumed_time_per_step_us': assumed_time_per_step_us,
             'estimated_runtime_seconds': expected_runtime_sec,
             'actual_time_per_step_us': avg_time_per_step_us,
             'actual_walltime_seconds': total_walltime

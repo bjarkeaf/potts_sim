@@ -16,11 +16,14 @@ def parse_graph(file_path, zero_based=False):
     opt_cut = None
     opt_energy = None
     mu_max = None
+    ave_abs_j = None
+
+    p_line_index = None
 
     lines = []
     with open(file_path, 'r') as f:
         lines = f.readlines()
-        for line in lines:
+        for i, line in enumerate(lines):
             line = line.strip()
             if not line:
                 continue
@@ -33,7 +36,11 @@ def parse_graph(file_path, zero_based=False):
             if line.startswith("c Maximum eigenvalue"):
                 mu_max = float(line.split(":")[1].strip())
                 continue
+            if line.startswith("c Average absolute coupling"):
+                ave_abs_j = float(line.split(":")[1].strip())
+                continue
             if line.startswith("p"):
+                p_line_index = i
                 parts = line.split()
                 if len(parts) >= 3:
                     num_spins = int(parts[1])
@@ -47,14 +54,13 @@ def parse_graph(file_path, zero_based=False):
 
     edges = np.array([sources, targets])
     coupling_values = np.array(coupling_coeffs)
-    
+
     # If mu_max wasn't found in the file, compute it
     if mu_max is None and num_spins is not None:
         mu_max = compute_max_eigenvalue(num_spins, sources, targets, coupling_values)
         
         # Update the file with the computed eigenvalue
         mu_max_line = f"c Maximum eigenvalue: {mu_max}\n"
-        p_line_index = next((i for i, line in enumerate(lines) if line.strip().startswith("p")), 0)
         lines.insert(p_line_index, mu_max_line)
         
         with open(file_path, 'w') as f:
@@ -62,7 +68,20 @@ def parse_graph(file_path, zero_based=False):
         
         print(f"Updated file with computed maximum eigenvalue: {mu_max}")
     
-    return num_spins, num_edges, edges, opt_cut, opt_energy, mu_max
+    # If average absolute coupling wasn't found, compute it
+    if ave_abs_j is None and coupling_values.size > 0:
+        ave_abs_j = np.mean(np.abs(coupling_values))
+        
+        # Update the file with the computed average absolute coupling
+        ave_abs_j_line = f"c Average absolute coupling: {ave_abs_j}\n"
+        lines.insert(p_line_index, ave_abs_j_line)
+        
+        with open(file_path, 'w') as f:
+            f.writelines(lines)
+        
+        print(f"Updated file with computed average absolute coupling: {ave_abs_j}")
+
+    return num_spins, num_edges, edges, opt_cut, opt_energy, mu_max, ave_abs_j
 
 def compute_max_eigenvalue(num_spins, i_indices, j_indices, J_values):
     """

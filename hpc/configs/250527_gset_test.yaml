@@ -1,7 +1,10 @@
 # General configuration
-num_runs: 100  # Number of different seeds to run per parameter set
+num_runs: 10  # Number of different seeds to run per parameter set
 graph_path: "graphs/gset/"  # Directory, file, or multiple directories/files
 out_dir: "results/"  # Directory to save results
+
+# Wall time estimation
+assumed_time_per_step_us: 500 # Assumed time between steps in microseconds
 
 # Global simulation parameters (can be overridden per model)
 T: 500         # Total simulation time

@@ -34,11 +34,10 @@ enum class ModelType {
  * @param polynomial_order        Order of polynomial nonlinearity (POLYNOMIAL).
  * @param alpha                   Alpha parameter (SIGMOID).
  * @param alpha_rate              Rate parameter (NEC).
- * @param gamma                   Coupling constant (NEC).
  * @param r_target                Target amplitude (NEC).
  * @param initial_alpha_arr       Initial alpha values per spin (NEC).
  * @param beta_schedule           Time‐dependent beta (POLYNOMIAL, SIGMOID).
- * @param gamma_schedule          Time‐dependent gamma (POLYNOMIAL, SIGMOID, FIXED_AMPLITUDE).
+ * @param gamma_schedule          Time‐dependent gamma (POLYNOMIAL, NEC, SIGMOID, FIXED_AMPLITUDE).
  * @param return_continuous_states If true, include complex‐state history.
  * @param return_discrete_states  If true, include discrete‐state history.
  * @param return_energy           If true, include energy history.
@@ -54,7 +53,6 @@ py::object run(
     int polynomial_order,
     double alpha,
     double alpha_rate,
-    double gamma,
     double r_target,
     const std::vector<double>& initial_alpha_arr,
     const std::vector<double>& beta_schedule,
@@ -114,9 +112,10 @@ py::object run(
         }
     }
 
-    // For POLYNOMIAL, SIGMOID, and FIXED_AMPLITUDE, check gamma_schedule length
+    // For POLYNOMIAL, NEC, SIGMOID, and FIXED_AMPLITUDE, check gamma_schedule length
     if (model_type == ModelType::POLYNOMIAL || 
         model_type == ModelType::SIGMOID || 
+        model_type == ModelType::NEC ||
         model_type == ModelType::FIXED_AMPLITUDE) {
         if (gamma_schedule.size() != static_cast<size_t>(num_steps)) {
             throw std::invalid_argument("gamma_schedule length must equal num_steps");
@@ -291,10 +290,10 @@ py::object run(
                     alpha_arr[i] += dt * alpha_rate * (sqrt_r_target - abs_x_sqrt);
 
                     // Calculate dx/dt
-                    //   dx_i/dt = -x_i - |x_i|^2 * x + gamma * conj(x_i)^(q-1) + coupling
+                    //   dx_i/dt = -x_i - |x_i|^2 * x + gamma[step] * conj(x_i)^(q-1) + coupling
                     dx_dt = alpha_arr[i] * x[i]
                             - abs_x_sq * x[i]
-                            + gamma * conj_pow
+                            + gamma_schedule[step] * conj_pow
                             + coupling_arr[i];
                     
                     // Update state
@@ -515,7 +514,7 @@ py::object run_polynomial(
         noise_factor, seed,
         ModelType::POLYNOMIAL,
         polynomial_order,
-        /*alpha*/0.0, /*alpha_rate*/0.0, /*gamma*/0.0, /*r_target*/0.0,
+        /*alpha*/0.0, /*alpha_rate*/0.0, /*r_target*/0.0,
         /*initial_alpha_arr*/{}, beta_schedule, gamma_schedule,
         return_continuous_states,
         return_discrete_states,
@@ -530,9 +529,9 @@ py::object run_nec(
     const py::array_t<int>& edges,
     double noise_factor, int seed,
     double alpha_rate,
-    double gamma,
     double r_target,
     const std::vector<double>& initial_alpha_arr,
+    const std::vector<double>& gamma_schedule,
     bool return_continuous_states,
     bool return_discrete_states,
     bool return_energy,
@@ -545,8 +544,8 @@ py::object run_nec(
         noise_factor, seed,
         ModelType::NEC,
         /*polynomial_order*/0,
-        /*alpha*/0.0, alpha_rate, gamma, r_target,
-        initial_alpha_arr, /*beta_schedule*/{}, /*gamma_schedule*/{},
+        /*alpha*/0.0, alpha_rate, r_target,
+        initial_alpha_arr, /*beta_schedule*/{}, gamma_schedule,
         return_continuous_states,
         return_discrete_states,
         return_energy,
@@ -574,7 +573,7 @@ py::object run_sigmoid(
         noise_factor, seed,
         ModelType::SIGMOID,
         /*polynomial_order*/0,
-        alpha, /*alpha_rate*/0.0, /*gamma*/0.0, /*r_target*/0.0,
+        alpha, /*alpha_rate*/0.0, /*r_target*/0.0,
         /*initial_alpha_arr*/{}, beta_schedule, gamma_schedule,
         return_continuous_states,
         return_discrete_states,
@@ -601,7 +600,7 @@ py::object run_fixed_amplitude(
         noise_factor, seed,
         ModelType::FIXED_AMPLITUDE,
         /*polynomial_order*/0,
-        /*alpha*/0.0, /*alpha_rate*/0.0, /*gamma*/0.0, /*r_target*/0.0,
+        /*alpha*/0.0, /*alpha_rate*/0.0, /*r_target*/0.0,
         /*initial_alpha_arr*/{}, /*beta_schedule*/{}, gamma_schedule,
         return_continuous_states,
         return_discrete_states,
@@ -640,8 +639,8 @@ PYBIND11_MODULE(potts_sim, m) {
     m.def("run_nec", &run_nec,
           py::arg("T"), py::arg("dt"), py::arg("num_spins"), py::arg("num_states"),
           py::arg("edges"), py::arg("noise_factor"), py::arg("seed") = 1,
-          py::arg("alpha_rate"), py::arg("gamma"), py::arg("r_target"),
-          py::arg("initial_alpha_arr"),
+          py::arg("alpha_rate"), py::arg("r_target"),
+          py::arg("initial_alpha_arr"), py::arg("gamma_schedule"),
           py::arg("return_continuous_states") = true,
           py::arg("return_discrete_states") = false,
           py::arg("return_energy") = false,

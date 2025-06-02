@@ -25,7 +25,7 @@ models:
     dt: 1e-2
     alpha_rate: [1e-2]
     gamma: "0:0.2:4"
-    r_target: [2.0]
+    r_target: [1.0, 1.5, 2.0]
     initial_alpha: "-mu_max"  # Will be evaluated for each graph
   
   SIGMOID:

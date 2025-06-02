@@ -69,6 +69,155 @@ def main():
         plot_models_by_max_success_count(results, args.out_dir, model_order)
     else:
         print("Warning: Cannot create max success count plot - required columns not found")
+    
+    # 4. Hyperparameter sweep plots for relative energy gap
+    if 'rel_energy_gap' in results.columns:
+        plot_hyperparam_energy_gaps(results, args.out_dir, model_order)
+    else:
+        print("Warning: Cannot create hyperparameter sweep plots - relative energy gap not found")
+
+def plot_hyperparam_energy_gaps(results, out_dir, model_order=None):
+    """
+    Plot the average relative energy gap versus hyperparameters for each model.
+    
+    For 1D hyperparameter sweeps: Line plot of gap vs parameter
+    For 2D hyperparameter sweeps: Heatmap with parameters as axes
+    For 3D+ hyperparameter sweeps: Skip plotting with a message
+    For no hyperparameter sweep: Skip plotting with a message
+    """
+    # Try to import seaborn for better heatmaps
+    try:
+        import seaborn as sns
+        has_seaborn = True
+    except ImportError:
+        has_seaborn = False
+    
+    # Process each model type separately
+    models = model_order if model_order else sorted(results['model'].unique())
+    
+    for model in models:
+        model_data = results[results['model'] == model].copy()
+        
+        # Skip if no data for this model
+        if model_data.empty:
+            continue
+            
+        # Identify which hyperparameters are being swept for this model
+        swept_params = identify_swept_hyperparameters(model_data)
+        
+        # Based on number of swept parameters, create appropriate plot
+        if len(swept_params) == 0:
+            print(f"Skipping hyperparameter plot for {model}: No parameters being swept")
+        elif len(swept_params) == 1:
+            param = swept_params[0]
+            print(f"Creating 1D hyperparameter plot for {model}: {param}")
+            plot_1d_hyperparam_gap(model_data, param, model, out_dir)
+        elif len(swept_params) == 2:
+            param1, param2 = swept_params
+            print(f"Creating 2D hyperparameter plot for {model}: {param1} vs {param2}")
+            plot_2d_hyperparam_gap(model_data, param1, param2, model, out_dir, has_seaborn)
+        else:
+            print(f"Skipping hyperparameter plot for {model}: More than 2 parameters being swept ({swept_params})")
+
+def identify_swept_hyperparameters(model_data):
+    """
+    Identify which hyperparameters are being swept.
+    Returns a list of parameter names that have multiple unique values.
+    """
+    # List of potential hyperparameters to check
+    potential_params = [
+        'poly_order', 'gamma_factor', 'beta_factor', 
+        'alpha_rate', 'r_target', 'alpha'
+    ]
+    
+    # Check which parameters have multiple unique values
+    swept_params = []
+    for param in potential_params:
+        if param in model_data.columns and len(model_data[param].unique()) > 1:
+            swept_params.append(param)
+    
+    return swept_params
+
+def plot_1d_hyperparam_gap(data, param, model, out_dir):
+    """Create a line plot of relative energy gap versus a single hyperparameter."""
+    plt.figure(figsize=(8, 5))
+    
+    # Group by the parameter and calculate mean relative energy gap
+    grouped = data.groupby(param)['rel_energy_gap'].mean().reset_index()
+    
+    # Sort by parameter value for proper line plot
+    grouped = grouped.sort_values(param)
+    
+    # Create the line plot
+    plt.plot(grouped[param], grouped['rel_energy_gap'], marker='o', linewidth=2)
+    
+    plt.xlabel(param)
+    plt.ylabel('Average Optimality Gap (%)')
+    plt.title(f'{model}: Energy Gap vs {param}')
+    plt.grid(True)
+    
+    # Save the plot
+    plt.tight_layout()
+    filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_1d_hyperparam.png'
+    plt.savefig(os.path.join(out_dir, filename), dpi=200)
+    plt.close()
+    
+    print(f"Saved 1D hyperparameter plot to {os.path.join(out_dir, filename)}")
+
+def plot_2d_hyperparam_gap(data, param1, param2, model, out_dir, has_seaborn):
+    """Create a heatmap of relative energy gap versus two hyperparameters."""
+    # Group by both parameters and calculate mean relative energy gap
+    grouped = data.groupby([param1, param2])['rel_energy_gap'].mean().reset_index()
+    
+    # Get unique values for each parameter, sorted
+    param1_values = sorted(grouped[param1].unique())
+    param2_values = sorted(grouped[param2].unique())
+    
+    # Determine which parameter has fewer unique values - use that as columns
+    if len(param1_values) <= len(param2_values):
+        # param1 has fewer values, use it as columns
+        x_param, y_param = param1, param2
+        x_values, y_values = param1_values, param2_values
+    else:
+        # param2 has fewer values, use it as columns
+        x_param, y_param = param2, param1
+        x_values, y_values = param2_values, param1_values
+    
+    # Create a pivot table for the heatmap with fewer points as columns
+    pivot = grouped.pivot_table(index=y_param, columns=x_param, values='rel_energy_gap')
+    
+    # Create the plot
+    plt.figure(figsize=(10, 8))
+    
+    if has_seaborn:
+        # Use seaborn for a nicer heatmap
+        import seaborn as sns
+        ax = sns.heatmap(pivot, cmap='viridis', annot=True, fmt=".2f",
+                   cbar_kws={'label': 'Average Optimality Gap (%)'})
+        
+        # Fix for Matplotlib 3.1.1 and later
+        bottom, top = ax.get_ylim()
+        ax.set_ylim(bottom + 0.5, top - 0.5)
+    else:
+        # Use matplotlib's imshow for the heatmap
+        im = plt.imshow(pivot.values, cmap='viridis', aspect='auto', origin='lower')
+        plt.colorbar(im, label='Average Optimality Gap (%)')
+        
+        # Set ticks and labels
+        plt.xticks(range(len(x_values)), x_values)
+        plt.yticks(range(len(y_values)), y_values)
+    
+    plt.xlabel(x_param)
+    plt.ylabel(y_param)
+    plt.title(f'{model}: Energy Gap vs {y_param} and {x_param}')
+    
+    # Save the plot
+    plt.tight_layout()
+    filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_2d_hyperparam.png'
+    plt.savefig(os.path.join(out_dir, filename), dpi=200)
+    plt.close()
+    
+    print(f"Saved 2D hyperparameter plot to {os.path.join(out_dir, filename)}")
 
 def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
     """Plot max success rate for each model versus graph, ordered by number of spins and success rate"""
