@@ -1,0 +1,11 @@
+timestamp: '2025-06-05T13:42:52.271265'
+git_revision: unknown
+config_file: configs/250602_G14-17.yaml
+num_tasks: 90400
+num_graphs: 4
+num_ranks: 120
+total_steps_processed: 41920000000
+assumed_time_per_step_us: 750
+estimated_runtime_seconds: 261999.99975
+actual_time_per_step_us: 514.4578378284477
+actual_walltime_seconds: 180833.79170918465

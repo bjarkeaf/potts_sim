@@ -5,12 +5,11 @@ isync.sh
 
 potts_sim.cpython-313-x86_64-linux-gnu.so
 analyze_results.py
+plot_benchmark.py
 run_local_test.sh
 run_local_test.sh.save
-
-free_cores.sh
-best_packing.sh
-packing.sh
+poll_free_cores_by_domain.sh
+free_cores_by_domain.sh
 
 # Directories to exclude (add trailing slash for clarity)
 .git/
@@ -19,6 +18,7 @@ __pycache__/
 plots/
 results_local/
 results/schedule_verification_*
+trash/
 
 # You can also use patterns
 #*.log
