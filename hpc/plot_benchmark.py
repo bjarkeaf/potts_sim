@@ -85,20 +85,13 @@ def main():
         plot_max_success_rate_by_graph(results, args.out_dir, model_order)
     else:
         print("Warning: Cannot create success rate plot - required columns not found")
-    
-    # 2. Absolute & relative optimality gap
-    if 'energy_gap' in results.columns:
-        plot_best_energy_gap_by_graph(results, args.out_dir, model_order)
-        plot_best_relative_energy_gap_by_graph(results, args.out_dir, model_order)
-    else:
-        print("Warning: Cannot create energy optimality gap plots - required columns not found")
-    
+        
     # 3. Absolute & relative cut gap
     if 'cut_gap' in results.columns:
-        plot_best_cut_gap_by_graph(results, args.out_dir, model_order)
-        plot_best_relative_cut_gap_by_graph(results, args.out_dir, model_order)
+        plot_optimality_gap(results, args.out_dir, model_order)
+        plot_relative_optimality_gap(results, args.out_dir, model_order)
     else:
-        print("Warning: Cannot create cut optimality gap plots - required columns not found")
+        print("Warning: Cannot create optimality gap plots - cut value columns not found")
     
     # 4. Hyperparameter sweep plots for cut gap (not energy gap)
     if 'cut_gap' in results.columns:
@@ -148,144 +141,8 @@ def get_best_params_by_graph_model(results, metric_col, is_minimize=True):
     # Return only the necessary columns
     return best_params[['graph', 'model', 'param_id']]
 
-def plot_best_energy_gap_by_graph(results, out_dir, model_order=None):
-    """Plot average optimality gap from ground state for each model versus number of spins using best parameters"""
-    # Get best parameters for each graph-model combination (minimize energy gap)
-    best_params = get_best_params_by_graph_model(results, 'energy_gap', is_minimize=True)
-    
-    # Filter results to only include best parameter combinations
-    filtered_results = pd.merge(
-        results, 
-        best_params, 
-        on=['graph', 'model', 'param_id']
-    )
-    
-    # Group by graph and model to calculate average optimality gap
-    avg_energy_gap = filtered_results.groupby(['graph', 'model'])['energy_gap'].mean().reset_index()
-    
-    # Add num_spins information by merging with results
-    graph_spins = results[['graph', 'num_spins']].drop_duplicates()
-    avg_energy_gap = avg_energy_gap.merge(graph_spins, on='graph')
-    
-    # Get all models
-    models = model_order if model_order else sorted(avg_energy_gap['model'].unique())
-    
-    # Get unique spin counts
-    spin_counts = sorted(graph_spins['num_spins'].unique())
-    
-    # Plot average optimality gap by number of spins for each model
-    plt.figure(figsize=(6, 3))
-    plt.title(f'{SERIES_NAME} | Best average energy gap')
-    
-    # Define bar positions
-    bar_positions = np.arange(len(spin_counts))
-    
-    # Calculate optimality gaps by spin count and model
-    diff_by_spin_model = {}
-    model_order_by_spin = {}
-    
-    for spin_count in spin_counts:
-        # Calculate optimality gap for each model for this spin count
-        diff_by_model = {}
-        for model in models:
-            model_data = avg_energy_gap[(avg_energy_gap['model'] == model) & 
-                                         (avg_energy_gap['num_spins'] == spin_count)]
-            diff = model_data['energy_gap'].mean() if not model_data.empty else 0
-            diff_by_model[model] = diff
-        
-        # Store differences for this spin count
-        diff_by_spin_model[spin_count] = diff_by_model
-        
-        # Sort models by optimality gap (ascending order - shorter to taller)
-        model_order_by_spin[spin_count] = sorted(models, key=lambda m: diff_by_model[m])
-    
-    # Plot bars for each spin count with models ordered by height
-    width = 0.8 / len(models)
-    
-    for i, spin_count in enumerate(spin_counts):
-        ordered_models = model_order_by_spin[spin_count]
-        
-        for j, model in enumerate(ordered_models):
-            diff = diff_by_spin_model[spin_count][model]
-            offset = (j - (len(models) - 1) / 2) * width
-            
-            # Use a consistent color for each model across all spin counts
-            model_idx = models.index(model)
-            plt.bar(bar_positions[i] + offset, diff, width, 
-                   color=plt.cm.tab10(model_idx % 10), 
-                   label=model if i == 0 and j == 0 else "")
-    
-    # Create a proper legend with all models
-    handles = [plt.Rectangle((0,0),1,1, color=plt.cm.tab10(models.index(model) % 10)) for model in models]
-    plt.legend(handles, models,
-               bbox_to_anchor=(1.05, 0.5),
-               loc='center left',
-               borderaxespad=0.0)
-    
-    plt.xlabel('Number of Spins')
-    plt.ylabel('Average energy gap\n'+r'($H - H_\mathrm{GS}$)')
-    plt.xticks(bar_positions, spin_counts)
-    plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'best_avg_energy_gap.png'), dpi=200)
-    print(f"Saved best average energy gap plot to {os.path.join(out_dir, 'best_avg_energy_gap.png')}")
-
-def plot_best_relative_energy_gap_by_graph(results, out_dir, model_order=None):
-    """Plot average relative energy gap (%) for each model versus number of spins using best parameters"""
-    # Get best parameters for each graph-model combination (minimize relative energy gap)
-    best_params = get_best_params_by_graph_model(results, 'rel_energy_gap', is_minimize=True)
-    
-    # Filter results to only include best parameter combinations
-    filtered_results = pd.merge(
-        results, 
-        best_params, 
-        on=['graph', 'model', 'param_id']
-    )
-    
-    # compute mean relative gap
-    avg_rel = filtered_results.groupby(['graph','model'])['rel_energy_gap'].mean().reset_index()
-    # merge spin counts
-    graph_spins = results[['graph','num_spins']].drop_duplicates()
-    avg_rel = avg_rel.merge(graph_spins, on='graph')
-    # determine model order and spins
-    models = model_order if model_order else sorted(avg_rel['model'].unique())
-    spin_counts = sorted(graph_spins['num_spins'].unique())
-    # setup plot
-    plt.figure(figsize=(6,3))
-    plt.title(f'{SERIES_NAME} | Best relative energy gap')
-    bar_positions = np.arange(len(spin_counts))
-    # calculate and sort bars
-    diff_by_spin = {}
-    order_by_spin = {}
-    for s in spin_counts:
-        dm = {m: avg_rel[(avg_rel.model==m)&(avg_rel.num_spins==s)]['rel_energy_gap'].mean() 
-              if not avg_rel[(avg_rel.model==m)&(avg_rel.num_spins==s)].empty else 0
-              for m in models}
-        diff_by_spin[s] = dm
-        order_by_spin[s] = sorted(models, key=lambda m: dm[m])
-    width = 0.8/len(models)
-    for i,s in enumerate(spin_counts):
-        for j,m in enumerate(order_by_spin[s]):
-            off = (j-(len(models)-1)/2)*width
-            plt.bar(bar_positions[i]+off, diff_by_spin[s][m], width,
-                    color=plt.cm.tab10(models.index(m)%10),
-                    label=m if i==0 and j==0 else "")
-    # legend, labels, save
-    handles = [plt.Rectangle((0,0),1,1,color=plt.cm.tab10(models.index(m)%10)) for m in models]
-    plt.legend(
-        handles, models,
-        bbox_to_anchor=(1.05, 0.5),
-        loc='center left',
-        borderaxespad=0.0
-    )
-    plt.xlabel('Number of Spins')
-    plt.ylabel('Average energy gap (%)')
-    plt.xticks(bar_positions, spin_counts)
-    plt.tight_layout()
-    plt.savefig(os.path.join(out_dir,'best_rel_avg_energy_gap.png'), dpi=200)
-    print(f"Saved best relative energy gap plot to {os.path.join(out_dir,'best_rel_avg_energy_gap.png')}")
-
-def plot_best_cut_gap_by_graph(results, out_dir, model_order=None):
-    """Plot average cut gap for each model versus number of spins using best parameters"""
+def plot_optimality_gap(results, out_dir, model_order=None):
+    """Plot best average optimality gap per model as horizontal bars."""
     # Get best parameters for each graph-model combination (minimize cut gap)
     best_params = get_best_params_by_graph_model(results, 'cut_gap', is_minimize=True)
     
@@ -296,77 +153,29 @@ def plot_best_cut_gap_by_graph(results, out_dir, model_order=None):
         on=['graph', 'model', 'param_id']
     )
     
-    # Group by graph and model to calculate average cut gap
-    avg_cut_gap = filtered_results.groupby(['graph', 'model'])['cut_gap'].mean().reset_index()
-    
-    # Add num_spins information by merging with results
-    graph_spins = results[['graph', 'num_spins']].drop_duplicates()
-    avg_cut_gap = avg_cut_gap.merge(graph_spins, on='graph')
-    
-    # Get all models
-    models = model_order if model_order else sorted(avg_cut_gap['model'].unique())
-    
-    # Get unique spin counts
-    spin_counts = sorted(graph_spins['num_spins'].unique())
-    
-    # Plot average cut gap by number of spins for each model
-    plt.figure(figsize=(6, 3))
-    plt.title(f'{SERIES_NAME} | Best average cut gap')
-    
-    # Define bar positions
-    bar_positions = np.arange(len(spin_counts))
-    
-    # Calculate cut gaps by spin count and model
-    diff_by_spin_model = {}
-    model_order_by_spin = {}
-    
-    for spin_count in spin_counts:
-        # Calculate cut gap for each model for this spin count
-        diff_by_model = {}
-        for model in models:
-            model_data = avg_cut_gap[(avg_cut_gap['model'] == model) & 
-                                     (avg_cut_gap['num_spins'] == spin_count)]
-            diff = model_data['cut_gap'].mean() if not model_data.empty else 0
-            diff_by_model[model] = diff
-        
-        # Store differences for this spin count
-        diff_by_spin_model[spin_count] = diff_by_model
-        
-        # Sort models by cut gap (ascending order - shorter to taller)
-        model_order_by_spin[spin_count] = sorted(models, key=lambda m: diff_by_model[m])
-    
-    # Plot bars for each spin count with models ordered by height
-    width = 0.8 / len(models)
-    
-    for i, spin_count in enumerate(spin_counts):
-        ordered_models = model_order_by_spin[spin_count]
-        
-        for j, model in enumerate(ordered_models):
-            diff = diff_by_spin_model[spin_count][model]
-            offset = (j - (len(models) - 1) / 2) * width
-            
-            # Use a consistent color for each model across all spin counts
-            model_idx = models.index(model)
-            plt.bar(bar_positions[i] + offset, diff, width, 
-                   color=plt.cm.tab10(model_idx % 10), 
-                   label=model if i == 0 and j == 0 else "")
-    
-    # Create a proper legend with all models
-    handles = [plt.Rectangle((0,0),1,1, color=plt.cm.tab10(models.index(model) % 10)) for model in models]
-    plt.legend(handles, models,
-               bbox_to_anchor=(1.05, 0.5),
-               loc='center left',
-               borderaxespad=0.0)
-    
-    plt.xlabel('Number of Spins')
-    plt.ylabel('Average cut gap\n'+r'($\mathrm{Cut}_\mathrm{opt} - \mathrm{Cut}$)')
-    plt.xticks(bar_positions, spin_counts)
-    plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'best_avg_cut_gap.png'), dpi=200)
-    print(f"Saved best average cut gap plot to {os.path.join(out_dir, 'best_avg_cut_gap.png')}")
+    # compute mean cut per model
+    mean_cut = filtered_results.groupby('model')['cut_gap'].mean().sort_values()
+    models = mean_cut.index.tolist()
+    values = mean_cut.values
 
-def plot_best_relative_cut_gap_by_graph(results, out_dir, model_order=None):
-    """Plot average relative cut gap (%) for each model versus number of spins using best parameters"""
+    plt.figure(figsize=(4, len(models)*0.6))
+    plt.title(f'{SERIES_NAME} | Absolute optimality gap')
+    ax = plt.gca()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    max_val = values.max()
+    offset = max_val * 0.01
+    plt.barh(models, values, color=plt.cm.tab10(range(len(models))))
+    for i, v in enumerate(values):
+        plt.text(v + offset, i, f'{v:.2f}', va='center', ha='left')
+    plt.xlabel('Average optimality gap (cut value)')
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, 'optimality_gaps.png'), dpi=200)
+    plt.close()
+    print(f"Saved best average optimality gap plot to {os.path.join(out_dir, 'optimality_gaps.png')}")
+
+def plot_relative_optimality_gap(results, out_dir, model_order=None):
+    """Plot best average relative optimality gap per model as horizontal bars."""
     # Get best parameters for each graph-model combination (minimize relative cut gap)
     best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True)
     
@@ -378,51 +187,29 @@ def plot_best_relative_cut_gap_by_graph(results, out_dir, model_order=None):
     )
     
     # compute mean relative gap
-    avg_rel = filtered_results.groupby(['graph','model'])['rel_cut_gap'].mean().reset_index()
-    # merge spin counts
-    graph_spins = results[['graph','num_spins']].drop_duplicates()
-    avg_rel = avg_rel.merge(graph_spins, on='graph')
-    # determine model order and spins
-    models = model_order if model_order else sorted(avg_rel['model'].unique())
-    spin_counts = sorted(graph_spins['num_spins'].unique())
-    # setup plot
-    plt.figure(figsize=(6,3))
-    plt.title(f'{SERIES_NAME} | Best relative cut gap')
-    bar_positions = np.arange(len(spin_counts))
-    # calculate and sort bars
-    diff_by_spin = {}
-    order_by_spin = {}
-    for s in spin_counts:
-        dm = {m: avg_rel[(avg_rel.model==m)&(avg_rel.num_spins==s)]['rel_cut_gap'].mean() 
-              if not avg_rel[(avg_rel.model==m)&(avg_rel.num_spins==s)].empty else 0
-              for m in models}
-        diff_by_spin[s] = dm
-        order_by_spin[s] = sorted(models, key=lambda m: dm[m])
-    width = 0.8/len(models)
-    for i,s in enumerate(spin_counts):
-        for j,m in enumerate(order_by_spin[s]):
-            off = (j-(len(models)-1)/2)*width
-            plt.bar(bar_positions[i]+off, diff_by_spin[s][m], width,
-                    color=plt.cm.tab10(models.index(m)%10),
-                    label=m if i==0 and j==0 else "")
-    # legend, labels, save
-    handles = [plt.Rectangle((0,0),1,1,color=plt.cm.tab10(models.index(m)%10)) for m in models]
-    plt.legend(
-        handles, models,
-        bbox_to_anchor=(1.05, 0.5),
-        loc='center left',
-        borderaxespad=0.0
-    )
-    plt.xlabel('Number of Spins')
-    plt.ylabel('Average cut gap (%)')
-    plt.xticks(bar_positions, spin_counts)
+    mean_rel_cut = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
+    models = mean_rel_cut.index.tolist()
+    values = mean_rel_cut.values
+
+    plt.figure(figsize=(4, len(models)*0.6))
+    plt.title(f'{SERIES_NAME} | Relative optimality gap')
+    ax = plt.gca()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    max_val = values.max()
+    offset = max_val * 0.01
+    plt.barh(models, values, color=plt.cm.tab10(range(len(models))))
+    for i, v in enumerate(values):
+        plt.text(v + offset, i, f'{v:.2f}%', va='center', ha='left')
+    plt.xlabel('Relative optimality gap (%)')
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir,'best_rel_avg_cut_gap.png'), dpi=200)
-    print(f"Saved best relative cut gap plot to {os.path.join(out_dir,'best_rel_avg_cut_gap.png')}")
+    plt.savefig(os.path.join(out_dir, 'rel_optimality_gaps.png'), dpi=200)
+    plt.close()
+    print(f"Saved best relative optimality gap plot to {os.path.join(out_dir, 'rel_optimality_gaps.png')}")
 
 def plot_hyperparams(results, out_dir, model_order=None):
     """
-    Plot the average relative cut gap versus hyperparameters for each model.
+    Plot the average relative optimality gap versus hyperparameters for each model.
     
     For 1D hyperparameter sweeps: Line plot of gap vs parameter
     For 2D hyperparameter sweeps: Heatmap with parameters as axes
@@ -471,7 +258,8 @@ def identify_swept_hyperparameters(model_data):
     # List of potential hyperparameters to check
     potential_params = [
         'poly_order', 'gamma_factor', 'beta_factor', 
-        'alpha_rate', 'r_target', 'alpha'
+        'alpha_rate', 'r_target', 'alpha',
+        'B_num_vertices', 'zeta'
     ]
     
     # Check which parameters have multiple unique values
@@ -496,8 +284,8 @@ def plot_1d_hyperparam(data, param, model, out_dir):
     plt.plot(grouped[param], grouped['rel_cut_gap'], marker='o', linewidth=2)
     
     plt.xlabel(param)
-    plt.ylabel('Average Cut Gap (%)')
-    plt.title(f'{SERIES_NAME} | {model}: Cut Gap vs {param}')
+    plt.ylabel('Average optimality gap (%)')
+    plt.title(f'{SERIES_NAME} | {model}: Cut gap vs. {param}')
     plt.grid(True)
     
     # Save the plot
@@ -537,19 +325,19 @@ def plot_2d_hyperparam(data, param1, param2, model, out_dir, has_seaborn):
         # Use seaborn for a nicer heatmap
         import seaborn as sns
         ax = sns.heatmap(pivot, cmap='viridis', annot=True, fmt=".2f",
-                         cbar_kws={'label': 'Average Cut Gap (%)'})
+                         cbar_kws={'label': 'Average optimality gap (%)'})
         bottom, top = ax.get_ylim()
         ax.set_ylim(bottom + 0.5, top - 0.5)
     else:
         # Use matplotlib's imshow for the heatmap
         im = plt.imshow(pivot.values, cmap='viridis', aspect='auto', origin='lower')
-        plt.colorbar(im, label='Average Cut Gap (%)')
+        plt.colorbar(im, label='Average optimality gap (%)')
         plt.xticks(range(len(x_values)), x_values)
         plt.yticks(range(len(y_values)), y_values)
     
     plt.xlabel(x_param)
     plt.ylabel(y_param)
-    plt.title(f'{SERIES_NAME} | {model}: Cut Gap vs {y_param} and {x_param}')
+    plt.title(f'{SERIES_NAME} | {model}: Cut gap vs. {y_param} and {x_param}')
     
     # Save the plot
     plt.tight_layout()
@@ -557,7 +345,7 @@ def plot_2d_hyperparam(data, param1, param2, model, out_dir, has_seaborn):
     plt.savefig(os.path.join(out_dir, filename), dpi=200)
     plt.close()
     
-    print(f"Saved 2D hyperparameter cut gap plot to {os.path.join(out_dir, filename)}")
+    print(f"Saved 2D hyperparameter optimality gap plot to {os.path.join(out_dir, filename)}")
 
 def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
     """Plot max success rate for each model versus graph, ordered by number of spins and success rate"""
@@ -631,118 +419,6 @@ def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, 'max_success_rate.png'), dpi=200)
     print(f"Saved max success rate plot to {os.path.join(out_dir, 'max_success_rate.png')}")
-
-def plot_energy_gap_by_graph(results, out_dir, model_order=None):
-    """Plot average optimality gap from ground state for each model versus number of spins"""
-    # Group by graph and model to calculate average optimality gap
-    avg_energy_gap = results.groupby(['graph', 'model'])['energy_gap'].mean().reset_index()
-    
-    # Add num_spins information by merging with results
-    graph_spins = results[['graph', 'num_spins']].drop_duplicates()
-    avg_energy_gap = avg_energy_gap.merge(graph_spins, on='graph')
-    
-    # Get all models
-    models = model_order if model_order else sorted(avg_energy_gap['model'].unique())
-    
-    # Get unique spin counts
-    spin_counts = sorted(graph_spins['num_spins'].unique())
-    
-    # Plot average optimality gap by number of spins for each model
-    plt.figure(figsize=(7, 3))
-    
-    # Define bar positions
-    bar_positions = np.arange(len(spin_counts))
-    
-    # Calculate optimality gaps by spin count and model
-    diff_by_spin_model = {}
-    model_order_by_spin = {}
-    
-    for spin_count in spin_counts:
-        # Calculate optimality gap for each model for this spin count
-        diff_by_model = {}
-        for model in models:
-            model_data = avg_energy_gap[(avg_energy_gap['model'] == model) & 
-                                         (avg_energy_gap['num_spins'] == spin_count)]
-            diff = model_data['energy_gap'].mean() if not model_data.empty else 0
-            diff_by_model[model] = diff
-        
-        # Store differences for this spin count
-        diff_by_spin_model[spin_count] = diff_by_model
-        
-        # Sort models by optimality gap (ascending order - shorter to taller)
-        model_order_by_spin[spin_count] = sorted(models, key=lambda m: diff_by_model[m])
-    
-    # Plot bars for each spin count with models ordered by height
-    width = 0.8 / len(models)
-    
-    for i, spin_count in enumerate(spin_counts):
-        ordered_models = model_order_by_spin[spin_count]
-        
-        for j, model in enumerate(ordered_models):
-            diff = diff_by_spin_model[spin_count][model]
-            offset = (j - (len(models) - 1) / 2) * width
-            
-            # Use a consistent color for each model across all spin counts
-            model_idx = models.index(model)
-            plt.bar(bar_positions[i] + offset, diff, width, 
-                   color=plt.cm.tab10(model_idx % 10), 
-                   label=model if i == 0 and j == 0 else "")
-    
-    # Create a proper legend with all models
-    handles = [plt.Rectangle((0,0),1,1, color=plt.cm.tab10(models.index(model) % 10)) for model in models]
-    plt.legend(handles, models)
-    
-    plt.xlabel('Number of Spins')
-    plt.ylabel('Average optimality gap\n'+r'($H - H_\mathrm{GS}$)')
-    #plt.title('Average optimality gap from Ground State by Model and Problem Size')
-    plt.xticks(bar_positions, spin_counts)
-    plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'avg_energy_gap.png'), dpi=200)
-    print(f"Saved average optimality gap plot to {os.path.join(out_dir, 'avg_energy_gap.png')}")
-
-def plot_relative_energy_gap_by_graph(results, out_dir, model_order=None):
-    """Plot average relative optimality gap (%) for each model versus number of spins"""
-    # compute mean relative gap
-    avg_rel = results.groupby(['graph','model'])['rel_energy_gap'].mean().reset_index()
-    # merge spin counts
-    graph_spins = results[['graph','num_spins']].drop_duplicates()
-    avg_rel = avg_rel.merge(graph_spins, on='graph')
-    # determine model order and spins
-    models = model_order if model_order else sorted(avg_rel['model'].unique())
-    spin_counts = sorted(graph_spins['num_spins'].unique())
-    # setup plot
-    plt.figure(figsize=(6,3))
-    bar_positions = np.arange(len(spin_counts))
-    # calculate and sort bars
-    diff_by_spin = {}
-    order_by_spin = {}
-    for s in spin_counts:
-        dm = {m: avg_rel[(avg_rel.model==m)&(avg_rel.num_spins==s)]['rel_energy_gap'].mean() 
-              if not avg_rel[(avg_rel.model==m)&(avg_rel.num_spins==s)].empty else 0
-              for m in models}
-        diff_by_spin[s] = dm
-        order_by_spin[s] = sorted(models, key=lambda m: dm[m])
-    width = 0.8/len(models)
-    for i,s in enumerate(spin_counts):
-        for j,m in enumerate(order_by_spin[s]):
-            off = (j-(len(models)-1)/2)*width
-            plt.bar(bar_positions[i]+off, diff_by_spin[s][m], width,
-                    color=plt.cm.tab10(models.index(m)%10),
-                    label=m if i==0 and j==0 else "")
-    # legend, labels, save
-    handles = [plt.Rectangle((0,0),1,1,color=plt.cm.tab10(models.index(m)%10)) for m in models]
-    plt.legend(
-        handles, models,
-        bbox_to_anchor=(1.05, 0.5),
-        loc='center left',
-        borderaxespad=0.0
-    )
-    plt.xlabel('Number of Spins')
-    plt.ylabel('Average optimality gap (%)')
-    plt.xticks(bar_positions, spin_counts)
-    plt.tight_layout()
-    plt.savefig(os.path.join(out_dir,'rel_avg_energy_gap.png'), dpi=200)
-    print(f"Saved relative optimality gap plot to {os.path.join(out_dir,'rel_avg_energy_gap.png')}")
 
 if __name__ == "__main__":
     main()

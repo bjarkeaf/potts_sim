@@ -1,5 +1,12 @@
-c Optimum cut value (max3cut): 15165
-c Optimum energy (max3cut): 4011
+c Optimum cut value (max-2-cut): 11624
+c Optimum energy (max-2-cut): 7552
+c
+c Optimum cut value (max-3-cut): 15165
+c Optimum energy (max-3-cut): 4011
+c
+c Optimum cut value (max-4-cut): 16803
+c Optimum energy (max-4-cut): 2373
+c
 c Average absolute coupling: 1.0
 c Maximum eigenvalue: 13.274151715691652
 p 800 19176 

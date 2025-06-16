@@ -77,6 +77,8 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "csignal": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "queue": "cpp",
+        "stack": "cpp"
     }
 }

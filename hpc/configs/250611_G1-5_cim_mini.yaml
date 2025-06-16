@@ -1,0 +1,21 @@
+# General configuration
+num_runs: 10  # Number of different seeds to run per parameter set
+graph_path: "graphs/gset/G1-5/"  # Directory, file, or multiple directories/files
+out_dir: "results/"  # Directory to save results
+
+# Wall time estimation
+assumed_time_per_step_us: 5000 # Assumed time between steps in microseconds
+
+# Global simulation parameters (can be overridden per model)
+T: 5e3         # Total simulation time
+dt: 1e-2       # Time step
+num_states: 3  # Number of Potts states
+noise_factor: 1e-4  # Noise scaling
+
+# Parameter sweeps for each model type
+models:
+  CIM:
+    alpha: [-20,-10]
+    beta_schedule: ["lin(0,0.005)"]
+    B_num_vertices: "0:10:60" # B * num_vertices, so B = B_num_vertices / num_vertices
+    zeta: 0.6

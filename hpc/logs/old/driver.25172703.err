@@ -1,0 +1,11 @@
+Loaded dependency [python3/3.13.2]: sqlite3/3.49.0
+Loaded dependency [python3/3.13.2]: gcc/12.4.0-binutils-2.42
+Loaded module: python3/3.13.2
+
+Loading python3/3.13.2
+  Loading requirement: sqlite3/3.49.0 gcc/12.4.0-binutils-2.42
+Loaded dependency [mpi4py/4.0.2-python-3.13.2-openmpi-5.0.6]: mpi/5.0.6-gcc-12.4.0-binutils-2.42
+Loaded module: mpi4py/4.0.2-python-3.13.2-openmpi-5.0.6
+
+Loading mpi4py/4.0.2-python-3.13.2-openmpi-5.0.6
+  Loading requirement: mpi/5.0.6-gcc-12.4.0-binutils-2.42

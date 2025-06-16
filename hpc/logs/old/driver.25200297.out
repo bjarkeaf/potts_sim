@@ -1,0 +1,778 @@
+Found 5 graph files
+Generated 3000 tasks
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 3,000
+Total steps          : 2,045,000,000
+Ranks for estimate   : 64
+Steps per rank       : 31,953,125
+Time per step        : 300 µs (assumed)
+Expected runtime     : 2:39:45
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 600 tasks | 1,200,000,000 steps (58.7%) | ~1:33:45
+NEC             : 1,400 tasks | 700,000,000 steps (34.2%) | ~0:54:41
+QPDC            : 550 tasks | 55,000,000 steps (2.7%) | ~0:04:17
+FIXED_AMPLITUDE : 50 tasks | 50,000,000 steps (2.4%) | ~0:03:54
+POLYNOMIAL      : 400 tasks | 40,000,000 steps (2.0%) | ~0:03:07
+================================================================================
+
+Rank 0: Processing 47 tasks
+Rank 4: Processing 47 tasks
+Rank 28: Processing 47 tasks
+Rank 12: Processing 47 tasks
+Rank 36: Processing 47 tasks
+Rank 56: Processing 46 tasks
+Rank 44: Processing 47 tasks
+Rank 60: Processing 46 tasks
+Rank 32: Processing 47 tasks
+Rank 52: Processing 47 tasks
+Rank 40: Processing 47 tasks
+Rank 48: Processing 47 tasks
+Rank 50: Processing 47 tasks
+Rank 34: Processing 47 tasks
+Rank 54: Processing 47 tasks
+Rank 24: Processing 47 tasks
+Rank 8: Processing 47 tasks
+Rank 38: Processing 47 tasks
+Rank 58: Processing 46 tasks
+Rank 42: Processing 47 tasks
+Rank 53: Processing 47 tasks
+Rank 39: Processing 47 tasks
+Rank 35: Processing 47 tasks
+Rank 33: Processing 47 tasks
+Rank 37: Processing 47 tasks
+Rank 45: Processing 47 tasks
+Rank 47: Processing 47 tasks
+Rank 43: Processing 47 tasks
+Rank 46: Processing 47 tasks
+Rank 41: Processing 47 tasks
+Rank 20: Processing 47 tasks
+Rank 49: Processing 47 tasks
+Rank 59: Processing 46 tasks
+Rank 63: Processing 46 tasks
+Rank 61: Processing 46 tasks
+Rank 51: Processing 47 tasks
+Rank 62: Processing 46 tasks
+Rank 55: Processing 47 tasks
+Rank 57: Processing 46 tasks
+Rank 16: Processing 47 tasks
+Rank 1: Processing 47 tasks
+Rank 2: Processing 47 tasks
+Rank 10: Processing 47 tasks
+Rank 5: Processing 47 tasks
+Rank 29: Processing 47 tasks
+Rank 13: Processing 47 tasks
+Rank 25: Processing 47 tasks
+Rank 9: Processing 47 tasks
+Rank 17: Processing 47 tasks
+Rank 21: Processing 47 tasks
+Rank 18: Processing 47 tasks
+Rank 26: Processing 47 tasks
+Rank 19: Processing 47 tasks
+Rank 27: Processing 47 tasks
+Rank 11: Processing 47 tasks
+Rank 22: Processing 47 tasks
+Rank 3: Processing 47 tasks
+Rank 14: Processing 47 tasks
+Rank 23: Processing 47 tasks
+Rank 15: Processing 47 tasks
+Rank 7: Processing 47 tasks
+Rank 6: Processing 47 tasks
+Rank 31: Processing 47 tasks
+Rank 30: Processing 47 tasks
+Rank 19: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.4 µs avg, 0.0 µs current
+Rank 19: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 52: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.5 µs avg, 0.0 µs current
+Rank 52: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 19: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 58: Completed 1/46 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.5 µs avg, 0.0 µs current
+Rank 59: Completed 1/46 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.5 µs avg, 0.0 µs current
+Rank 58: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 59: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 7: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.5 µs avg, 0.0 µs current
+Rank 52: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 62: Completed 1/46 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.5 µs avg, 0.0 µs current
+Rank 62: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 8: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.5 µs avg, 0.0 µs current
+Rank 58: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 59: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 25: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.5 µs avg, 0.0 µs current
+Rank 25: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 0: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.6 µs avg, 0.0 µs current
+Rank 25: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 5: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.6 µs avg, 0.0 µs current
+Rank 31: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.6 µs avg, 0.0 µs current
+Rank 31: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 31: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 56: Completed 1/46 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 56: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 60: Completed 1/46 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 48: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 60: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 48: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 63: Completed 1/46 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 63: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 24: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 24: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 56: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 60: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 48: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 24: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 6: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 10: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 17: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 15: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 17: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 44: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 37: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 33: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 44: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 51: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 37: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 33: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 51: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 3: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 29: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.7 µs avg, 0.0 µs current
+Rank 36: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 53: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 29: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 36: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 53: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 17: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 38: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 38: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 4: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 37: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 33: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 51: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 44: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 29: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 36: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 53: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 38: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 18: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 18: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 9: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 61: Completed 1/46 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 61: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 18: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 55: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.9 µs avg, 0.0 µs current
+Rank 55: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 43: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.9 µs avg, 0.0 µs current
+Rank 43: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 27: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.8 µs avg, 0.0 µs current
+Rank 61: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 27: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 28: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.9 µs avg, 0.0 µs current
+Rank 54: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.9 µs avg, 0.0 µs current
+Rank 28: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 54: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 55: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 43: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 27: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 28: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 54: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 14: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.9 µs avg, 0.0 µs current
+Rank 2: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.9 µs avg, 0.0 µs current
+Rank 32: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.9 µs avg, 0.0 µs current
+Rank 32: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 47: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 146.9 µs avg, 0.0 µs current
+Rank 47: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 40: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.0 µs avg, 0.0 µs current
+Rank 40: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 32: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 47: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 50: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.0 µs avg, 0.0 µs current
+Rank 50: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 40: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 26: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.0 µs avg, 0.0 µs current
+Rank 26: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 41: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.0 µs avg, 0.0 µs current
+Rank 50: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 41: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 42: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.0 µs avg, 0.0 µs current
+Rank 42: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 26: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 49: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.1 µs avg, 0.0 µs current
+Rank 49: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 41: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 21: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.1 µs avg, 0.0 µs current
+Rank 42: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 21: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 49: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 45: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.1 µs avg, 0.0 µs current
+Rank 21: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 45: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 13: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.1 µs avg, 0.0 µs current
+Rank 34: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.1 µs avg, 0.0 µs current
+Rank 34: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 45: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 34: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 11: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.2 µs avg, 0.0 µs current
+Rank 35: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.2 µs avg, 0.0 µs current
+Rank 35: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 12: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.2 µs avg, 0.0 µs current
+Rank 20: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.2 µs avg, 0.0 µs current
+Rank 20: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 35: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 46: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.3 µs avg, 0.0 µs current
+Rank 46: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 20: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 46: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 22: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.3 µs avg, 0.0 µs current
+Rank 22: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 22: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 23: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.5 µs avg, 0.0 µs current
+Rank 23: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 23: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 30: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.6 µs avg, 0.0 µs current
+Rank 30: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 57: Completed 1/46 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.7 µs avg, 0.0 µs current
+Rank 57: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 30: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 57: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 1: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.7 µs avg, 0.0 µs current
+Rank 39: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 147.8 µs avg, 0.0 µs current
+Rank 39: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 39: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 16: Completed 1/47 tasks | Runtime: 0:00:14 | ETA: 0:00:00 | Time/step: 148.1 µs avg, 0.0 µs current
+Rank 16: Error processing task 1: name 'ave_abs_j' is not defined
+Rank 16: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 8: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 5: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 7: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 0: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 6: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 2: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 14: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 3: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 9: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 4: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 15: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 10: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 13: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 12: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 11: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 1: Error processing task 2: name 'ave_abs_j' is not defined
+Rank 19: Completed 11/47 tasks | Runtime: 0:18:18 | ETA: 1:19:43 | Time/step: 192.7 µs avg, 186.8 µs current
+Rank 19: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 19: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 18: Completed 11/47 tasks | Runtime: 0:18:18 | ETA: 1:19:43 | Time/step: 192.7 µs avg, 186.9 µs current
+Rank 18: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 18: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 21: Completed 11/47 tasks | Runtime: 0:18:19 | ETA: 1:19:49 | Time/step: 193.0 µs avg, 187.1 µs current
+Rank 21: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 21: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 20: Completed 11/47 tasks | Runtime: 0:18:20 | ETA: 1:19:50 | Time/step: 193.0 µs avg, 187.1 µs current
+Rank 20: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 20: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 16: Completed 11/47 tasks | Runtime: 0:18:21 | ETA: 1:19:54 | Time/step: 193.2 µs avg, 187.3 µs current
+Rank 16: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 16: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 17: Completed 11/47 tasks | Runtime: 0:18:21 | ETA: 1:19:57 | Time/step: 193.2 µs avg, 187.4 µs current
+Rank 17: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 17: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 15: Completed 11/47 tasks | Runtime: 0:18:35 | ETA: 1:20:58 | Time/step: 192.3 µs avg, 189.8 µs current
+Rank 15: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 15: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 14: Completed 11/47 tasks | Runtime: 0:18:36 | ETA: 1:21:04 | Time/step: 192.5 µs avg, 190.0 µs current
+Rank 14: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 14: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 61: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 61: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 58: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 58: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 56: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 56: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 59: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 59: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 52: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 52: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 54: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 54: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 60: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 60: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 53: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 53: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 55: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 55: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 49: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 49: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 51: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 51: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 48: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 48: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 50: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 50: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 57: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 57: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 45: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 45: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 44: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 44: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 46: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 46: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 43: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 43: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 47: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 47: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 42: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 42: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 41: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 41: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 40: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 40: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 36: Completed 11/47 tasks | Runtime: 0:22:40 | ETA: 1:31:06 | Time/step: 215.9 µs avg, 210.2 µs current
+Rank 36: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 35: Completed 11/47 tasks | Runtime: 0:22:42 | ETA: 1:31:13 | Time/step: 216.2 µs avg, 210.5 µs current
+Rank 35: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 37: Completed 11/47 tasks | Runtime: 0:22:42 | ETA: 1:31:15 | Time/step: 216.3 µs avg, 210.6 µs current
+Rank 37: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 34: Completed 11/47 tasks | Runtime: 0:22:43 | ETA: 1:31:20 | Time/step: 216.5 µs avg, 210.8 µs current
+Rank 34: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 38: Completed 11/47 tasks | Runtime: 0:22:44 | ETA: 1:27:52 | Time/step: 216.6 µs avg, 210.9 µs current
+Rank 38: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 32: Completed 11/47 tasks | Runtime: 0:22:45 | ETA: 1:31:28 | Time/step: 216.8 µs avg, 211.1 µs current
+Rank 32: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 39: Completed 11/47 tasks | Runtime: 0:22:47 | ETA: 1:28:03 | Time/step: 217.1 µs avg, 211.4 µs current
+Rank 39: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 33: Completed 11/47 tasks | Runtime: 0:22:53 | ETA: 1:32:00 | Time/step: 218.0 µs avg, 212.3 µs current
+Rank 33: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 31: Completed 11/47 tasks | Runtime: 0:22:55 | ETA: 1:35:20 | Time/step: 218.3 µs avg, 212.6 µs current
+Rank 31: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 28: Completed 11/47 tasks | Runtime: 0:22:57 | ETA: 1:28:42 | Time/step: 218.6 µs avg, 212.9 µs current
+Rank 28: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 24: Completed 11/47 tasks | Runtime: 0:22:58 | ETA: 1:28:48 | Time/step: 218.8 µs avg, 213.1 µs current
+Rank 24: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 25: Completed 11/47 tasks | Runtime: 0:22:58 | ETA: 1:28:49 | Time/step: 218.9 µs avg, 213.2 µs current
+Rank 25: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 29: Completed 11/47 tasks | Runtime: 0:22:59 | ETA: 1:28:50 | Time/step: 218.9 µs avg, 213.2 µs current
+Rank 29: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 26: Completed 11/47 tasks | Runtime: 0:22:59 | ETA: 1:28:52 | Time/step: 219.0 µs avg, 213.3 µs current
+Rank 26: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 27: Completed 11/47 tasks | Runtime: 0:22:59 | ETA: 1:28:53 | Time/step: 219.0 µs avg, 213.3 µs current
+Rank 27: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 30: Completed 11/47 tasks | Runtime: 0:23:00 | ETA: 1:35:41 | Time/step: 219.2 µs avg, 213.4 µs current
+Rank 30: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 63: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 63: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 62: Error processing task 10: name 'ave_abs_j' is not defined
+Rank 62: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 8: Completed 11/47 tasks | Runtime: 0:24:05 | ETA: 1:29:46 | Time/step: 212.5 µs avg, 210.4 µs current
+Rank 8: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 8: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 9: Completed 11/47 tasks | Runtime: 0:24:06 | ETA: 1:29:49 | Time/step: 212.7 µs avg, 210.5 µs current
+Rank 9: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 9: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 10: Completed 11/47 tasks | Runtime: 0:24:07 | ETA: 1:29:54 | Time/step: 212.9 µs avg, 210.7 µs current
+Rank 10: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 10: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 12: Completed 11/47 tasks | Runtime: 0:24:07 | ETA: 1:29:54 | Time/step: 212.9 µs avg, 210.7 µs current
+Rank 12: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 12: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 7: Completed 11/47 tasks | Runtime: 0:24:08 | ETA: 1:33:05 | Time/step: 212.9 µs avg, 210.8 µs current
+Rank 7: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 7: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 5: Completed 11/47 tasks | Runtime: 0:24:08 | ETA: 1:26:28 | Time/step: 213.1 µs avg, 210.9 µs current
+Rank 5: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 5: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 2: Completed 11/47 tasks | Runtime: 0:24:10 | ETA: 1:26:34 | Time/step: 213.3 µs avg, 211.2 µs current
+Rank 2: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 2: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 6: Completed 11/47 tasks | Runtime: 0:24:10 | ETA: 1:33:16 | Time/step: 213.3 µs avg, 211.2 µs current
+Rank 6: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 6: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 0: Completed 11/47 tasks | Runtime: 0:24:10 | ETA: 1:26:35 | Time/step: 213.4 µs avg, 211.2 µs current
+Rank 0: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 0: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 11: Completed 11/47 tasks | Runtime: 0:24:11 | ETA: 1:30:10 | Time/step: 213.5 µs avg, 211.3 µs current
+Rank 11: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 11: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 4: Completed 11/47 tasks | Runtime: 0:24:12 | ETA: 1:26:39 | Time/step: 213.5 µs avg, 211.4 µs current
+Rank 4: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 4: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 3: Completed 11/47 tasks | Runtime: 0:24:12 | ETA: 1:26:41 | Time/step: 213.6 µs avg, 211.4 µs current
+Rank 3: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 3: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 1: Completed 11/47 tasks | Runtime: 0:24:18 | ETA: 1:27:04 | Time/step: 214.5 µs avg, 212.4 µs current
+Rank 1: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 1: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 13: Completed 11/47 tasks | Runtime: 0:24:21 | ETA: 1:30:45 | Time/step: 214.9 µs avg, 212.7 µs current
+Rank 13: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 13: Error processing task 12: name 'ave_abs_j' is not defined
+Rank 22: Completed 11/47 tasks | Runtime: 0:25:47 | ETA: 1:27:28 | Time/step: 214.9 µs avg, 209.9 µs current
+Rank 22: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 23: Completed 11/47 tasks | Runtime: 0:25:48 | ETA: 1:27:32 | Time/step: 215.1 µs avg, 210.1 µs current
+Rank 23: Error processing task 11: name 'ave_abs_j' is not defined
+Rank 45: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 45: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 43: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 43: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 44: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 44: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 40: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 40: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 42: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 42: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 41: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 41: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 38: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 38: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 39: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 39: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 19: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 19: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 18: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 18: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 16: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 16: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 20: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 20: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 21: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 21: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 17: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 17: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 15: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 15: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 14: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 14: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 61: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 56: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 58: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 59: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 60: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 52: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 54: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 53: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 55: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 51: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 49: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 50: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 57: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 48: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 63: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 62: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 36: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 36: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 35: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 35: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 37: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 37: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 34: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 34: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 32: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 32: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 33: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 33: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 8: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 8: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 9: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 9: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 10: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 10: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 12: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 12: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 31: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 31: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 7: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 7: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 24: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 24: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 28: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 28: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 5: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 5: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 2: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 2: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 11: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 11: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 6: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 6: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 29: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 29: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 3: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 3: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 25: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 25: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 4: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 4: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 26: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 26: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 0: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 0: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 27: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 27: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 30: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 30: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 1: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 1: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 13: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 13: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 46: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 47: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 22: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 22: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 23: Error processing task 20: name 'ave_abs_j' is not defined
+Rank 23: Error processing task 21: name 'ave_abs_j' is not defined
+Rank 44: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 44: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 45: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 45: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 43: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 43: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 40: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 40: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 41: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 41: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 42: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 42: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 38: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 38: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 39: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 39: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 19: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 18: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 63: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 63: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 20: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 16: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 17: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 21: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 62: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 62: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 15: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 14: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 5: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 5: Error processing task 31: name 'ave_abs_j' is not defined
+Rank 2: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 2: Error processing task 31: name 'ave_abs_j' is not defined
+Rank 3: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 3: Error processing task 31: name 'ave_abs_j' is not defined
+Rank 4: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 4: Error processing task 31: name 'ave_abs_j' is not defined
+Rank 0: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 0: Error processing task 31: name 'ave_abs_j' is not defined
+Rank 1: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 1: Error processing task 31: name 'ave_abs_j' is not defined
+Rank 56: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 56: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 61: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 61: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 59: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 59: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 58: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 58: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 60: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 60: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 54: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 54: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 55: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 55: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 52: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 52: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 51: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 51: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 53: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 53: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 49: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 49: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 57: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 57: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 48: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 48: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 50: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 50: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 36: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 36: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 35: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 35: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 37: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 37: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 34: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 34: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 32: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 32: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 31: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 31: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 33: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 33: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 28: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 28: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 24: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 24: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 25: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 25: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 26: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 26: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 27: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 27: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 30: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 30: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 8: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 9: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 12: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 10: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 29: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 29: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 11: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 13: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 46: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 46: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 47: Error processing task 29: name 'ave_abs_j' is not defined
+Rank 47: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 7: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 6: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 22: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 23: Error processing task 30: name 'ave_abs_j' is not defined
+Rank 44: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 45: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 43: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 40: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 41: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 42: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 38: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 39: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 63: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 63: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 62: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 62: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 44: Completed 41/47 tasks | Runtime: 1:26:32 | ETA: 0:20:42 | Time/step: 211.1 µs avg, 207.1 µs current
+Rank 45: Completed 41/47 tasks | Runtime: 1:26:33 | ETA: 0:20:42 | Time/step: 211.1 µs avg, 207.2 µs current
+Rank 43: Completed 41/47 tasks | Runtime: 1:26:35 | ETA: 0:20:43 | Time/step: 211.2 µs avg, 207.2 µs current
+Rank 40: Completed 41/47 tasks | Runtime: 1:26:40 | ETA: 0:20:44 | Time/step: 211.4 µs avg, 207.4 µs current
+Rank 41: Completed 41/47 tasks | Runtime: 1:26:41 | ETA: 0:20:44 | Time/step: 211.5 µs avg, 207.5 µs current
+Rank 42: Completed 41/47 tasks | Runtime: 1:26:44 | ETA: 0:20:45 | Time/step: 211.6 µs avg, 207.6 µs current
+Rank 38: Completed 41/47 tasks | Runtime: 1:26:57 | ETA: 0:20:42 | Time/step: 211.2 µs avg, 207.2 µs current
+Rank 19: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 19: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 39: Completed 41/47 tasks | Runtime: 1:27:00 | ETA: 0:20:42 | Time/step: 211.3 µs avg, 207.1 µs current
+Rank 63: Completed 41/46 tasks | Runtime: 1:27:03 | ETA: 0:18:47 | Time/step: 208.1 µs avg, 205.1 µs current
+Rank 2: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 2: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 18: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 18: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 5: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 5: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 17: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 17: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 20: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 20: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 28: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 28: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 62: Completed 41/46 tasks | Runtime: 1:27:09 | ETA: 0:18:49 | Time/step: 208.4 µs avg, 205.3 µs current
+Rank 3: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 3: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 16: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 16: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 24: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 24: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 21: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 21: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 4: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 4: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 0: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 0: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 27: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 27: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 25: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 25: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 26: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 26: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 29: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 29: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 15: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 15: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 1: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 1: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 14: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 14: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 56: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 56: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 61: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 61: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 58: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 58: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 59: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 59: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 60: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 60: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 54: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 54: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 55: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 55: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 51: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 51: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 53: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 53: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 52: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 52: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 49: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 49: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 57: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 57: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 48: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 48: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 50: Error processing task 38: name 'ave_abs_j' is not defined
+Rank 50: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 22: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 22: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 23: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 23: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 56: Completed 41/46 tasks | Runtime: 1:30:49 | ETA: 0:19:09 | Time/step: 212.9 µs avg, 209.0 µs current
+Rank 61: Completed 41/46 tasks | Runtime: 1:30:50 | ETA: 0:19:09 | Time/step: 212.9 µs avg, 209.1 µs current
+Rank 58: Completed 41/46 tasks | Runtime: 1:30:50 | ETA: 0:19:09 | Time/step: 212.9 µs avg, 209.1 µs current
+Rank 59: Completed 41/46 tasks | Runtime: 1:30:52 | ETA: 0:19:10 | Time/step: 213.0 µs avg, 209.1 µs current
+Rank 60: Completed 41/46 tasks | Runtime: 1:30:54 | ETA: 0:19:10 | Time/step: 213.1 µs avg, 209.2 µs current
+Rank 55: Completed 41/47 tasks | Runtime: 1:31:00 | ETA: 0:22:41 | Time/step: 213.3 µs avg, 209.4 µs current
+Rank 54: Completed 41/47 tasks | Runtime: 1:31:00 | ETA: 0:22:41 | Time/step: 213.3 µs avg, 209.4 µs current
+Rank 51: Completed 41/47 tasks | Runtime: 1:31:02 | ETA: 0:17:27 | Time/step: 213.4 µs avg, 209.5 µs current
+Rank 53: Completed 41/47 tasks | Runtime: 1:31:03 | ETA: 0:17:27 | Time/step: 213.4 µs avg, 209.6 µs current
+Rank 52: Completed 41/47 tasks | Runtime: 1:31:04 | ETA: 0:17:28 | Time/step: 213.5 µs avg, 209.6 µs current
+Rank 36: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 35: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 49: Completed 41/47 tasks | Runtime: 1:31:11 | ETA: 0:17:29 | Time/step: 213.7 µs avg, 209.9 µs current
+Rank 37: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 34: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 32: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 57: Completed 41/46 tasks | Runtime: 1:31:23 | ETA: 0:19:16 | Time/step: 214.2 µs avg, 210.3 µs current
+Rank 48: Completed 41/47 tasks | Runtime: 1:31:25 | ETA: 0:17:32 | Time/step: 214.3 µs avg, 210.4 µs current
+Rank 50: Completed 41/47 tasks | Runtime: 1:31:27 | ETA: 0:17:32 | Time/step: 214.4 µs avg, 210.5 µs current
+Rank 33: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 36: Completed 41/47 tasks | Runtime: 1:32:20 | ETA: 0:21:19 | Time/step: 215.6 µs avg, 213.3 µs current
+Rank 35: Completed 41/47 tasks | Runtime: 1:32:23 | ETA: 0:21:20 | Time/step: 215.7 µs avg, 213.4 µs current
+Rank 37: Completed 41/47 tasks | Runtime: 1:32:30 | ETA: 0:21:21 | Time/step: 216.0 µs avg, 213.7 µs current
+Rank 34: Completed 41/47 tasks | Runtime: 1:32:32 | ETA: 0:21:22 | Time/step: 216.1 µs avg, 213.7 µs current
+Rank 32: Completed 41/47 tasks | Runtime: 1:32:35 | ETA: 0:21:22 | Time/step: 216.2 µs avg, 213.8 µs current
+Rank 8: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 8: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 9: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 9: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 12: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 12: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 10: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 10: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 11: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 11: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 33: Completed 41/47 tasks | Runtime: 1:33:15 | ETA: 0:21:32 | Time/step: 217.7 µs avg, 215.4 µs current
+Rank 13: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 13: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 46: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 47: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 31: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 30: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 46: Completed 41/47 tasks | Runtime: 1:35:23 | ETA: 0:17:41 | Time/step: 215.2 µs avg, 212.2 µs current
+Rank 47: Completed 41/47 tasks | Runtime: 1:35:37 | ETA: 0:17:43 | Time/step: 215.7 µs avg, 212.8 µs current
+Rank 31: Completed 41/47 tasks | Runtime: 1:35:49 | ETA: 0:21:20 | Time/step: 216.2 µs avg, 213.4 µs current
+Rank 7: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 7: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 6: Error processing task 39: name 'ave_abs_j' is not defined
+Rank 6: Error processing task 40: name 'ave_abs_j' is not defined
+Rank 30: Completed 41/47 tasks | Runtime: 1:36:06 | ETA: 0:21:23 | Time/step: 216.8 µs avg, 214.0 µs current
+Saved combined results with 2450 rows to results/results_250610_G1-5_max-4-cut.parquet
+Cleaned up 64 individual rank result files
+Finished sweep in 1:58:25
+Average time per step: 214.05 µs

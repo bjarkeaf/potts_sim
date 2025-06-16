@@ -1,0 +1,11 @@
+timestamp: '2025-06-16T08:03:42.993206'
+git_revision: unknown
+config_file: configs/250615_G1-5_max-4-cut.yaml
+num_tasks: 3000
+num_graphs: 5
+num_ranks: 110
+total_steps_processed: 2045000000
+assumed_time_per_step_us: 400
+estimated_runtime_seconds: 7436.3636
+actual_time_per_step_us: 148.30766470239914
+actual_walltime_seconds: 3100.239376783371

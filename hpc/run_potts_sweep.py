@@ -43,6 +43,7 @@ except ImportError:
 
 import potts_sim
 from potts_utils import parse_graph
+from cim_sim import run_cim_from_graph
 
 class ModelType(Enum):
     """Enum for the different Potts model types"""
@@ -51,6 +52,7 @@ class ModelType(Enum):
     POLYNOMIAL = "polynomial" 
     SIGMOID = "sigmoid"
     FIXED_AMPLITUDE = "fixed_amplitude"
+    CIM = "cim"  # Add CIM model type
 
 def get_git_revision():
     """Get git commit hash for reproducibility"""
@@ -64,17 +66,17 @@ def get_git_revision():
 @functools.lru_cache(maxsize=32)
 def load_graph(graph_path):
     """Parse a graph file, cached to avoid repeated parsing"""
-    num_spins, num_edges, edges, opt_cut, opt_energy, mu_max, ave_abs_j = parse_graph(graph_path)
+    num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max, ave_abs_J = parse_graph(graph_path)
     return {
         'path': graph_path,
         'name': Path(graph_path).stem,
-        'num_spins': num_spins,
+        'num_vertices': num_vertices,
         'num_edges': num_edges,
         'edges': edges,
-        'opt_cut': opt_cut,
-        'opt_energy': opt_energy,
+        'opt_cut_dict': opt_cut_dict,
+        'opt_energy_dict': opt_energy_dict,
         'mu_max': mu_max,
-        'ave_abs_j': ave_abs_j,
+        'ave_abs_J': ave_abs_J,
     }
 
 def safe_eval(expr, env):
@@ -188,8 +190,8 @@ def expand_param_values(param_values, is_schedule=False):
             if isinstance(val, str):
                 if ':' in val:
                     expanded.extend(parse_range(val))
-                elif any(token in val for token in ['mu_max', 'alpha', 'ave_abs_j']):
-                    # This is an expression to be evaluated later with mu_max or alpha
+                elif any(token in val for token in ['mu_max', 'alpha', 'ave_abs_J', 'num_vertices']):
+                    # This is an expression to be evaluated later with environment variables
                     expanded.append(val)  # Keep as string
                 else:
                     # Try to convert to float if it's a simple number string
@@ -268,7 +270,7 @@ def generate_param_sets(model_type, model_params, T, dt):
             for poly_order, beta_expr, factor in itertools.product(
                     poly_orders, beta_info['schedules'], gamma_info['factors']):
                 param_id = f"po{poly_order}_b{beta_expr}_gf{factor}"
-                param_sets.append({
+                param_sets.append({ 
                     'id': param_id,
                     'poly_order': poly_order,
                     'beta_expr': beta_expr,
@@ -324,8 +326,8 @@ def generate_param_sets(model_type, model_params, T, dt):
         
     elif model_type == ModelType.NEC:
         # Expand all parameter ranges
+        poly_orders = [int(po) for po in expand_param_values(model_params.get('poly_order', [3]))]
         alpha_rates = expand_param_values(model_params.get('alpha_rate', [1e-2]))
-        #gammas = expand_param_values(model_params.get('gamma', [1.0]))
         r_targets = expand_param_values(model_params.get('r_target', [2.0]))
         initial_alphas = expand_param_values(model_params.get('initial_alpha', [1.0]))
         
@@ -335,13 +337,14 @@ def generate_param_sets(model_type, model_params, T, dt):
 
         # Handle the case where gamma is directly specified
         if gamma_info['type'] == 'direct':
-            for alpha_rate, r_target, initial_alpha, gamma_expr in itertools.product(
-                    alpha_rates, r_targets, initial_alphas, gamma_info['schedules']):
+            for poly_order, alpha_rate, r_target, initial_alpha, gamma_expr in itertools.product(
+                    poly_orders, alpha_rates, r_targets, initial_alphas, gamma_info['schedules']):
                 param_id = f"ar{alpha_rate:.2e}_rt{r_target}_ia{initial_alpha}_g{gamma_expr}"
                 param_sets.append({
                     'id': param_id,
+                    'poly_order': poly_order,
                     'alpha_rate': alpha_rate,
-                    'gamma': gamma_expr,
+                    'gamma_expr': gamma_expr,
                     'r_target': r_target,
                     'initial_alpha': initial_alpha,
                     'initial_alpha_expr': initial_alpha if isinstance(initial_alpha, str) else None
@@ -349,11 +352,12 @@ def generate_param_sets(model_type, model_params, T, dt):
 
         # Handle gamma as prototype with factors
         elif gamma_info['type'] == 'prototype':
-            for alpha_rate, r_target, initial_alpha, factor in itertools.product(
-                    alpha_rates, r_targets, initial_alphas, gamma_info['factors']):
+            for poly_order, alpha_rate, r_target, initial_alpha, factor in itertools.product(
+                    poly_orders, alpha_rates, r_targets, initial_alphas, gamma_info['factors']):
                 param_id = f"ar{alpha_rate:.2e}_rt{r_target}_ia{initial_alpha}_gpf{factor}"
                 param_sets.append({
                     'id': param_id,
+                    'poly_order': poly_order,
                     'alpha_rate': alpha_rate,
                     'gamma_prototype': gamma_info['prototype'],
                     'gamma_factor': factor,
@@ -479,16 +483,97 @@ def generate_param_sets(model_type, model_params, T, dt):
             
         return param_sets
     
+    elif model_type == ModelType.CIM:
+        # Expand all parameter ranges for CIM model
+        alphas = expand_param_values(model_params.get('alpha', [-10.0]))
+        
+        # Check for B_num_vertices (scaled B) or regular B
+        if 'B_num_vertices' in model_params:
+            B_num_vertices_values = expand_param_values(model_params.get('B_num_vertices', [18]))
+            use_scaled_B = True
+        else:
+            Bs = expand_param_values(model_params.get('B', [18/100]))
+            use_scaled_B = False
+            
+        zetas = expand_param_values(model_params.get('zeta', [0.6]))
+        
+        beta_info = process_schedule_param('beta_schedule', ["lin(0,0.01)"])
+        
+        param_sets = []
+        
+        # Handle the case where beta is directly specified
+        if beta_info['type'] == 'direct':
+            if use_scaled_B:
+                # Use B_num_vertices parameter
+                for alpha, B_num_vertices, zeta, beta_expr in itertools.product(
+                        alphas, B_num_vertices_values, zetas, beta_info['schedules']):
+                    param_id = f"a{alpha}_Bnv{B_num_vertices}_z{zeta}_b{beta_expr}"
+                    param_sets.append({
+                        'id': param_id,
+                        'alpha': alpha,
+                        'B_num_vertices': B_num_vertices,
+                        'zeta': zeta,
+                        'beta_expr': beta_expr
+                    })
+            else:
+                # Use regular B parameter
+                for alpha, B, zeta, beta_expr in itertools.product(
+                        alphas, Bs, zetas, beta_info['schedules']):
+                    param_id = f"a{alpha}_B{B}_z{zeta}_b{beta_expr}"
+                    param_sets.append({
+                        'id': param_id,
+                        'alpha': alpha,
+                        'B': B,
+                        'zeta': zeta,
+                        'beta_expr': beta_expr
+                    })
+        
+        # Handle beta as prototype with factors
+        elif beta_info['type'] == 'prototype':
+            if use_scaled_B:
+                # Use B_num_vertices parameter
+                for alpha, B_num_vertices, zeta, factor in itertools.product(
+                        alphas, B_num_vertices_values, zetas, beta_info['factors']):
+                    param_id = f"a{alpha}_Bnv{B_num_vertices}_z{zeta}_bpf{factor}"
+                    param_sets.append({
+                        'id': param_id,
+                        'alpha': alpha,
+                        'B_num_vertices': B_num_vertices,
+                        'zeta': zeta,
+                        'beta_prototype': beta_info['prototype'],
+                        'beta_factor': factor,
+                        'beta_is_prototype': True
+                    })
+            else:
+                # Use regular B parameter
+                for alpha, B, zeta, factor in itertools.product(
+                        alphas, Bs, zetas, beta_info['factors']):
+                    param_id = f"a{alpha}_B{B}_z{zeta}_bpf{factor}"
+                    param_sets.append({
+                        'id': param_id,
+                        'alpha': alpha,
+                        'B': B,
+                        'zeta': zeta,
+                        'beta_prototype': beta_info['prototype'],
+                        'beta_factor': factor,
+                        'beta_is_prototype': True
+                    })
+        
+        else:
+            raise ValueError("CIM model only supports direct or prototype beta_schedule specification")
+            
+        return param_sets
+    
     else:
         raise ValueError(f"Unknown model type: {model_type}")
 
 def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor):
     """Run a single task with the given parameters"""
-    num_spins = graph['num_spins']
+    num_vertices = graph['num_vertices']
     num_edges = graph['num_edges']
     edges = graph['edges']
     mu_max = graph['mu_max']
-    ave_abs_j = graph['ave_abs_j']
+    ave_abs_J = graph['ave_abs_J']
     start_time = time.time()
     
     # Calculate num_steps
@@ -500,8 +585,9 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     # Prepare environment for schedule evaluation
     env = {
         'mu_max': mu_max,
-        'ave_abs_j': ave_abs_j,
-        'np': np
+        'ave_abs_J': ave_abs_J,
+        'np': np,
+        'num_vertices': num_vertices 
     }
     
     # Add model-specific parameters to environment
@@ -537,7 +623,7 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
         
         res = potts_sim.run_polynomial(
-            T, dt, num_spins, num_states,
+            T, dt, num_vertices, num_states,
             edges,
             noise_factor, task_seed,
             param_set['poly_order'],
@@ -546,7 +632,8 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             return_discrete_states=False,
             return_energy=True,
             return_cut_value=True,
-            return_best_only=True
+            return_best_only=True,
+            return_last_only=False
         )
     
     elif model_type == ModelType.NEC:
@@ -566,19 +653,21 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
         else:
             initial_alpha = param_set['initial_alpha']
             
-        initial_alpha_arr = [initial_alpha] * num_spins
+        initial_alpha_arr = [initial_alpha] * num_vertices
         
         res = potts_sim.run_nec(
-            T, dt, num_spins, num_states,
+            T, dt, num_vertices, num_states,
             edges,
             noise_factor, task_seed,
+            param_set['poly_order'],
             param_set['alpha_rate'], param_set['r_target'],
             initial_alpha_arr, gamma_schedule,
             return_continuous_states=False,
             return_discrete_states=False,
             return_energy=True,
             return_cut_value=True,
-            return_best_only=True
+            return_best_only=True,
+            return_last_only=False
         )
     
     elif model_type == ModelType.SIGMOID:
@@ -607,7 +696,7 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
             
         res = potts_sim.run_sigmoid(
-            T, dt, num_spins, num_states,
+            T, dt, num_vertices, num_states,
             edges,
             noise_factor, task_seed,
             param_set['alpha'],
@@ -616,7 +705,8 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             return_discrete_states=False,
             return_energy=True,
             return_cut_value=True,
-            return_best_only=True
+            return_best_only=True,
+            return_last_only=False
         )
     
     elif model_type == ModelType.FIXED_AMPLITUDE:
@@ -630,7 +720,7 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
         
         res = potts_sim.run_fixed_amplitude(
-            T, dt, num_spins, num_states,
+            T, dt, num_vertices, num_states,
             edges,
             noise_factor, task_seed,
             gamma_schedule,
@@ -638,7 +728,42 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             return_discrete_states=False,
             return_energy=True,
             return_cut_value=True,
-            return_best_only=True
+            return_best_only=True,
+            return_last_only=False
+        )
+    
+    elif model_type == ModelType.CIM:
+        # For CIM model
+        # Evaluate beta schedule
+        if 'beta_is_prototype' in param_set and param_set['beta_is_prototype']:
+            # beta = prototype * factor
+            prototype_schedule = compile_schedule(param_set['beta_prototype'])(num_steps, env)
+            beta_schedule = [param_set['beta_factor'] * p for p in prototype_schedule]
+        else:
+            # beta schedule is directly defined
+            beta_schedule = compile_schedule(param_set['beta_expr'])(num_steps, env)
+        
+        # Determine B value - either directly specified or calculated from B_num_vertices
+        if 'B_num_vertices' in param_set:
+            # Calculate B = B_num_vertices / num_vertices
+            B = param_set['B_num_vertices'] / num_vertices
+        else:
+            # Use B directly
+            B = param_set['B']
+        
+        res = run_cim_from_graph(
+            T, dt, num_vertices, num_states,
+            edges,
+            noise_factor, task_seed,
+            param_set['alpha'],
+            beta_schedule,
+            B, param_set['zeta'],
+            return_continuous_states=False,
+            return_discrete_states=False,
+            return_energy=True,
+            return_cut_value=True,
+            return_best_only=True,
+            return_last_only=False
         )
     
     else:
@@ -649,10 +774,18 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     best_energy = float(res["energy"][0])
     best_step = int(res["step"])
     elapsed_time = time.time() - start_time
+
+    # Number of spins is the number of vertices in the graph except for CIM
+    num_spins = num_vertices if model_type != ModelType.CIM else res['num_spins']
+
+    # Optimum cut value and energy from graph
+    opt_cut = graph['opt_cut_dict'].get(num_states)
+    opt_energy = graph['opt_energy_dict'].get(num_states)
     
     # Return results in a dictionary
     result = {
         "graph": graph['name'],
+        "num_vertices": graph['num_vertices'],
         "num_spins": num_spins,
         "num_edges": num_edges,
         "model": model_type.name,
@@ -661,16 +794,16 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
         "cut_value": best_cut,
         "energy": best_energy,
         "step": best_step,
-        "opt_cut": graph['opt_cut'],
-        "opt_energy": graph['opt_energy'],
-        "cut_gap": best_cut - graph['opt_cut'] if graph['opt_cut'] is not None else None,
-        "energy_gap": best_energy - graph['opt_energy'] if graph['opt_energy'] is not None else None,
+        "opt_cut": opt_cut,
+        "opt_energy": opt_energy,
+        "cut_gap": (best_cut - opt_cut) if opt_cut is not None else None,
+        "energy_gap": (best_energy - opt_energy) if opt_energy is not None else None,
         "runtime": elapsed_time,
         "T": T,
         "dt": dt,
         "num_steps": num_steps,
         "mu_max": mu_max,
-        "ave_abs_j": ave_abs_j,
+        "ave_abs_J": ave_abs_J,
     }
     
     # Add model-specific parameters to the result
@@ -709,6 +842,7 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             })
     elif model_type == ModelType.NEC:
         result.update({
+            "poly_order": param_set['poly_order'],
             "alpha_rate": param_set['alpha_rate'],
             "r_target": param_set['r_target'],
             "initial_alpha": param_set['initial_alpha']
@@ -767,6 +901,34 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             result.update({
                 "gamma_schedule": param_set['gamma_expr']
             })
+    elif model_type == ModelType.CIM:
+        result.update({
+            'alpha': param_set['alpha'],
+            'zeta': param_set['zeta']
+        })
+        
+        # Add B parameter info (either direct or scaled)
+        if 'B_num_vertices' in param_set:
+            B = param_set['B_num_vertices'] / num_vertices
+            result.update({
+                'B_num_vertices': param_set['B_num_vertices'],
+                'B': B
+            })
+        else:
+            result.update({
+                'B': param_set['B']
+            })
+        
+        # Add beta schedule information
+        if 'beta_is_prototype' in param_set and param_set['beta_is_prototype']:
+            result.update({
+                'beta_prototype': param_set['beta_prototype'],
+                'beta_factor': param_set['beta_factor']
+            })
+        else:
+            result.update({
+                'beta_schedule': param_set['beta_expr']
+            })
     
     return result
 
@@ -783,12 +945,12 @@ def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
     import matplotlib.pyplot as plt # Only import matplotlib if needed
     num_steps = int(np.floor(T / dt))
     mu_max = graph['mu_max']
-    ave_abs_j = graph['ave_abs_j']
+    ave_abs_J = graph['ave_abs_J']
     
     # Prepare environment for schedule evaluation
     env = {
         'mu_max': mu_max,
-        'ave_abs_j': ave_abs_j,
+        'ave_abs_J': ave_abs_J,
         'np': np
     }
     
@@ -832,7 +994,7 @@ def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
         # Plot schedules
         ax.plot(time_axis, beta_schedule, label=beta_label)
         ax.plot(time_axis, gamma_schedule, label=gamma_label)
-        ax.set_title(f"{model_type.name} Model - Order: {param_set['poly_order']}")
+        ax.set_title(f"{model_type.name} Model - Polynomial Order: {param_set['poly_order']}")
         
     elif model_type == ModelType.NEC:
         # For NEC model
@@ -863,7 +1025,7 @@ def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
         ax.text(0.02, 0.90, alpha_rate_text, transform=ax.transAxes, verticalalignment='top')
         ax.text(0.02, 0.85, r_target_text, transform=ax.transAxes, verticalalignment='top')
         
-        ax.set_title(f"NEC Model")
+        ax.set_title(f"NEC Model - Polynomial Order: {param_set['poly_order']}")
         
     elif model_type == ModelType.SIGMOID:
         # Evaluate beta schedule
@@ -910,6 +1072,37 @@ def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
         # Plot schedule
         ax.plot(time_axis, gamma_schedule, label=gamma_label)
         ax.set_title(f"FIXED_AMPLITUDE Model")
+    
+    elif model_type == ModelType.CIM:
+        # Evaluate beta schedule
+        if 'beta_is_prototype' in param_set and param_set['beta_is_prototype']:
+            prototype_schedule = compile_schedule(param_set['beta_prototype'])(num_steps, env)
+            beta_schedule = [param_set['beta_factor'] * p for p in prototype_schedule]
+            beta_label = f"Beta (prototype={param_set['beta_prototype']}, factor={param_set['beta_factor']})"
+        else:
+            beta_schedule = compile_schedule(param_set['beta_expr'])(num_steps, env)
+            beta_label = f"Beta ({param_set['beta_expr']})"
+        
+        # Plot beta schedule
+        ax.plot(time_axis, beta_schedule, label=beta_label)
+        
+        # Add alpha, B, and zeta as text annotations
+        alpha_text = f"Alpha: {param_set['alpha']}"
+        
+        # Display B information (either direct or scaled)
+        if 'B_num_vertices' in param_set:
+            B = param_set['B_num_vertices'] / graph['num_vertices']
+            B_text = f"B: {B:.4f} (B_num_vertices: {param_set['B_num_vertices']} ÷ {graph['num_vertices']})"
+        else:
+            B_text = f"B: {param_set['B']}"
+            
+        zeta_text = f"Zeta: {param_set['zeta']}"
+        
+        ax.text(0.02, 0.95, alpha_text, transform=ax.transAxes, verticalalignment='top')
+        ax.text(0.02, 0.90, B_text, transform=ax.transAxes, verticalalignment='top')
+        ax.text(0.02, 0.85, zeta_text, transform=ax.transAxes, verticalalignment='top')
+        
+        ax.set_title(f"CIM Model")
     
     # Finalize the plot
     ax.set_xlabel("Time")
@@ -1184,8 +1377,8 @@ def main():
             'num_tasks': len(tasks),
             'num_graphs': len(graph_files),
             'num_ranks': size,
-            'estimated_runtime_seconds': expected_runtime_sec,
-            'assumed_time_per_step_us': assumed_time_per_step_us
+            'assumed_time_per_step_us': assumed_time_per_step_us,
+            'estimated_runtime_seconds': expected_runtime_sec
         }
         
         run_info_file = os.path.join(out_dir, f"run_info_{config_basename}.yaml")

@@ -61,7 +61,8 @@ py::object run(
     bool return_discrete_states,
     bool return_energy,
     bool return_cut_value,
-    bool return_best_only
+    bool return_best_only,
+    bool return_last_only
 )
 {
 
@@ -142,10 +143,10 @@ py::object run(
     
     // Reference state vectors for rounding
     //      ref_state_conj[j] = exp(-i * theta_j) for j=0,1,...,q-1
-    //      where theta_j = -pi + (2j+1) * pi / q
+    //      where theta_j = 2*pi/q * (j - floor(q/2))
     std::vector<std::complex<double>> ref_state_conj(num_states);
     for (int j = 0; j < num_states; ++j) {
-        double theta_j = -M_PI + (2*j + 1)*M_PI/num_states;
+        double theta_j = 2.0 * M_PI / num_states * (j - std::floor(num_states / 2.0));
         ref_state_conj[j] = std::polar(1.0, -theta_j);
     }
 
@@ -154,7 +155,6 @@ py::object run(
     double phase_noise;
     double abs_x;
     double abs_x_sqrt;
-    double abs_x_sq;
     double abs_x_pow;
     double abs_x_pow1;
     double abs_x_pow2;
@@ -195,7 +195,7 @@ py::object run(
     // Allocate continuous state (complex amplitudes) history if requested
     py::array_t<std::complex<double>> continuous_state_history;
     std::complex<double>* ptr_continuous_states = nullptr;
-    if (return_continuous_states && !return_best_only) {
+    if (return_continuous_states && !return_best_only && !return_last_only) {
         continuous_state_history = py::array_t<std::complex<double>>(
             { size_t(num_steps), size_t(num_spins) }
         );
@@ -206,7 +206,7 @@ py::object run(
     // Allocate discrete state (rounded Potts state) history if requested
     py::array_t<int> discrete_state_history;
     int* ptr_discrete_states = nullptr;
-    if (return_discrete_states && !return_best_only) {
+    if (return_discrete_states && !return_best_only && !return_last_only) {
         discrete_state_history = py::array_t<int>(
             { size_t(num_steps), size_t(num_spins) }
         );
@@ -217,7 +217,7 @@ py::object run(
     // Allocate energy (Hamiltonian) history if requested
     py::array_t<double> energy_history;
     double* ptr_energy = nullptr;
-    if (return_energy && !return_best_only) {
+    if (return_energy && !return_best_only && !return_last_only) {
         energy_history = py::array_t<double>(num_steps);
         auto bi = energy_history.request();
         ptr_energy = static_cast<double*>(bi.ptr);
@@ -226,7 +226,7 @@ py::object run(
     // Allocate cut value history if requested
     py::array_t<double> cut_value_history;
     double* ptr_cut_value = nullptr;
-    if (return_cut_value && !return_best_only) {
+    if (return_cut_value && !return_best_only && !return_last_only) {
         cut_value_history = py::array_t<double>(num_steps);
         auto bi = cut_value_history.request();
         ptr_cut_value = static_cast<double*>(bi.ptr);
@@ -281,7 +281,7 @@ py::object run(
                     // Precompute state-dependent values
                     abs_x = std::abs(x[i]); // |x_i|
                     abs_x_sqrt = std::sqrt(abs_x); // sqrt(|x_i|)
-                    abs_x_sq = abs_x * abs_x; // |x_i|^2
+                    abs_x_pow = std::pow(abs_x, polynomial_order - 1); // |x_i|^(n-1), n=3 in original NEC model
                     conj_x = std::conj(x[i]); // conj(x_i)
                     conj_pow = std::pow(conj_x, num_states - 1); // conj(x_i)^(q-1)
 
@@ -292,7 +292,7 @@ py::object run(
                     // Calculate dx/dt
                     //   dx_i/dt = -x_i - |x_i|^2 * x + gamma[step] * conj(x_i)^(q-1) + coupling
                     dx_dt = alpha_arr[i] * x[i]
-                            - abs_x_sq * x[i]
+                            - abs_x_pow * x[i]
                             + gamma_schedule[step] * conj_pow
                             + coupling_arr[i];
                     
@@ -427,7 +427,7 @@ py::object run(
         }
 
         // Store states and energy if requested (only for full history mode)
-        if (!return_best_only) {
+        if (!return_best_only && !return_last_only) {
             if (return_continuous_states) {
                 std::memcpy(ptr_continuous_states + static_cast<size_t>(step) * num_spins,
                     x.data(),
@@ -446,11 +446,10 @@ py::object run(
     // Create return values
     py::dict out;
     
-    // If returning only the best solution, create single-step arrays
     if (return_best_only) {
         if (return_continuous_states) {
             continuous_state_history = py::array_t<std::complex<double>>(
-                { size_t(1), size_t(num_spins) }
+                { py::ssize_t(1), py::ssize_t(num_spins) }
             );
             auto bi = continuous_state_history.request();
             ptr_continuous_states = static_cast<std::complex<double>*>(bi.ptr);
@@ -460,7 +459,7 @@ py::object run(
         
         if (return_discrete_states) {
             discrete_state_history = py::array_t<int>(
-                { size_t(1), size_t(num_spins) }
+                { py::ssize_t(1), py::ssize_t(num_spins) }
             );
             auto bi = discrete_state_history.request();
             ptr_discrete_states = static_cast<int*>(bi.ptr);
@@ -481,15 +480,47 @@ py::object run(
             ptr_cut_value = static_cast<double*>(bi.ptr);
             ptr_cut_value[0] = best_cut_value;
         }
+        out["step"] = py::cast(best_step);
     }
-    
+    else if (return_last_only) {
+        // single‐step arrays for the last time‐step
+        if (return_continuous_states) {
+            continuous_state_history = py::array_t<std::complex<double>>(
+                { py::ssize_t(1), py::ssize_t(num_spins) }
+            );
+            auto bi = continuous_state_history.request();
+            ptr_continuous_states = static_cast<std::complex<double>*>(bi.ptr);
+            std::memcpy(ptr_continuous_states, x.data(),
+                        num_spins * sizeof(std::complex<double>));
+        }
+        if (return_discrete_states) {
+            discrete_state_history = py::array_t<int>(
+                { py::ssize_t(1), py::ssize_t(num_spins) }
+            );
+            auto bi = discrete_state_history.request();
+            ptr_discrete_states = static_cast<int*>(bi.ptr);
+            std::memcpy(ptr_discrete_states, rounded_state.data(),
+                        num_spins * sizeof(int));
+        }
+        if (return_energy) {
+            energy_history = py::array_t<double>(1);
+            auto bi = energy_history.request();
+            ptr_energy = static_cast<double*>(bi.ptr);
+            ptr_energy[0] = energy;
+        }
+        if (return_cut_value) {
+            cut_value_history = py::array_t<double>(1);
+            auto bi = cut_value_history.request();
+            ptr_cut_value = static_cast<double*>(bi.ptr);
+            ptr_cut_value[0] = cut_value;
+        }
+        out["step"] = py::cast(num_steps - 1);
+    }
     // Add the results to the output dictionary
     out["continuous_states"] = return_continuous_states ? py::object(continuous_state_history) : py::none();
-    out["discrete_states"] = return_discrete_states ? py::object(discrete_state_history) : py::none();
-    out["energy"] = return_energy ? py::object(energy_history) : py::none();
-    out["cut_value"] = return_cut_value ? py::object(cut_value_history) : py::none();
-    out["step"] = return_best_only ? py::cast(best_step) : py::none();
-    
+    out["discrete_states"]   = return_discrete_states   ? py::object(discrete_state_history)   : py::none();
+    out["energy"]            = return_energy            ? py::object(energy_history)           : py::none();
+    out["cut_value"]         = return_cut_value         ? py::object(cut_value_history)        : py::none();
     return out;
     
 }
@@ -506,7 +537,8 @@ py::object run_polynomial(
     bool return_discrete_states,
     bool return_energy,
     bool return_cut_value,
-    bool return_best_only = false)
+    bool return_best_only = false,
+    bool return_last_only = false)
 {
     return run(
         T, dt, num_spins, num_states,
@@ -520,7 +552,8 @@ py::object run_polynomial(
         return_discrete_states,
         return_energy,
         return_cut_value,
-        return_best_only);
+        return_best_only,
+        return_last_only);
 }
 
 // wrapper for NEC model
@@ -528,6 +561,7 @@ py::object run_nec(
     double T, double dt, int num_spins, int num_states,
     const py::array_t<int>& edges,
     double noise_factor, int seed,
+    int polynomial_order,
     double alpha_rate,
     double r_target,
     const std::vector<double>& initial_alpha_arr,
@@ -536,21 +570,23 @@ py::object run_nec(
     bool return_discrete_states,
     bool return_energy,
     bool return_cut_value,
-    bool return_best_only = false)
+    bool return_best_only = false,
+    bool return_last_only = false)
 {
     return run(
         T, dt, num_spins, num_states,
         edges,
         noise_factor, seed,
         ModelType::NEC,
-        /*polynomial_order*/0,
+        polynomial_order,
         /*alpha*/0.0, alpha_rate, r_target,
         initial_alpha_arr, /*beta_schedule*/{}, gamma_schedule,
         return_continuous_states,
         return_discrete_states,
         return_energy,
         return_cut_value,
-        return_best_only);
+        return_best_only,
+        return_last_only);
 }
 
 // wrapper for sigmoid model
@@ -565,7 +601,8 @@ py::object run_sigmoid(
     bool return_discrete_states,
     bool return_energy,
     bool return_cut_value,
-    bool return_best_only = false)
+    bool return_best_only = false,
+    bool return_last_only = false)
 {
     return run(
         T, dt, num_spins, num_states,
@@ -579,7 +616,8 @@ py::object run_sigmoid(
         return_discrete_states,
         return_energy,
         return_cut_value,
-        return_best_only);
+        return_best_only,
+        return_last_only);
 }
 
 // wrapper for fixed_amplitude model
@@ -592,7 +630,8 @@ py::object run_fixed_amplitude(
     bool return_discrete_states,
     bool return_energy,
     bool return_cut_value,
-    bool return_best_only = false)
+    bool return_best_only = false,
+    bool return_last_only = false)
 {
     return run(
         T, dt, num_spins, num_states,
@@ -606,7 +645,8 @@ py::object run_fixed_amplitude(
         return_discrete_states,
         return_energy,
         return_cut_value,
-        return_best_only);
+        return_best_only,
+        return_last_only);
 }
 
 //-----------------------------------------------------------
@@ -634,18 +674,20 @@ PYBIND11_MODULE(potts_sim, m) {
           py::arg("return_discrete_states") = false,
           py::arg("return_energy") = false,
           py::arg("return_cut_value") = false,
-          py::arg("return_best_only") = false);
+          py::arg("return_best_only") = false,
+          py::arg("return_last_only") = false);
 
     m.def("run_nec", &run_nec,
           py::arg("T"), py::arg("dt"), py::arg("num_spins"), py::arg("num_states"),
           py::arg("edges"), py::arg("noise_factor"), py::arg("seed") = 1,
-          py::arg("alpha_rate"), py::arg("r_target"),
+          py::arg("polynomial_order"), py::arg("alpha_rate"), py::arg("r_target"),
           py::arg("initial_alpha_arr"), py::arg("gamma_schedule"),
           py::arg("return_continuous_states") = true,
           py::arg("return_discrete_states") = false,
           py::arg("return_energy") = false,
           py::arg("return_cut_value") = false,
-          py::arg("return_best_only") = false);
+          py::arg("return_best_only") = false,
+          py::arg("return_last_only") = false);
 
     m.def("run_sigmoid", &run_sigmoid,
           py::arg("T"), py::arg("dt"), py::arg("num_spins"), py::arg("num_states"),
@@ -655,7 +697,8 @@ PYBIND11_MODULE(potts_sim, m) {
           py::arg("return_discrete_states") = false,
           py::arg("return_energy") = false,
           py::arg("return_cut_value") = false,
-          py::arg("return_best_only") = false);
+          py::arg("return_best_only") = false,
+          py::arg("return_last_only") = false);
 
     m.def("run_fixed_amplitude", &run_fixed_amplitude,
           py::arg("T"), py::arg("dt"), py::arg("num_spins"), py::arg("num_states"),
@@ -665,5 +708,6 @@ PYBIND11_MODULE(potts_sim, m) {
           py::arg("return_discrete_states") = false,
           py::arg("return_energy") = false,
           py::arg("return_cut_value") = false,
-          py::arg("return_best_only") = false);
+          py::arg("return_best_only") = false,
+          py::arg("return_last_only") = false);
 }

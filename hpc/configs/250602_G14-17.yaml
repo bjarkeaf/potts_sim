@@ -4,7 +4,7 @@ graph_path: "graphs/gset/G14-17/"  # Directory, file, or multiple directories/fi
 out_dir: "results/"  # Directory to save results
 
 # Wall time estimation
-assumed_time_per_step_us: 500 # Assumed time between steps in microseconds
+assumed_time_per_step_us: 550 # Assumed time between steps in microseconds
 
 # Global simulation parameters (can be overridden per model)
 T: 100         # Total simulation time
@@ -18,7 +18,7 @@ models:
     T: 100
     dt: 1e-3
     poly_order: [5]  # Polynomial order of model
-    beta_schedule: ["const(1/(1+ave_abs_j))"] # Will be evaluated for each graph
+    beta_schedule: ["const(1/(1+ave_abs_J))"] # Will be evaluated for each graph
     gamma_schedule:
       prototype: "lin(0,1.755)" # gamma_th = (256/27)**(1/4) ~ 1.755
       factor: "0:0.2:5" # Matlab style: start:step:end

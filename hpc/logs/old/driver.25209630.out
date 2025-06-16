@@ -1,0 +1,506 @@
+Found 5 graph files
+Generated 3000 tasks
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 3,000
+Total steps          : 2,045,000,000
+Ranks for estimate   : 120
+Steps per rank       : 17,041,666
+Time per step        : 300 µs (assumed)
+Expected runtime     : 1:25:12
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 600 tasks | 1,200,000,000 steps (58.7%) | ~0:50:00
+NEC             : 1,400 tasks | 700,000,000 steps (34.2%) | ~0:29:10
+QPDC            : 550 tasks | 55,000,000 steps (2.7%) | ~0:02:17
+FIXED_AMPLITUDE : 50 tasks | 50,000,000 steps (2.4%) | ~0:02:05
+POLYNOMIAL      : 400 tasks | 40,000,000 steps (2.0%) | ~0:01:40
+================================================================================
+
+Rank 0: Processing 25 tasks
+Rank 4: Processing 25 tasks
+Rank 1: Processing 25 tasks
+Rank 3: Processing 25 tasks
+Rank 10: Processing 25 tasks
+Rank 9: Processing 25 tasks
+Rank 11: Processing 25 tasks
+Rank 2: Processing 25 tasks
+Rank 6: Processing 25 tasks
+Rank 7: Processing 25 tasks
+Rank 5: Processing 25 tasks
+Rank 8: Processing 25 tasks
+Rank 12: Processing 25 tasks
+Rank 13: Processing 25 tasks
+Rank 19: Processing 25 tasks
+Rank 18: Processing 25 tasks
+Rank 16: Processing 25 tasks
+Rank 17: Processing 25 tasks
+Rank 23: Processing 25 tasks
+Rank 22: Processing 25 tasks
+Rank 15: Processing 25 tasks
+Rank 20: Processing 25 tasks
+Rank 21: Processing 25 tasks
+Rank 14: Processing 25 tasks
+Rank 25: Processing 25 tasks
+Rank 27: Processing 25 tasks
+Rank 24: Processing 25 tasks
+Rank 26: Processing 25 tasks
+Rank 74: Processing 25 tasks
+Rank 28: Processing 25 tasks
+Rank 80: Processing 25 tasks
+Rank 30: Processing 25 tasks
+Rank 36: Processing 25 tasks
+Rank 96: Processing 25 tasks
+Rank 29: Processing 25 tasks
+Rank 32: Processing 25 tasks
+Rank 35: Processing 25 tasks
+Rank 34: Processing 25 tasks
+Rank 72: Processing 25 tasks
+Rank 31: Processing 25 tasks
+Rank 102: Processing 25 tasks
+Rank 33: Processing 25 tasks
+Rank 82: Processing 25 tasks
+Rank 37: Processing 25 tasks
+Rank 38: Processing 25 tasks
+Rank 43: Processing 25 tasks
+Rank 39: Processing 25 tasks
+Rank 99: Processing 25 tasks
+Rank 76: Processing 25 tasks
+Rank 40: Processing 25 tasks
+Rank 100: Processing 25 tasks
+Rank 81: Processing 25 tasks
+Rank 47: Processing 25 tasks
+Rank 106: Processing 25 tasks
+Rank 78: Processing 25 tasks
+Rank 65: Processing 25 tasks
+Rank 42: Processing 25 tasks
+Rank 105: Processing 25 tasks
+Rank 73: Processing 25 tasks
+Rank 41: Processing 25 tasks
+Rank 107: Processing 25 tasks
+Rank 77: Processing 25 tasks
+Rank 46: Processing 25 tasks
+Rank 104: Processing 25 tasks
+Rank 83: Processing 25 tasks
+Rank 44: Processing 25 tasks
+Rank 97: Processing 25 tasks
+Rank 88: Processing 25 tasks
+Rank 45: Processing 25 tasks
+Rank 103: Processing 25 tasks
+Rank 90: Processing 25 tasks
+Rank 51: Processing 25 tasks
+Rank 101: Processing 25 tasks
+Rank 79: Processing 25 tasks
+Rank 66: Processing 25 tasks
+Rank 113: Processing 25 tasks
+Rank 92: Processing 25 tasks
+Rank 49: Processing 25 tasks
+Rank 75: Processing 25 tasks
+Rank 63: Processing 25 tasks
+Rank 94: Processing 25 tasks
+Rank 50: Processing 25 tasks
+Rank 114: Processing 25 tasks
+Rank 95: Processing 25 tasks
+Rank 70: Processing 25 tasks
+Rank 115: Processing 25 tasks
+Rank 84: Processing 25 tasks
+Rank 61: Processing 25 tasks
+Rank 112: Processing 25 tasks
+Rank 86: Processing 25 tasks
+Rank 56: Processing 25 tasks
+Rank 117: Processing 25 tasks
+Rank 89: Processing 25 tasks
+Rank 71: Processing 25 tasks
+Rank 116: Processing 25 tasks
+Rank 93: Processing 25 tasks
+Rank 48: Processing 25 tasks
+Rank 110: Processing 25 tasks
+Rank 85: Processing 25 tasks
+Rank 69: Processing 25 tasks
+Rank 111: Processing 25 tasks
+Rank 91: Processing 25 tasks
+Rank 62: Processing 25 tasks
+Rank 108: Processing 25 tasks
+Rank 87: Processing 25 tasks
+Rank 58: Processing 25 tasks
+Rank 119: Processing 25 tasks
+Rank 68: Processing 25 tasks
+Rank 109: Processing 25 tasks
+Rank 57: Processing 25 tasks
+Rank 118: Processing 25 tasks
+Rank 60: Processing 25 tasks
+Rank 98: Processing 25 tasks
+Rank 59: Processing 25 tasks
+Rank 67: Processing 25 tasks
+Rank 64: Processing 25 tasks
+Rank 55: Processing 25 tasks
+Rank 54: Processing 25 tasks
+Rank 53: Processing 25 tasks
+Rank 52: Processing 25 tasks
+Rank 10: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.0 µs avg, 0.0 µs current
+Rank 17: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.0 µs avg, 0.0 µs current
+Rank 19: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.1 µs avg, 0.0 µs current
+Rank 22: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.1 µs avg, 0.0 µs current
+Rank 9: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.2 µs avg, 0.0 µs current
+Rank 55: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.3 µs avg, 0.0 µs current
+Rank 78: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.3 µs avg, 0.0 µs current
+Rank 70: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.3 µs avg, 0.0 µs current
+Rank 51: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.3 µs avg, 0.0 µs current
+Rank 23: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.4 µs avg, 0.0 µs current
+Rank 21: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.5 µs avg, 0.0 µs current
+Rank 53: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.5 µs avg, 0.0 µs current
+Rank 16: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.5 µs avg, 0.0 µs current
+Rank 13: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.5 µs avg, 0.0 µs current
+Rank 3: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.5 µs avg, 0.0 µs current
+Rank 59: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.5 µs avg, 0.0 µs current
+Rank 57: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.5 µs avg, 0.0 µs current
+Rank 20: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.6 µs avg, 0.0 µs current
+Rank 82: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.6 µs avg, 0.0 µs current
+Rank 5: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.6 µs avg, 0.0 µs current
+Rank 31: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.7 µs avg, 0.0 µs current
+Rank 1: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.7 µs avg, 0.0 µs current
+Rank 83: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.7 µs avg, 0.0 µs current
+Rank 72: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.7 µs avg, 0.0 µs current
+Rank 50: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.7 µs avg, 0.0 µs current
+Rank 74: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.7 µs avg, 0.0 µs current
+Rank 18: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.8 µs avg, 0.0 µs current
+Rank 2: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.7 µs avg, 0.0 µs current
+Rank 33: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.8 µs avg, 0.0 µs current
+Rank 7: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.8 µs avg, 0.0 µs current
+Rank 93: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.8 µs avg, 0.0 µs current
+Rank 68: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.8 µs avg, 0.0 µs current
+Rank 114: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.8 µs avg, 0.0 µs current
+Rank 6: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.8 µs avg, 0.0 µs current
+Rank 4: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.8 µs avg, 0.0 µs current
+Rank 81: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.8 µs avg, 0.0 µs current
+Rank 37: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 107: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 76: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 15: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 35: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 60: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 102: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 69: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 8: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 30: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 58: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 85: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 41: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 25: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 403.9 µs avg, 0.0 µs current
+Rank 112: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.0 µs avg, 0.0 µs current
+Rank 61: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.0 µs avg, 0.0 µs current
+Rank 119: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.0 µs avg, 0.0 µs current
+Rank 111: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.0 µs avg, 0.0 µs current
+Rank 54: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.0 µs avg, 0.0 µs current
+Rank 34: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.0 µs avg, 0.0 µs current
+Rank 88: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.0 µs avg, 0.0 µs current
+Rank 62: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.0 µs avg, 0.0 µs current
+Rank 47: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 75: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 52: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 115: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 103: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 11: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 12: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 79: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 43: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 89: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 80: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 84: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 26: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 73: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 118: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 105: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 106: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.1 µs avg, 0.0 µs current
+Rank 38: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.2 µs avg, 0.0 µs current
+Rank 63: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.2 µs avg, 0.0 µs current
+Rank 99: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.2 µs avg, 0.0 µs current
+Rank 91: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.2 µs avg, 0.0 µs current
+Rank 39: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.2 µs avg, 0.0 µs current
+Rank 66: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.2 µs avg, 0.0 µs current
+Rank 29: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.2 µs avg, 0.0 µs current
+Rank 67: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.2 µs avg, 0.0 µs current
+Rank 117: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.2 µs avg, 0.0 µs current
+Rank 100: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.2 µs avg, 0.0 µs current
+Rank 71: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.3 µs avg, 0.0 µs current
+Rank 113: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.3 µs avg, 0.0 µs current
+Rank 64: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.3 µs avg, 0.0 µs current
+Rank 65: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.3 µs avg, 0.0 µs current
+Rank 42: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.3 µs avg, 0.0 µs current
+Rank 98: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.3 µs avg, 0.0 µs current
+Rank 77: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.3 µs avg, 0.0 µs current
+Rank 45: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.4 µs avg, 0.0 µs current
+Rank 28: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.4 µs avg, 0.0 µs current
+Rank 44: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.4 µs avg, 0.0 µs current
+Rank 101: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.4 µs avg, 0.0 µs current
+Rank 95: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.4 µs avg, 0.0 µs current
+Rank 48: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.4 µs avg, 0.0 µs current
+Rank 49: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.4 µs avg, 0.0 µs current
+Rank 27: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.4 µs avg, 0.0 µs current
+Rank 116: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.4 µs avg, 0.0 µs current
+Rank 110: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.4 µs avg, 0.0 µs current
+Rank 86: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.5 µs avg, 0.0 µs current
+Rank 90: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.5 µs avg, 0.0 µs current
+Rank 14: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.5 µs avg, 0.0 µs current
+Rank 97: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.5 µs avg, 0.0 µs current
+Rank 104: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.5 µs avg, 0.0 µs current
+Rank 32: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.6 µs avg, 0.0 µs current
+Rank 108: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.6 µs avg, 0.0 µs current
+Rank 109: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.6 µs avg, 0.0 µs current
+Rank 40: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.6 µs avg, 0.0 µs current
+Rank 24: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.6 µs avg, 0.0 µs current
+Rank 87: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.6 µs avg, 0.0 µs current
+Rank 96: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.6 µs avg, 0.0 µs current
+Rank 46: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.7 µs avg, 0.0 µs current
+Rank 56: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.8 µs avg, 0.0 µs current
+Rank 94: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.8 µs avg, 0.0 µs current
+Rank 92: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 404.9 µs avg, 0.0 µs current
+Rank 36: Completed 1/25 tasks | Runtime: 0:00:40 | ETA: 0:00:00 | Time/step: 406.7 µs avg, 0.0 µs current
+Rank 23: Completed 11/25 tasks | Runtime: 1:18:51 | ETA: 1:56:02 | Time/step: 727.9 µs avg, 732.9 µs current
+Rank 22: Completed 11/25 tasks | Runtime: 1:18:52 | ETA: 1:56:04 | Time/step: 728.0 µs avg, 733.1 µs current
+Rank 21: Completed 11/25 tasks | Runtime: 1:18:52 | ETA: 1:56:04 | Time/step: 728.0 µs avg, 733.1 µs current
+Rank 20: Completed 11/25 tasks | Runtime: 1:18:55 | ETA: 1:56:08 | Time/step: 728.5 µs avg, 733.6 µs current
+Rank 67: Completed 11/25 tasks | Runtime: 1:18:55 | ETA: 1:56:09 | Time/step: 728.6 µs avg, 733.7 µs current
+Rank 63: Completed 11/25 tasks | Runtime: 1:18:56 | ETA: 1:56:10 | Time/step: 728.7 µs avg, 733.8 µs current
+Rank 68: Completed 11/25 tasks | Runtime: 1:18:56 | ETA: 1:56:11 | Time/step: 728.8 µs avg, 733.8 µs current
+Rank 69: Completed 11/25 tasks | Runtime: 1:18:57 | ETA: 1:56:12 | Time/step: 728.9 µs avg, 733.9 µs current
+Rank 61: Completed 11/25 tasks | Runtime: 1:18:59 | ETA: 1:56:14 | Time/step: 729.1 µs avg, 734.2 µs current
+Rank 66: Completed 11/25 tasks | Runtime: 1:18:59 | ETA: 1:56:15 | Time/step: 729.2 µs avg, 734.2 µs current
+Rank 60: Completed 11/25 tasks | Runtime: 1:18:59 | ETA: 1:56:15 | Time/step: 729.2 µs avg, 734.3 µs current
+Rank 28: Completed 11/25 tasks | Runtime: 1:19:00 | ETA: 1:56:16 | Time/step: 729.2 µs avg, 734.3 µs current
+Rank 26: Completed 11/25 tasks | Runtime: 1:19:00 | ETA: 1:56:16 | Time/step: 729.3 µs avg, 734.4 µs current
+Rank 29: Completed 11/25 tasks | Runtime: 1:19:00 | ETA: 1:56:16 | Time/step: 729.3 µs avg, 734.4 µs current
+Rank 25: Completed 11/25 tasks | Runtime: 1:19:00 | ETA: 1:56:17 | Time/step: 729.3 µs avg, 734.4 µs current
+Rank 64: Completed 11/25 tasks | Runtime: 1:19:00 | ETA: 1:56:17 | Time/step: 729.3 µs avg, 734.4 µs current
+Rank 17: Completed 11/25 tasks | Runtime: 1:19:01 | ETA: 1:56:17 | Time/step: 729.4 µs avg, 734.5 µs current
+Rank 19: Completed 11/25 tasks | Runtime: 1:19:01 | ETA: 1:56:18 | Time/step: 729.5 µs avg, 734.6 µs current
+Rank 13: Completed 11/25 tasks | Runtime: 1:19:01 | ETA: 1:56:18 | Time/step: 729.5 µs avg, 734.6 µs current
+Rank 16: Completed 11/25 tasks | Runtime: 1:19:01 | ETA: 1:56:18 | Time/step: 729.5 µs avg, 734.6 µs current
+Rank 62: Completed 11/25 tasks | Runtime: 1:19:02 | ETA: 1:56:19 | Time/step: 729.6 µs avg, 734.7 µs current
+Rank 59: Completed 11/25 tasks | Runtime: 1:19:02 | ETA: 1:56:20 | Time/step: 729.7 µs avg, 734.7 µs current
+Rank 18: Completed 11/25 tasks | Runtime: 1:19:02 | ETA: 1:56:20 | Time/step: 729.7 µs avg, 734.8 µs current
+Rank 55: Completed 11/25 tasks | Runtime: 1:19:03 | ETA: 1:56:20 | Time/step: 729.7 µs avg, 734.8 µs current
+Rank 51: Completed 11/25 tasks | Runtime: 1:19:03 | ETA: 1:56:20 | Time/step: 729.7 µs avg, 734.8 µs current
+Rank 57: Completed 11/25 tasks | Runtime: 1:19:03 | ETA: 1:56:21 | Time/step: 729.8 µs avg, 734.9 µs current
+Rank 15: Completed 11/25 tasks | Runtime: 1:19:04 | ETA: 1:56:22 | Time/step: 729.9 µs avg, 735.0 µs current
+Rank 58: Completed 11/25 tasks | Runtime: 1:19:05 | ETA: 1:56:23 | Time/step: 730.0 µs avg, 735.1 µs current
+Rank 50: Completed 11/25 tasks | Runtime: 1:19:05 | ETA: 1:56:23 | Time/step: 730.0 µs avg, 735.1 µs current
+Rank 65: Completed 11/25 tasks | Runtime: 1:19:06 | ETA: 1:56:25 | Time/step: 730.2 µs avg, 735.3 µs current
+Rank 27: Completed 11/25 tasks | Runtime: 1:19:06 | ETA: 1:56:25 | Time/step: 730.3 µs avg, 735.4 µs current
+Rank 10: Completed 11/25 tasks | Runtime: 1:19:06 | ETA: 1:56:26 | Time/step: 730.3 µs avg, 735.4 µs current
+Rank 54: Completed 11/25 tasks | Runtime: 1:19:07 | ETA: 1:56:26 | Time/step: 730.3 µs avg, 735.4 µs current
+Rank 12: Completed 11/25 tasks | Runtime: 1:19:07 | ETA: 1:56:26 | Time/step: 730.3 µs avg, 735.4 µs current
+Rank 53: Completed 11/25 tasks | Runtime: 1:19:07 | ETA: 1:56:26 | Time/step: 730.4 µs avg, 735.5 µs current
+Rank 11: Completed 11/25 tasks | Runtime: 1:19:08 | ETA: 1:56:27 | Time/step: 730.5 µs avg, 735.6 µs current
+Rank 45: Completed 11/25 tasks | Runtime: 1:19:08 | ETA: 1:56:28 | Time/step: 730.6 µs avg, 735.7 µs current
+Rank 52: Completed 11/25 tasks | Runtime: 1:19:09 | ETA: 1:56:29 | Time/step: 730.6 µs avg, 735.7 µs current
+Rank 14: Completed 11/25 tasks | Runtime: 1:19:09 | ETA: 1:56:29 | Time/step: 730.6 µs avg, 735.7 µs current
+Rank 43: Completed 11/25 tasks | Runtime: 1:19:09 | ETA: 1:56:30 | Time/step: 730.8 µs avg, 735.9 µs current
+Rank 41: Completed 11/25 tasks | Runtime: 1:19:10 | ETA: 1:56:31 | Time/step: 730.8 µs avg, 735.9 µs current
+Rank 42: Completed 11/25 tasks | Runtime: 1:19:10 | ETA: 1:56:31 | Time/step: 730.9 µs avg, 736.0 µs current
+Rank 4: Completed 11/25 tasks | Runtime: 1:19:10 | ETA: 1:56:31 | Time/step: 730.9 µs avg, 736.0 µs current
+Rank 3: Completed 11/25 tasks | Runtime: 1:19:10 | ETA: 1:56:32 | Time/step: 730.9 µs avg, 736.0 µs current
+Rank 5: Completed 11/25 tasks | Runtime: 1:19:11 | ETA: 1:56:33 | Time/step: 731.0 µs avg, 736.1 µs current
+Rank 46: Completed 11/25 tasks | Runtime: 1:19:12 | ETA: 1:56:33 | Time/step: 731.1 µs avg, 736.2 µs current
+Rank 40: Completed 11/25 tasks | Runtime: 1:19:12 | ETA: 1:56:34 | Time/step: 731.2 µs avg, 736.3 µs current
+Rank 24: Completed 11/25 tasks | Runtime: 1:19:12 | ETA: 1:56:34 | Time/step: 731.2 µs avg, 736.3 µs current
+Rank 7: Completed 11/25 tasks | Runtime: 1:19:12 | ETA: 1:56:34 | Time/step: 731.2 µs avg, 736.3 µs current
+Rank 9: Completed 11/25 tasks | Runtime: 1:19:13 | ETA: 1:56:36 | Time/step: 731.4 µs avg, 736.5 µs current
+Rank 2: Completed 11/25 tasks | Runtime: 1:19:14 | ETA: 1:56:37 | Time/step: 731.5 µs avg, 736.6 µs current
+Rank 1: Completed 11/25 tasks | Runtime: 1:19:15 | ETA: 1:56:38 | Time/step: 731.6 µs avg, 736.7 µs current
+Rank 34: Completed 11/25 tasks | Runtime: 1:19:15 | ETA: 1:56:39 | Time/step: 731.6 µs avg, 736.8 µs current
+Rank 38: Completed 11/25 tasks | Runtime: 1:19:15 | ETA: 1:56:39 | Time/step: 731.7 µs avg, 736.8 µs current
+Rank 31: Completed 11/25 tasks | Runtime: 1:19:16 | ETA: 1:56:40 | Time/step: 731.8 µs avg, 736.9 µs current
+Rank 56: Completed 11/25 tasks | Runtime: 1:19:16 | ETA: 1:56:40 | Time/step: 731.8 µs avg, 736.9 µs current
+Rank 44: Completed 11/25 tasks | Runtime: 1:19:17 | ETA: 1:56:41 | Time/step: 731.9 µs avg, 737.0 µs current
+Rank 35: Completed 11/25 tasks | Runtime: 1:19:17 | ETA: 1:56:41 | Time/step: 731.9 µs avg, 737.0 µs current
+Rank 8: Completed 11/25 tasks | Runtime: 1:19:17 | ETA: 1:56:42 | Time/step: 732.0 µs avg, 737.1 µs current
+Rank 39: Completed 11/25 tasks | Runtime: 1:19:17 | ETA: 1:56:42 | Time/step: 732.0 µs avg, 737.1 µs current
+Rank 33: Completed 11/25 tasks | Runtime: 1:19:18 | ETA: 1:56:43 | Time/step: 732.0 µs avg, 737.2 µs current
+Rank 48: Completed 11/25 tasks | Runtime: 1:19:18 | ETA: 1:56:43 | Time/step: 732.1 µs avg, 737.2 µs current
+Rank 6: Completed 11/25 tasks | Runtime: 1:19:19 | ETA: 1:56:44 | Time/step: 732.2 µs avg, 737.3 µs current
+Rank 30: Completed 11/25 tasks | Runtime: 1:19:19 | ETA: 1:56:45 | Time/step: 732.3 µs avg, 737.4 µs current
+Rank 32: Completed 11/25 tasks | Runtime: 1:19:22 | ETA: 1:56:49 | Time/step: 732.7 µs avg, 737.8 µs current
+Rank 47: Completed 11/25 tasks | Runtime: 1:19:23 | ETA: 1:56:50 | Time/step: 732.8 µs avg, 738.0 µs current
+Rank 49: Completed 11/25 tasks | Runtime: 1:19:24 | ETA: 1:56:51 | Time/step: 732.9 µs avg, 738.1 µs current
+Rank 0: Completed 11/25 tasks | Runtime: 1:19:26 | ETA: 1:56:55 | Time/step: 733.3 µs avg, 738.5 µs current
+Rank 37: Completed 11/25 tasks | Runtime: 1:19:27 | ETA: 1:56:57 | Time/step: 733.5 µs avg, 738.7 µs current
+Rank 36: Completed 11/25 tasks | Runtime: 1:19:36 | ETA: 1:57:10 | Time/step: 734.9 µs avg, 740.0 µs current
+Rank 109: Completed 11/25 tasks | Runtime: 1:24:19 | ETA: 2:04:18 | Time/step: 693.1 µs avg, 697.1 µs current
+Rank 102: Completed 11/25 tasks | Runtime: 1:24:20 | ETA: 2:04:20 | Time/step: 693.2 µs avg, 697.2 µs current
+Rank 107: Completed 11/25 tasks | Runtime: 1:24:21 | ETA: 2:04:21 | Time/step: 693.3 µs avg, 697.4 µs current
+Rank 103: Completed 11/25 tasks | Runtime: 1:24:21 | ETA: 2:04:21 | Time/step: 693.4 µs avg, 697.4 µs current
+Rank 106: Completed 11/25 tasks | Runtime: 1:24:21 | ETA: 2:04:22 | Time/step: 693.4 µs avg, 697.4 µs current
+Rank 108: Completed 11/25 tasks | Runtime: 1:24:22 | ETA: 2:04:22 | Time/step: 693.5 µs avg, 697.5 µs current
+Rank 105: Completed 11/25 tasks | Runtime: 1:24:23 | ETA: 2:04:24 | Time/step: 693.6 µs avg, 697.6 µs current
+Rank 99: Completed 11/25 tasks | Runtime: 1:24:24 | ETA: 2:04:26 | Time/step: 693.8 µs avg, 697.8 µs current
+Rank 93: Completed 11/25 tasks | Runtime: 1:24:27 | ETA: 2:04:30 | Time/step: 694.2 µs avg, 698.2 µs current
+Rank 95: Completed 11/25 tasks | Runtime: 1:24:28 | ETA: 2:04:31 | Time/step: 694.3 µs avg, 698.3 µs current
+Rank 101: Completed 11/25 tasks | Runtime: 1:24:28 | ETA: 2:04:31 | Time/step: 694.3 µs avg, 698.3 µs current
+Rank 94: Completed 11/25 tasks | Runtime: 1:24:29 | ETA: 2:04:33 | Time/step: 694.4 µs avg, 698.5 µs current
+Rank 83: Completed 11/25 tasks | Runtime: 1:24:29 | ETA: 2:04:34 | Time/step: 694.5 µs avg, 698.5 µs current
+Rank 92: Completed 11/25 tasks | Runtime: 1:24:30 | ETA: 2:04:34 | Time/step: 694.5 µs avg, 698.5 µs current
+Rank 104: Completed 11/25 tasks | Runtime: 1:24:30 | ETA: 2:04:34 | Time/step: 694.6 µs avg, 698.6 µs current
+Rank 98: Completed 11/25 tasks | Runtime: 1:24:32 | ETA: 2:04:37 | Time/step: 694.8 µs avg, 698.8 µs current
+Rank 100: Completed 11/25 tasks | Runtime: 1:24:33 | ETA: 2:04:39 | Time/step: 695.0 µs avg, 699.0 µs current
+Rank 97: Completed 11/25 tasks | Runtime: 1:24:33 | ETA: 2:04:39 | Time/step: 695.0 µs avg, 699.0 µs current
+Rank 82: Completed 11/25 tasks | Runtime: 1:24:33 | ETA: 2:04:39 | Time/step: 695.0 µs avg, 699.0 µs current
+Rank 91: Completed 11/25 tasks | Runtime: 1:24:33 | ETA: 2:04:39 | Time/step: 695.0 µs avg, 699.0 µs current
+Rank 84: Completed 11/25 tasks | Runtime: 1:24:34 | ETA: 2:04:41 | Time/step: 695.1 µs avg, 699.2 µs current
+Rank 81: Completed 11/25 tasks | Runtime: 1:24:34 | ETA: 2:04:41 | Time/step: 695.2 µs avg, 699.2 µs current
+Rank 70: Completed 11/25 tasks | Runtime: 1:24:37 | ETA: 2:04:46 | Time/step: 695.6 µs avg, 699.7 µs current
+Rank 85: Completed 11/25 tasks | Runtime: 1:24:38 | ETA: 2:04:46 | Time/step: 695.6 µs avg, 699.7 µs current
+Rank 86: Completed 11/25 tasks | Runtime: 1:24:38 | ETA: 2:04:47 | Time/step: 695.7 µs avg, 699.7 µs current
+Rank 80: Completed 11/25 tasks | Runtime: 1:24:38 | ETA: 2:04:47 | Time/step: 695.7 µs avg, 699.8 µs current
+Rank 76: Completed 11/25 tasks | Runtime: 1:24:39 | ETA: 2:04:48 | Time/step: 695.8 µs avg, 699.8 µs current
+Rank 96: Completed 11/25 tasks | Runtime: 1:24:40 | ETA: 2:04:49 | Time/step: 695.9 µs avg, 700.0 µs current
+Rank 77: Completed 11/25 tasks | Runtime: 1:24:40 | ETA: 2:04:50 | Time/step: 696.0 µs avg, 700.0 µs current
+Rank 75: Completed 11/25 tasks | Runtime: 1:24:41 | ETA: 2:04:51 | Time/step: 696.1 µs avg, 700.1 µs current
+Rank 90: Completed 11/25 tasks | Runtime: 1:24:41 | ETA: 2:04:51 | Time/step: 696.1 µs avg, 700.2 µs current
+Rank 74: Completed 11/25 tasks | Runtime: 1:24:41 | ETA: 2:04:52 | Time/step: 696.1 µs avg, 700.2 µs current
+Rank 89: Completed 11/25 tasks | Runtime: 1:24:43 | ETA: 2:04:54 | Time/step: 696.4 µs avg, 700.4 µs current
+Rank 71: Completed 11/25 tasks | Runtime: 1:24:43 | ETA: 2:04:54 | Time/step: 696.4 µs avg, 700.5 µs current
+Rank 72: Completed 11/25 tasks | Runtime: 1:24:44 | ETA: 2:04:55 | Time/step: 696.4 µs avg, 700.5 µs current
+Rank 88: Completed 11/25 tasks | Runtime: 1:24:44 | ETA: 2:04:55 | Time/step: 696.5 µs avg, 700.5 µs current
+Rank 78: Completed 11/25 tasks | Runtime: 1:24:44 | ETA: 2:04:56 | Time/step: 696.6 µs avg, 700.6 µs current
+Rank 87: Completed 11/25 tasks | Runtime: 1:24:48 | ETA: 2:05:02 | Time/step: 697.1 µs avg, 701.2 µs current
+Rank 73: Completed 11/25 tasks | Runtime: 1:24:49 | ETA: 2:05:02 | Time/step: 697.1 µs avg, 701.2 µs current
+Rank 79: Completed 11/25 tasks | Runtime: 1:24:53 | ETA: 2:05:09 | Time/step: 697.8 µs avg, 701.9 µs current
+Rank 115: Completed 11/25 tasks | Runtime: 1:31:50 | ETA: 2:15:38 | Time/step: 664.0 µs avg, 667.1 µs current
+Rank 110: Completed 11/25 tasks | Runtime: 1:31:51 | ETA: 2:15:39 | Time/step: 664.0 µs avg, 667.2 µs current
+Rank 117: Completed 11/25 tasks | Runtime: 1:31:53 | ETA: 2:15:42 | Time/step: 664.3 µs avg, 667.4 µs current
+Rank 112: Completed 11/25 tasks | Runtime: 1:31:53 | ETA: 2:15:42 | Time/step: 664.3 µs avg, 667.4 µs current
+Rank 119: Completed 11/25 tasks | Runtime: 1:31:53 | ETA: 2:15:43 | Time/step: 664.3 µs avg, 667.5 µs current
+Rank 118: Completed 11/25 tasks | Runtime: 1:31:53 | ETA: 2:15:43 | Time/step: 664.3 µs avg, 667.5 µs current
+Rank 116: Completed 11/25 tasks | Runtime: 1:31:55 | ETA: 2:15:46 | Time/step: 664.6 µs avg, 667.7 µs current
+Rank 113: Completed 11/25 tasks | Runtime: 1:31:56 | ETA: 2:15:47 | Time/step: 664.6 µs avg, 667.8 µs current
+Rank 114: Completed 11/25 tasks | Runtime: 1:31:59 | ETA: 2:15:52 | Time/step: 665.0 µs avg, 668.2 µs current
+Rank 111: Completed 11/25 tasks | Runtime: 1:32:04 | ETA: 2:15:59 | Time/step: 665.7 µs avg, 668.9 µs current
+Rank 23: Completed 21/25 tasks | Runtime: 2:37:03 | ETA: 0:37:53 | Time/step: 730.5 µs avg, 733.3 µs current
+Rank 21: Completed 21/25 tasks | Runtime: 2:37:05 | ETA: 0:37:53 | Time/step: 730.7 µs avg, 733.3 µs current
+Rank 22: Completed 21/25 tasks | Runtime: 2:37:08 | ETA: 0:37:54 | Time/step: 730.9 µs avg, 733.7 µs current
+Rank 20: Completed 21/25 tasks | Runtime: 2:37:09 | ETA: 0:37:53 | Time/step: 730.9 µs avg, 733.4 µs current
+Rank 67: Completed 21/25 tasks | Runtime: 2:37:10 | ETA: 0:37:53 | Time/step: 731.0 µs avg, 733.5 µs current
+Rank 68: Completed 21/25 tasks | Runtime: 2:37:11 | ETA: 0:37:53 | Time/step: 731.1 µs avg, 733.5 µs current
+Rank 63: Completed 21/25 tasks | Runtime: 2:37:11 | ETA: 0:37:54 | Time/step: 731.2 µs avg, 733.6 µs current
+Rank 61: Completed 21/25 tasks | Runtime: 2:37:13 | ETA: 0:37:53 | Time/step: 731.2 µs avg, 733.4 µs current
+Rank 66: Completed 21/25 tasks | Runtime: 2:37:14 | ETA: 0:37:54 | Time/step: 731.4 µs avg, 733.6 µs current
+Rank 69: Completed 21/25 tasks | Runtime: 2:37:14 | ETA: 0:37:55 | Time/step: 731.4 µs avg, 734.0 µs current
+Rank 28: Completed 21/25 tasks | Runtime: 2:37:17 | ETA: 0:37:55 | Time/step: 731.6 µs avg, 734.0 µs current
+Rank 25: Completed 21/25 tasks | Runtime: 2:37:18 | ETA: 0:37:55 | Time/step: 731.7 µs avg, 734.1 µs current
+Rank 29: Completed 21/25 tasks | Runtime: 2:37:18 | ETA: 0:37:55 | Time/step: 731.7 µs avg, 734.1 µs current
+Rank 60: Completed 21/25 tasks | Runtime: 2:37:18 | ETA: 0:37:56 | Time/step: 731.7 µs avg, 734.2 µs current
+Rank 26: Completed 21/25 tasks | Runtime: 2:37:20 | ETA: 0:37:56 | Time/step: 731.8 µs avg, 734.3 µs current
+Rank 19: Completed 21/25 tasks | Runtime: 2:37:21 | ETA: 0:37:56 | Time/step: 731.9 µs avg, 734.4 µs current
+Rank 59: Completed 21/25 tasks | Runtime: 2:37:21 | ETA: 0:37:56 | Time/step: 731.9 µs avg, 734.3 µs current
+Rank 16: Completed 21/25 tasks | Runtime: 2:37:22 | ETA: 0:37:56 | Time/step: 732.0 µs avg, 734.4 µs current
+Rank 55: Completed 21/25 tasks | Runtime: 2:37:22 | ETA: 0:37:56 | Time/step: 732.0 µs avg, 734.4 µs current
+Rank 17: Completed 21/25 tasks | Runtime: 2:37:23 | ETA: 0:37:57 | Time/step: 732.0 µs avg, 734.7 µs current
+Rank 62: Completed 21/25 tasks | Runtime: 2:37:23 | ETA: 0:37:56 | Time/step: 732.0 µs avg, 734.5 µs current
+Rank 13: Completed 21/25 tasks | Runtime: 2:37:23 | ETA: 0:37:57 | Time/step: 732.0 µs avg, 734.6 µs current
+Rank 64: Completed 21/25 tasks | Runtime: 2:37:23 | ETA: 0:37:57 | Time/step: 732.1 µs avg, 734.8 µs current
+Rank 51: Completed 21/25 tasks | Runtime: 2:37:24 | ETA: 0:37:57 | Time/step: 732.2 µs avg, 734.6 µs current
+Rank 57: Completed 21/25 tasks | Runtime: 2:37:24 | ETA: 0:37:57 | Time/step: 732.2 µs avg, 734.5 µs current
+Rank 18: Completed 21/25 tasks | Runtime: 2:37:25 | ETA: 0:37:57 | Time/step: 732.2 µs avg, 734.8 µs current
+Rank 50: Completed 21/25 tasks | Runtime: 2:37:27 | ETA: 0:37:57 | Time/step: 732.3 µs avg, 734.7 µs current
+Rank 15: Completed 21/25 tasks | Runtime: 2:37:27 | ETA: 0:37:57 | Time/step: 732.3 µs avg, 734.8 µs current
+Rank 10: Completed 21/25 tasks | Runtime: 2:37:27 | ETA: 0:37:56 | Time/step: 732.4 µs avg, 734.5 µs current
+Rank 58: Completed 21/25 tasks | Runtime: 2:37:28 | ETA: 0:37:58 | Time/step: 732.5 µs avg, 734.9 µs current
+Rank 65: Completed 21/25 tasks | Runtime: 2:37:29 | ETA: 0:37:58 | Time/step: 732.6 µs avg, 734.9 µs current
+Rank 53: Completed 21/25 tasks | Runtime: 2:37:30 | ETA: 0:37:58 | Time/step: 732.6 µs avg, 734.9 µs current
+Rank 27: Completed 21/25 tasks | Runtime: 2:37:31 | ETA: 0:37:58 | Time/step: 732.7 µs avg, 735.1 µs current
+Rank 54: Completed 21/25 tasks | Runtime: 2:37:31 | ETA: 0:37:58 | Time/step: 732.7 µs avg, 735.1 µs current
+Rank 52: Completed 21/25 tasks | Runtime: 2:37:34 | ETA: 0:37:58 | Time/step: 732.9 µs avg, 735.1 µs current
+Rank 11: Completed 21/25 tasks | Runtime: 2:37:34 | ETA: 0:37:59 | Time/step: 732.9 µs avg, 735.4 µs current
+Rank 12: Completed 21/25 tasks | Runtime: 2:37:35 | ETA: 0:38:00 | Time/step: 733.0 µs avg, 735.7 µs current
+Rank 14: Completed 21/25 tasks | Runtime: 2:37:37 | ETA: 0:38:00 | Time/step: 733.1 µs avg, 735.7 µs current
+Rank 45: Completed 21/25 tasks | Runtime: 2:37:37 | ETA: 0:38:00 | Time/step: 733.1 µs avg, 735.7 µs current
+Rank 41: Completed 21/25 tasks | Runtime: 2:37:39 | ETA: 0:38:00 | Time/step: 733.3 µs avg, 735.8 µs current
+Rank 42: Completed 21/25 tasks | Runtime: 2:37:40 | ETA: 0:38:01 | Time/step: 733.3 µs avg, 735.9 µs current
+Rank 3: Completed 21/25 tasks | Runtime: 2:37:40 | ETA: 0:38:01 | Time/step: 733.4 µs avg, 735.9 µs current
+Rank 4: Completed 21/25 tasks | Runtime: 2:37:40 | ETA: 0:38:01 | Time/step: 733.4 µs avg, 735.9 µs current
+Rank 43: Completed 21/25 tasks | Runtime: 2:37:40 | ETA: 0:38:01 | Time/step: 733.4 µs avg, 736.1 µs current
+Rank 46: Completed 21/25 tasks | Runtime: 2:37:42 | ETA: 0:38:01 | Time/step: 733.5 µs avg, 736.0 µs current
+Rank 5: Completed 21/25 tasks | Runtime: 2:37:43 | ETA: 0:38:02 | Time/step: 733.6 µs avg, 736.2 µs current
+Rank 7: Completed 21/25 tasks | Runtime: 2:37:43 | ETA: 0:38:01 | Time/step: 733.6 µs avg, 736.1 µs current
+Rank 40: Completed 21/25 tasks | Runtime: 2:37:44 | ETA: 0:38:02 | Time/step: 733.7 µs avg, 736.3 µs current
+Rank 2: Completed 21/25 tasks | Runtime: 2:37:46 | ETA: 0:38:02 | Time/step: 733.8 µs avg, 736.2 µs current
+Rank 24: Completed 21/25 tasks | Runtime: 2:37:48 | ETA: 0:38:04 | Time/step: 734.0 µs avg, 736.8 µs current
+Rank 56: Completed 21/25 tasks | Runtime: 2:37:48 | ETA: 0:38:02 | Time/step: 734.0 µs avg, 736.2 µs current
+Rank 9: Completed 21/25 tasks | Runtime: 2:37:48 | ETA: 0:38:03 | Time/step: 734.0 µs avg, 736.7 µs current
+Rank 38: Completed 21/25 tasks | Runtime: 2:37:48 | ETA: 0:38:02 | Time/step: 734.0 µs avg, 736.4 µs current
+Rank 8: Completed 21/25 tasks | Runtime: 2:37:50 | ETA: 0:38:02 | Time/step: 734.1 µs avg, 736.3 µs current
+Rank 44: Completed 21/25 tasks | Runtime: 2:37:51 | ETA: 0:38:03 | Time/step: 734.2 µs avg, 736.6 µs current
+Rank 1: Completed 21/25 tasks | Runtime: 2:37:51 | ETA: 0:38:04 | Time/step: 734.2 µs avg, 736.9 µs current
+Rank 31: Completed 21/25 tasks | Runtime: 2:37:51 | ETA: 0:38:03 | Time/step: 734.3 µs avg, 736.7 µs current
+Rank 34: Completed 21/25 tasks | Runtime: 2:37:51 | ETA: 0:38:04 | Time/step: 734.3 µs avg, 736.9 µs current
+Rank 39: Completed 21/25 tasks | Runtime: 2:37:55 | ETA: 0:38:04 | Time/step: 734.5 µs avg, 737.1 µs current
+Rank 48: Completed 21/25 tasks | Runtime: 2:37:55 | ETA: 0:38:04 | Time/step: 734.5 µs avg, 737.0 µs current
+Rank 35: Completed 21/25 tasks | Runtime: 2:37:55 | ETA: 0:38:05 | Time/step: 734.6 µs avg, 737.2 µs current
+Rank 30: Completed 21/25 tasks | Runtime: 2:37:56 | ETA: 0:38:04 | Time/step: 734.6 µs avg, 736.9 µs current
+Rank 33: Completed 21/25 tasks | Runtime: 2:37:56 | ETA: 0:38:05 | Time/step: 734.6 µs avg, 737.2 µs current
+Rank 6: Completed 21/25 tasks | Runtime: 2:37:58 | ETA: 0:38:05 | Time/step: 734.8 µs avg, 737.4 µs current
+Rank 49: Completed 21/25 tasks | Runtime: 2:38:02 | ETA: 0:38:05 | Time/step: 735.1 µs avg, 737.3 µs current
+Rank 32: Completed 21/25 tasks | Runtime: 2:38:03 | ETA: 0:38:06 | Time/step: 735.2 µs avg, 737.6 µs current
+Rank 47: Completed 21/25 tasks | Runtime: 2:38:03 | ETA: 0:38:06 | Time/step: 735.2 µs avg, 737.5 µs current
+Rank 0: Completed 21/25 tasks | Runtime: 2:38:09 | ETA: 0:38:07 | Time/step: 735.6 µs avg, 738.0 µs current
+Rank 37: Completed 21/25 tasks | Runtime: 2:38:16 | ETA: 0:38:10 | Time/step: 736.2 µs avg, 738.9 µs current
+Rank 36: Completed 21/25 tasks | Runtime: 2:38:33 | ETA: 0:38:14 | Time/step: 737.5 µs avg, 740.1 µs current
+Rank 108: Completed 21/25 tasks | Runtime: 2:48:01 | ETA: 0:40:39 | Time/step: 695.2 µs avg, 697.1 µs current
+Rank 109: Completed 21/25 tasks | Runtime: 2:48:01 | ETA: 0:40:41 | Time/step: 695.3 µs avg, 697.5 µs current
+Rank 107: Completed 21/25 tasks | Runtime: 2:48:01 | ETA: 0:40:40 | Time/step: 695.3 µs avg, 697.3 µs current
+Rank 106: Completed 21/25 tasks | Runtime: 2:48:02 | ETA: 0:40:40 | Time/step: 695.3 µs avg, 697.3 µs current
+Rank 102: Completed 21/25 tasks | Runtime: 2:48:03 | ETA: 0:40:41 | Time/step: 695.4 µs avg, 697.6 µs current
+Rank 103: Completed 21/25 tasks | Runtime: 2:48:03 | ETA: 0:40:41 | Time/step: 695.4 µs avg, 697.5 µs current
+Rank 105: Completed 21/25 tasks | Runtime: 2:48:03 | ETA: 0:40:40 | Time/step: 695.4 µs avg, 697.3 µs current
+Rank 99: Completed 21/25 tasks | Runtime: 2:48:10 | ETA: 0:40:42 | Time/step: 695.9 µs avg, 698.0 µs current
+Rank 101: Completed 21/25 tasks | Runtime: 2:48:15 | ETA: 0:40:43 | Time/step: 696.2 µs avg, 698.2 µs current
+Rank 93: Completed 21/25 tasks | Runtime: 2:48:16 | ETA: 0:40:44 | Time/step: 696.3 µs avg, 698.5 µs current
+Rank 95: Completed 21/25 tasks | Runtime: 2:48:17 | ETA: 0:40:44 | Time/step: 696.4 µs avg, 698.5 µs current
+Rank 94: Completed 21/25 tasks | Runtime: 2:48:19 | ETA: 0:40:45 | Time/step: 696.5 µs avg, 698.6 µs current
+Rank 104: Completed 21/25 tasks | Runtime: 2:48:19 | ETA: 0:40:44 | Time/step: 696.5 µs avg, 698.5 µs current
+Rank 92: Completed 21/25 tasks | Runtime: 2:48:21 | ETA: 0:40:45 | Time/step: 696.7 µs avg, 698.8 µs current
+Rank 83: Completed 21/25 tasks | Runtime: 2:48:23 | ETA: 0:40:47 | Time/step: 696.8 µs avg, 699.1 µs current
+Rank 97: Completed 21/25 tasks | Runtime: 2:48:23 | ETA: 0:40:45 | Time/step: 696.8 µs avg, 698.6 µs current
+Rank 82: Completed 21/25 tasks | Runtime: 2:48:26 | ETA: 0:40:46 | Time/step: 697.0 µs avg, 699.1 µs current
+Rank 98: Completed 21/25 tasks | Runtime: 2:48:27 | ETA: 0:40:47 | Time/step: 697.0 µs avg, 699.3 µs current
+Rank 100: Completed 21/25 tasks | Runtime: 2:48:27 | ETA: 0:40:47 | Time/step: 697.1 µs avg, 699.3 µs current
+Rank 91: Completed 21/25 tasks | Runtime: 2:48:29 | ETA: 0:40:47 | Time/step: 697.2 µs avg, 699.4 µs current
+Rank 84: Completed 21/25 tasks | Runtime: 2:48:29 | ETA: 0:40:47 | Time/step: 697.2 µs avg, 699.4 µs current
+Rank 81: Completed 21/25 tasks | Runtime: 2:48:31 | ETA: 0:40:48 | Time/step: 697.3 µs avg, 699.5 µs current
+Rank 85: Completed 21/25 tasks | Runtime: 2:48:35 | ETA: 0:40:48 | Time/step: 697.6 µs avg, 699.6 µs current
+Rank 70: Completed 21/25 tasks | Runtime: 2:48:35 | ETA: 0:40:48 | Time/step: 697.6 µs avg, 699.7 µs current
+Rank 80: Completed 21/25 tasks | Runtime: 2:48:37 | ETA: 0:40:49 | Time/step: 697.7 µs avg, 699.8 µs current
+Rank 86: Completed 21/25 tasks | Runtime: 2:48:37 | ETA: 0:40:49 | Time/step: 697.8 µs avg, 699.9 µs current
+Rank 77: Completed 21/25 tasks | Runtime: 2:48:38 | ETA: 0:40:49 | Time/step: 697.9 µs avg, 699.8 µs current
+Rank 96: Completed 21/25 tasks | Runtime: 2:48:39 | ETA: 0:40:49 | Time/step: 697.9 µs avg, 699.9 µs current
+Rank 90: Completed 21/25 tasks | Runtime: 2:48:40 | ETA: 0:40:49 | Time/step: 697.9 µs avg, 699.8 µs current
+Rank 76: Completed 21/25 tasks | Runtime: 2:48:40 | ETA: 0:40:50 | Time/step: 698.0 µs avg, 700.2 µs current
+Rank 74: Completed 21/25 tasks | Runtime: 2:48:42 | ETA: 0:40:50 | Time/step: 698.1 µs avg, 700.0 µs current
+Rank 75: Completed 21/25 tasks | Runtime: 2:48:43 | ETA: 0:40:50 | Time/step: 698.2 µs avg, 700.3 µs current
+Rank 89: Completed 21/25 tasks | Runtime: 2:48:47 | ETA: 0:40:51 | Time/step: 698.4 µs avg, 700.5 µs current
+Rank 71: Completed 21/25 tasks | Runtime: 2:48:47 | ETA: 0:40:51 | Time/step: 698.4 µs avg, 700.5 µs current
+Rank 72: Completed 21/25 tasks | Runtime: 2:48:47 | ETA: 0:40:51 | Time/step: 698.4 µs avg, 700.4 µs current
+Rank 88: Completed 21/25 tasks | Runtime: 2:48:49 | ETA: 0:40:52 | Time/step: 698.6 µs avg, 700.7 µs current
+Rank 78: Completed 21/25 tasks | Runtime: 2:48:49 | ETA: 0:40:52 | Time/step: 698.6 µs avg, 700.7 µs current
+Rank 73: Completed 21/25 tasks | Runtime: 2:48:55 | ETA: 0:40:53 | Time/step: 699.0 µs avg, 700.9 µs current
+Rank 87: Completed 21/25 tasks | Runtime: 2:48:59 | ETA: 0:40:54 | Time/step: 699.2 µs avg, 701.4 µs current
+Rank 79: Completed 21/25 tasks | Runtime: 2:49:08 | ETA: 0:40:56 | Time/step: 699.9 µs avg, 702.0 µs current
+Rank 115: Completed 21/25 tasks | Runtime: 3:03:05 | ETA: 0:44:30 | Time/step: 665.8 µs avg, 667.7 µs current
+Rank 117: Completed 21/25 tasks | Runtime: 3:03:06 | ETA: 0:44:29 | Time/step: 665.8 µs avg, 667.4 µs current
+Rank 110: Completed 21/25 tasks | Runtime: 3:03:06 | ETA: 0:44:30 | Time/step: 665.8 µs avg, 667.7 µs current
+Rank 119: Completed 21/25 tasks | Runtime: 3:03:07 | ETA: 0:44:30 | Time/step: 665.9 µs avg, 667.5 µs current
+Rank 118: Completed 21/25 tasks | Runtime: 3:03:08 | ETA: 0:44:30 | Time/step: 666.0 µs avg, 667.7 µs current
+Rank 112: Completed 21/25 tasks | Runtime: 3:03:10 | ETA: 0:44:31 | Time/step: 666.1 µs avg, 667.9 µs current
+Rank 116: Completed 21/25 tasks | Runtime: 3:03:13 | ETA: 0:44:31 | Time/step: 666.3 µs avg, 668.0 µs current
+Rank 113: Completed 21/25 tasks | Runtime: 3:03:16 | ETA: 0:44:33 | Time/step: 666.4 µs avg, 668.3 µs current
+Rank 114: Completed 21/25 tasks | Runtime: 3:03:21 | ETA: 0:44:33 | Time/step: 666.7 µs avg, 668.5 µs current
+Rank 111: Completed 21/25 tasks | Runtime: 3:03:31 | ETA: 0:44:36 | Time/step: 667.4 µs avg, 669.1 µs current
+Saved combined results with 3000 rows to results/results_250610_G1-5_max-4-cut.parquet
+Cleaned up 120 individual rank result files
+Finished sweep in 3:48:34
+Average time per step: 716.02 µs
