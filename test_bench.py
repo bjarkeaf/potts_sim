@@ -31,7 +31,37 @@ from potts_utils import parse_graph
 from cim_sim import run_cim_from_graph
 
 #%% Define helper functions
-def plot_model(res, name, num_vertices, num_states):
+
+def plot_phase_with_wraparound(ax, t, phase, **kwargs):
+    """Plot phase data with disconnected lines at phase wrapping points."""
+    # Ensure phase is 2D array (time, spins) to handle single-spin input
+    if phase.ndim == 1:
+        phase = phase[:, np.newaxis]
+    for i in range(min(5, phase.shape[1])):
+        t_plot = np.copy(t)
+        phase_plot = np.copy(phase[:, i])
+
+        # Find jumps larger than threshold (π)
+        jumps = np.where(np.abs(np.diff(phase_plot)) > np.pi)[0]
+
+        # Insert wrap points, NaN, and opposite wrap at each jump
+        for idx in jumps[::-1]:  # go backwards to keep indices valid
+            t_cross = t_plot[idx + 1]
+            delta = phase_plot[idx + 1] - phase_plot[idx]
+            if delta > 0:
+                # crossed from -π to +π
+                b0, b1 = -np.pi, np.pi
+            else:
+                # crossed from +π to -π
+                b0, b1 = np.pi, -np.pi
+
+            # insert [boundary, NaN, opposite boundary] at crossing time
+            t_plot = np.insert(t_plot, idx + 1, [t_cross, t_cross, t_cross])
+            phase_plot = np.insert(phase_plot, idx + 1, [b0, np.nan, b1])
+
+        ax.plot(t_plot, phase_plot, **kwargs)
+
+def plot_model(res, name, dt, num_steps, num_vertices, num_states, opt_cut=0):
         cont   = res["continuous_states"]
         disc   = res["discrete_states"]
         cut    = res["cut_value"]
@@ -55,7 +85,8 @@ def plot_model(res, name, num_vertices, num_states):
             phase = np.angle(cont)
             for i in range(num_spins):
                 ax1.plot(t, amp[:,i],   lw=0.8)
-                ax2.plot(t, phase[:,i], lw=0.8)
+                #ax2.plot(t, phase[:,i], lw=0.8)
+                plot_phase_with_wraparound(ax2, t, phase[:,i], lw=0.8)
             # add reference phase lines
             for j in range(num_states):
                 theta = 2*np.pi/num_states * (j - np.floor(num_states/2))
@@ -153,7 +184,7 @@ def plot_histograms(res, name, num_states):
     ax3.set_title("Distribution of Final Discrete States")
     plt.tight_layout()
 
-def execute_model(name, run_func, T, dt, num_vertices, num_states, edges, noise_factor, seed, *extra_args):
+def execute_model(name, run_func, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed, *extra_args):
     num_steps = int(np.floor(T / dt))
     last_only = num_steps > 2e5
     if name == "CIM":
@@ -185,128 +216,142 @@ def execute_model(name, run_func, T, dt, num_vertices, num_states, edges, noise_
     print(f"{name} best cut = {last_c} (opt {opt_cut}, diff {last_c-opt_cut}), pct {pct:.2f}%")
     print(f"Time per step: {duration*1e6/num_steps:.2f} μs\n")
     if not last_only:
-        plot_model(res, name, num_vertices, num_states)
+        plot_model(res, name, dt, num_steps, num_vertices, num_states, opt_cut)
         plt.show()
     plot_histograms(res, name, num_states)
+    res["dt"] = dt
+    res["num_steps"] = num_steps
+    return res
 
 #%% Set up the simulation parameters
- 
-# Default parameters
-T = 100         # total simulation time
-dt = 1e-3       # time step
-num_steps = int(np.floor(T / dt))  # number of time steps
+if __name__ == "__main__":
+    # Default parameters
+    T = 100         # total simulation time
+    dt = 1e-3       # time step
 
-num_states = 4 # number of states for Potts model (q=k)
+    num_states = 3 # number of states for Potts model (q=k)
 
-noise_factor = 1e-4
-seed = 2
+    noise_factor = 1e-4
+    seed = 2
 
-# Load a coupling graph
-#file_path = "graphs/band/band50_3_antiferro.col"
-file_path = "graphs/gset/G5.col"
-#file_path = "graphs/g05/g05_60.0.col"
-num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max, ave_abs_J = parse_graph(file_path)
-opt_cut = opt_cut_dict.get(num_states, 0)
+    # Load a coupling graph
+    #file_path = "graphs/band/band50_3_antiferro.col"
+    #file_path = "graphs/gset/G5.col"
+    file_path = "graphs/g05/g05_10.0.col"
+    num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max, ave_abs_J = parse_graph(file_path)
+    opt_cut = opt_cut_dict.get(num_states, 0)
+    
+    edges_per_vertex = num_edges / num_vertices  # average number of edges per vertex
 
-#%% Run polynomial model
+    res_dict = {}  # Dictionary to store results for each model
 
-T = 100         # total simulation time
-dt = 1e-3       # time step
-num_steps = int(np.floor(T / dt))  # number of time steps
+   #%% Run polynomial model
+    T = 100         # total simulation time
+    dt = 1e-3       # time step
+    num_steps = int(np.floor(T / dt))  # number of time steps
 
-poly_order = 4 # order of polynomial model (Polynomial model)
+    poly_order = 3 # order of polynomial model (Polynomial model)
 
-beta_schedule = np.linspace(1/mu_max, 1/mu_max + 2, num_steps) # beta schedule
-gamma_schedule = beta_schedule * 3.5 # gamma schedule
+    beta_schedule = np.linspace(1/mu_max, 1/mu_max + 2, num_steps) # beta schedule
+    gamma_schedule = beta_schedule * 3.5 # gamma schedule
 
-execute_model("Polynomial", potts_sim.run_polynomial, T, dt, num_vertices, num_states, edges, noise_factor, seed,
-    poly_order,
-    list(beta_schedule), list(gamma_schedule)
-)
+    amplitude_seed = 0.0
 
-#%% Run q-PDC model
-T = 100         # total simulation time
-dt = 1e-3       # time step
-num_steps = int(np.floor(T / dt))  # number of time steps
+    res_dict["Polynomial"] = execute_model("Polynomial", potts_sim.run_polynomial, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed,
+        amplitude_seed,
+        poly_order,
+        list(beta_schedule), list(gamma_schedule)
+    )
 
-poly_order = 5 # order of polynomial model (Polynomial model)
-beta_schedule  = np.ones(num_steps) * (1/(1+ave_abs_J))
-gamma_schedule = np.linspace(0,1.755, num_steps)
-gamma_schedule *= 5
+    #%% Run q-PDC model
+    T = 100         # total simulation time
+    dt = 1e-3       # time step
+    num_steps = int(np.floor(T / dt))  # number of time steps
 
-execute_model("q-PDC", potts_sim.run_polynomial, T, dt, num_vertices, num_states, edges, noise_factor, seed,
-    poly_order,
-    list(beta_schedule), list(gamma_schedule)
-)
+    dampening = 1 + edges_per_vertex
+    gamma_th = (256/27)**(1/4)
 
-#%% Run NEC
+    poly_order = 5 # order of polynomial model (Polynomial model)
+    beta_schedule  = np.ones(num_steps) * 1 / dampening # constant beta schedule
+    gamma_schedule = np.linspace(0,gamma_th*2, num_steps)
+    gamma_schedule *= 5
 
-T = 2e3         # total simulation time
-dt = 1e-2       # time step
-num_steps = int(np.floor(T / dt))  # number of time steps
+    amplitude_seed = 1
 
-polynomial_order = 4 # n=3 used in original paper, but n>=q is required for amplitude bounding
-alpha_rate = 1e-2 # rate of change of alpha (NEC model)
-r_target = 1 # target radius for NEC model
-initial_alpha_arr = -mu_max * np.ones(num_vertices) # initial alpha values for NEC model
+    res_dict["q-PDC"] = execute_model("q-PDC", potts_sim.run_polynomial, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed,
+        amplitude_seed,
+        poly_order,
+        list(beta_schedule), list(gamma_schedule)
+    )
 
-# constant gamma
-#gamma_schedule = np.ones(num_steps) * 0.3
+    #%% Run NEC
 
-# linear gamma schedule
-gamma_schedule  = np.linspace(0, 1, num_steps)
-gamma_schedule *= 2.5 # scale by factor
+    T = 2e3         # total simulation time
+    dt = 1e-2       # time step
+    num_steps = int(np.floor(T / dt))  # number of time steps
 
-execute_model("NEC", potts_sim.run_nec, T, dt, num_vertices, num_states, edges, noise_factor, seed,
-    polynomial_order, alpha_rate, r_target,
-    initial_alpha_arr, gamma_schedule
-)
+    polynomial_order = 4 # n=3 used in original paper, but n>=q is required for amplitude bounding
+    alpha_rate = 1e-2 # rate of change of alpha (NEC model)
+    r_target = 1 # target radius for NEC model
+    initial_alpha_arr = -mu_max * np.ones(num_vertices) # initial alpha values for NEC model
 
-#%% Run Sigmoid model
+    # constant gamma
+    #gamma_schedule = np.ones(num_steps) * 0.3
 
-T = 2000         # total simulation time
-dt = 1e-3       # time step
-num_steps = int(np.floor(T / dt))  # number of time steps
+    # linear gamma schedule
+    gamma_schedule  = np.linspace(0, 1, num_steps)
+    gamma_schedule *= 2.5 # scale by factor
 
-alpha = -50.0 # alpha value for sigmoid model
+    res_dict["NEC"] = execute_model("NEC", potts_sim.run_nec, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed,
+        polynomial_order, alpha_rate, r_target,
+        initial_alpha_arr, gamma_schedule
+    )
 
-beta_schedule  = np.linspace((1-alpha)/mu_max, (1-alpha)/mu_max + 20, num_steps) # beta schedule (Polynomial and Sigmoid models)
-gamma_schedule = beta_schedule * 4 # gamma schedule (Polynomial, Sigmoid, and Fixed-Amplitude models)
+    #%% Run Sigmoid model
 
-execute_model("Sigmoid", potts_sim.run_sigmoid, T, dt, num_vertices, num_states, edges, noise_factor, seed,
-    alpha, list(beta_schedule), list(gamma_schedule)
-)
+    T = 2000         # total simulation time
+    dt = 1e-3       # time step
+    num_steps = int(np.floor(T / dt))  # number of time steps
 
-#%% Run Fixed-Amplitude model
+    alpha = -50.0 # alpha value for sigmoid model
 
-T = 1000         # total simulation time
-dt = 1e-3       # time step
-num_steps = int(np.floor(T / dt))  # number of time steps
+    beta_schedule  = np.linspace((1-alpha)/mu_max, (1-alpha)/mu_max + 20, num_steps) # beta schedule (Polynomial and Sigmoid models)
+    gamma_schedule = beta_schedule * 4 # gamma schedule (Polynomial, Sigmoid, and Fixed-Amplitude models)
 
-gamma_schedule = np.linspace(0,10,num_steps)
+    res_dict["Sigmoid"] = execute_model("Sigmoid", potts_sim.run_sigmoid, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed,
+        alpha, list(beta_schedule), list(gamma_schedule)
+    )
 
-execute_model("Fixed-Amplitude", potts_sim.run_fixed_amplitude, T, dt, num_vertices, num_states, edges, noise_factor, seed,
-    list(gamma_schedule)
-)
+    #%% Run Fixed-Amplitude model
 
-#%% Run CIM model
+    T = 100         # total simulation time
+    dt = 1e-3       # time step
+    num_steps = int(np.floor(T / dt))  # number of time steps
 
-T = 1e2          # total simulation time
-dt = 1e-2        # time step
-num_steps = int(np.floor(T / dt))  # number of time steps
+    gamma_schedule = np.linspace(0,10,num_steps)
 
-# CIM specific parameters
-zeta = 0.6       # empirical rescaling factor
-B_num_vertices = 60  # B/A/num_    vertices ratio for soft constraints 
-B = B_num_vertices / num_vertices  # B value for CIM model
-alpha = -10      # parameter for tanh nonlinearity
-beta_schedule = np.linspace(0, 0.02, num_steps)  # time-dependent annealing schedule
+    res_dict["Fixed-Amplitude"] = execute_model("Fixed-Amplitude", potts_sim.run_fixed_amplitude, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed,
+        list(gamma_schedule)
+    )
 
-# Execute the CIM model
-execute_model("CIM", run_cim_from_graph, T, dt, num_vertices, num_states, edges, noise_factor, seed,
-    alpha,
-    list(beta_schedule),
-    B, zeta
-)
+    #%% Run CIM model
+
+    T = 1e2          # total simulation time
+    dt = 1e-2        # time step
+    num_steps = int(np.floor(T / dt))  # number of time steps
+
+    # CIM specific parameters
+    zeta = 0.6       # empirical rescaling factor
+    B_num_vertices = 60  # B/A/num_    vertices ratio for soft constraints 
+    B = B_num_vertices / num_vertices  # B value for CIM model
+    alpha = -10      # parameter for tanh nonlinearity
+    beta_schedule = np.linspace(0, 0.02, num_steps)  # time-dependent annealing schedule
+
+    # Execute the CIM model
+    res_dict["CIM"] = execute_model("CIM", run_cim_from_graph, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed,
+        alpha,
+        list(beta_schedule),
+        B, zeta
+    )
 
 # %%

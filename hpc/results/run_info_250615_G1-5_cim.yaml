@@ -1,0 +1,11 @@
+timestamp: '2025-06-17T07:51:18.326010'
+git_revision: unknown
+config_file: configs/250615_G1-5_cim.yaml
+num_tasks: 22500
+num_graphs: 5
+num_ranks: 120
+total_steps_processed: 2250000000
+assumed_time_per_step_us: 7000
+estimated_runtime_seconds: 131250.0
+actual_time_per_step_us: 8229.336661310937
+actual_walltime_seconds: 163507.3596816063

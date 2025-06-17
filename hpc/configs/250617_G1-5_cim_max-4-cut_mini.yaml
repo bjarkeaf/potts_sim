@@ -17,5 +17,5 @@ models:
   CIM:
     alpha: [-10]
     beta_schedule: ["lin(0,0.02)"]
-    B_num_vertices: "50:50:200" # B * num_vertices, so B = B_num_vertices / num_vertices
-    zeta: "0.5:0.5:2"
+    B_num_vertices: "25:25:300" # B * num_vertices, so B = B_num_vertices / num_vertices
+    zeta: "0.25:0.25:2"
