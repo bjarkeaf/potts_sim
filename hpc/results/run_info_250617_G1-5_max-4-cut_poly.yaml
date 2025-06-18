@@ -1,0 +1,11 @@
+timestamp: '2025-06-17T11:28:00.124055'
+git_revision: unknown
+config_file: configs/250617_G1-5_max-4-cut_poly.yaml
+num_tasks: 84000
+num_graphs: 5
+num_ranks: 128
+total_steps_processed: 8400000000
+assumed_time_per_step_us: 150
+estimated_runtime_seconds: 9843.75
+actual_time_per_step_us: 104.42700458044098
+actual_walltime_seconds: 6936.832086086273

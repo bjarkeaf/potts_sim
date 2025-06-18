@@ -27,7 +27,7 @@ if to_build:
     
 import potts_sim  # Import the custom module
 from potts_utils import parse_graph
-#from potts_utils import parse_graph, compute_largest_eigenvalues_and_eigenvectors, compute_max_eigenvalue
+from potts_utils import parse_graph, compute_largest_eigenvalues_and_eigenvectors, compute_max_eigenvalue
 from cim_sim import run_cim_from_graph
 
 #%% Define helper functions
@@ -229,16 +229,16 @@ if __name__ == "__main__":
     T = 100         # total simulation time
     dt = 1e-3       # time step
 
-    num_states = 3 # number of states for Potts model (q=k)
+    num_states = 4 # number of states for Potts model (q=k)
 
     noise_factor = 1e-4
     seed = 2
 
     # Load a coupling graph
     #file_path = "graphs/band/band50_3_antiferro.col"
-    #file_path = "graphs/gset/G5.col"
-    file_path = "graphs/g05/g05_10.0.col"
-    num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max, ave_abs_J = parse_graph(file_path)
+    file_path = "graphs/gset/G5.col"
+    #file_path = "graphs/g05/g05_10.0.col"
+    num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max = parse_graph(file_path)
     opt_cut = opt_cut_dict.get(num_states, 0)
     
     edges_per_vertex = num_edges / num_vertices  # average number of edges per vertex
@@ -246,14 +246,14 @@ if __name__ == "__main__":
     res_dict = {}  # Dictionary to store results for each model
 
    #%% Run polynomial model
-    T = 100         # total simulation time
+    T = 1000         # total simulation time
     dt = 1e-3       # time step
     num_steps = int(np.floor(T / dt))  # number of time steps
 
-    poly_order = 3 # order of polynomial model (Polynomial model)
+    poly_order = 11 # order of polynomial model (Polynomial model)
 
     beta_schedule = np.linspace(1/mu_max, 1/mu_max + 2, num_steps) # beta schedule
-    gamma_schedule = beta_schedule * 3.5 # gamma schedule
+    gamma_schedule = beta_schedule * 0.25 # gamma schedule
 
     amplitude_seed = 0.0
 
@@ -264,17 +264,17 @@ if __name__ == "__main__":
     )
 
     #%% Run q-PDC model
-    T = 100         # total simulation time
+    T = 50         # total simulation time
     dt = 1e-3       # time step
     num_steps = int(np.floor(T / dt))  # number of time steps
 
     dampening = 1 + edges_per_vertex
     gamma_th = (256/27)**(1/4)
 
-    poly_order = 5 # order of polynomial model (Polynomial model)
+    poly_order = 2*num_states - 1 # order of polynomial model (Polynomial model)
     beta_schedule  = np.ones(num_steps) * 1 / dampening # constant beta schedule
-    gamma_schedule = np.linspace(0,gamma_th*2, num_steps)
-    gamma_schedule *= 5
+    gamma_schedule = np.linspace(0,gamma_th, num_steps)
+    gamma_schedule *= 32
 
     amplitude_seed = 1
 

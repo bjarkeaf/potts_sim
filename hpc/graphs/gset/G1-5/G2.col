@@ -7,7 +7,6 @@ c
 c Optimum cut value (max-4-cut): 16809
 c Optimum energy (max-4-cut): 2367
 c
-c Average absolute coupling: 1.0
 c Maximum eigenvalue: 13.395787316459488
 p 800 19176 
 e 1 63 1

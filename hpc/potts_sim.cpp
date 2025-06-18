@@ -31,6 +31,7 @@ enum class ModelType {
  * @param noise_factor            Scaling factor for Gaussian noise.
  * @param seed                    Random seed for noise generation.
  * @param model_type              Variant of Potts model to run (POLYNOMIAL, NEC, SIGMOID, FIXED_AMPLITUDE).
+ * @param seed_amplitude          Seed for initial amplitude (POLYNOMIAL).
  * @param polynomial_order        Order of polynomial nonlinearity (POLYNOMIAL).
  * @param alpha                   Alpha parameter (SIGMOID).
  * @param alpha_rate              Rate parameter (NEC).
@@ -50,6 +51,7 @@ py::object run(
     const py::array_t<int>& edges,
     double noise_factor, int seed,
     ModelType model_type,
+    double seed_amplitude,
     int polynomial_order,
     double alpha,
     double alpha_rate,
@@ -136,10 +138,24 @@ py::object run(
     // Allocate arrays for spin states, coupling terms, noise, etc.
     //----------------------------------------------------------------
     
+    // Initialize random number generator for Gaussian noise
+    std::mt19937 gen(seed);  // fixed seed
+    std::normal_distribution<double> dist(0.0, 1.0); // mean=0, stddev=1
+    double noise_scale = noise_factor * std::sqrt(dt / 2.0); // account for dt scaling
+
     // Allocate arrays for spin states, coupling terms, noise, etc.
     std::vector<std::complex<double>> x(num_spins, {0.0, 0.0}); // initialize spin states to zero
     std::vector<std::complex<double>> coupling_arr(num_spins); 
     std::vector<int> rounded_state(num_spins); // to store the rounded states
+
+    if (seed_amplitude != 0) {
+        // Initialize x with random complex numbers of provided amplitude
+        std::uniform_real_distribution<double> dist(0.0, 2.0 * M_PI); // uniform distribution for phase
+        for (int i = 0; i < num_spins; ++i) {
+            double theta = dist(gen); // random phase
+            x[i] = std::polar(seed_amplitude, theta); // set amplitude to seed
+        }
+    }
     
     // Reference state vectors for rounding
     //      ref_state_conj[j] = exp(-i * theta_j) for j=0,1,...,q-1
@@ -171,11 +187,6 @@ py::object run(
     std::complex<double> dx_dt;
     double energy = 0.0;
     double cut_value = 0.0;
-
-    // Initialize random number generator for Gaussian noise
-    std::mt19937 gen(seed);  // fixed seed
-    std::normal_distribution<double> dist(0.0, 1.0); // mean=0, stddev=1
-    double noise_scale = noise_factor * std::sqrt(dt / 2.0); // account for dt scaling
 
     // Variables for tracking best solution
     int best_step = 0;
@@ -522,7 +533,6 @@ py::object run(
     out["energy"]            = return_energy            ? py::object(energy_history)           : py::none();
     out["cut_value"]         = return_cut_value         ? py::object(cut_value_history)        : py::none();
     return out;
-    
 }
 
 // wrapper for polynomial model
@@ -530,6 +540,7 @@ py::object run_polynomial(
     double T, double dt, int num_spins, int num_states,
     const py::array_t<int>& edges,
     double noise_factor, int seed,
+    double seed_amplitude,
     int polynomial_order,
     const std::vector<double>& beta_schedule,
     const std::vector<double>& gamma_schedule,
@@ -545,6 +556,7 @@ py::object run_polynomial(
         edges,
         noise_factor, seed,
         ModelType::POLYNOMIAL,
+        seed_amplitude, 
         polynomial_order,
         /*alpha*/0.0, /*alpha_rate*/0.0, /*r_target*/0.0,
         /*initial_alpha_arr*/{}, beta_schedule, gamma_schedule,
@@ -578,6 +590,7 @@ py::object run_nec(
         edges,
         noise_factor, seed,
         ModelType::NEC,
+        /*seed_amplitude*/0.0,
         polynomial_order,
         /*alpha*/0.0, alpha_rate, r_target,
         initial_alpha_arr, /*beta_schedule*/{}, gamma_schedule,
@@ -609,6 +622,7 @@ py::object run_sigmoid(
         edges,
         noise_factor, seed,
         ModelType::SIGMOID,
+        /*seed_amplitude*/0.0,
         /*polynomial_order*/0,
         alpha, /*alpha_rate*/0.0, /*r_target*/0.0,
         /*initial_alpha_arr*/{}, beta_schedule, gamma_schedule,
@@ -638,6 +652,7 @@ py::object run_fixed_amplitude(
         edges,
         noise_factor, seed,
         ModelType::FIXED_AMPLITUDE,
+        /*seed_amplitude*/0.0,
         /*polynomial_order*/0,
         /*alpha*/0.0, /*alpha_rate*/0.0, /*r_target*/0.0,
         /*initial_alpha_arr*/{}, /*beta_schedule*/{}, gamma_schedule,
@@ -670,6 +685,7 @@ PYBIND11_MODULE(potts_sim, m) {
           py::arg("edges"), py::arg("noise_factor"), py::arg("seed") = 1,
           py::arg("polynomial_order"),
           py::arg("beta_schedule"), py::arg("gamma_schedule"),
+          py::arg("seed_amplitude") = 0,
           py::arg("return_continuous_states") = true,
           py::arg("return_discrete_states") = false,
           py::arg("return_energy") = false,

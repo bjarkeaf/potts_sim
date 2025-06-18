@@ -167,20 +167,20 @@ theta_values = np.array(theta_values + [-np.pi, np.pi])
 theta_labels = [r"$-\frac{2\pi}{3}$", r"$0$", r"$\frac{2\pi}{3}$", r"$-\pi$", r"$\pi$"]
 
 # Create figure
-fig = plt.figure(figsize=(12, 13))
+fig = plt.figure(figsize=(10, 10))
 
 # Simplified outer GridSpec: just [top], [bottom]
-outer = GridSpec(2, 1, height_ratios=[2,1], hspace=0.15)
+outer = GridSpec(2, 1, height_ratios=[2,1], hspace=0.3)
 
 # Top section: 3 rows (amp, phase, cut) x 4 columns
-top = outer[0].subgridspec(3, 4, height_ratios=[1, 1, 1*2/3], hspace=0.2, wspace=0.2)
+top = outer[0].subgridspec(3, 4, height_ratios=[1, 1, 1*2/3], hspace=0.35, wspace=-0.3)
 
 # Bottom section: 2 rows (main, cut) x 2 columns (wide)
-bottom = outer[1].subgridspec(2, 2, height_ratios=[1, 1*2/3], hspace=0.25, wspace=0)
+bottom = outer[1].subgridspec(2, 2, height_ratios=[1, 1*2/3], hspace=0.40, wspace=-0.3)
 
 # Models and labels
 models = ["NEC", "q-PDC", "Polynomial", "Sigmoid"]
-display_names = ["NEC", "q-PDC", "Polynomial\nPotts machine", "Sigmoid\nPotts machine"]
+display_names = ["NEC", "q-PDC", "Polynomial PM\n(this work)", "Sigmoid PM\n(this work)"]
 letters = ['a', 'b', 'c', 'd']
 
 max_num_spins = 100 # Maximum number of spins to plot
@@ -204,7 +204,7 @@ for idx, (model_key, display_name, letter) in enumerate(zip(models, display_name
     # Amplitude row (row 0)
     axA = fig.add_subplot(top[0, idx])
     axA.set_box_aspect(aspect_ratio)
-    axA.text(-0.15, 1.05, f"({letter}1)", transform=axA.transAxes,
+    axA.text(-0.2, 1.10, f"({letter}1)", transform=axA.transAxes,
              fontsize=12, fontweight="bold")
     axA.set_title(display_name, pad=10)
     
@@ -228,7 +228,7 @@ for idx, (model_key, display_name, letter) in enumerate(zip(models, display_name
     # Phase row (row 1)
     axP = fig.add_subplot(top[1, idx])
     axP.set_box_aspect(aspect_ratio)
-    axP.text(-0.15, 1.05, f"({letter}2)", transform=axP.transAxes,
+    axP.text(-0.2, 1.10, f"({letter}2)", transform=axP.transAxes,
              fontsize=12, fontweight="bold")
     
     # Plot phases if complex
@@ -258,7 +258,7 @@ for idx, (model_key, display_name, letter) in enumerate(zip(models, display_name
     # Cut value row (row 2)
     axC = fig.add_subplot(top[2, idx])
     axC.set_box_aspect(aspect_ratio*2/3)
-    axC.text(-0.15, 1.05, f"({letter}3)", transform=axC.transAxes,
+    axC.text(-0.2, 1.10, f"({letter}3)", transform=axC.transAxes,
              fontsize=12, fontweight="bold")
     cut = np.array(model_res["cut_value"])
     if cut.size > 1000:
@@ -267,8 +267,8 @@ for idx, (model_key, display_name, letter) in enumerate(zip(models, display_name
         t_cut = np.linspace(0, T, cut.size)
     else:
         t_cut = np.linspace(0, T, cut.size)
-    axC.plot(t_cut, cut, lw=1, label="Cut value")
-    axC.axhline(opt_cut, color='red', linestyle='--', label='Optimum cut value')
+    axC.plot(t_cut, cut, lw=1)
+    axC.axhline(opt_cut, color='red', linestyle='--', label='Optimum')
     axC.legend(loc='lower right')
     axC.set_ylim(50, opt_cut+3)  # Set y-axis range
     axC.set_yticks(np.arange(50, opt_cut+5, 10))  # Set y-ticks 
@@ -285,7 +285,7 @@ for idx, (model_key, display_name, letter) in enumerate(zip(models, display_name
 # Bottom models: 2 wide columns, 2 rows (main and cut)
 bottom_models = [
     ("Fixed-Amplitude", "q-SHIL", "e", "Spin phases"),
-    ("CIM", "Sigmoid Ising machine", "f", "Spin amplitudes")
+    ("CIM", "Sigmoid IM", "f", "Spin amplitudes")
 ]
 
 for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
@@ -293,7 +293,7 @@ for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
     # Main plot (row 0)
     ax = fig.add_subplot(bottom[0, j])
     ax.set_box_aspect(aspect_ratio)
-    ax.text(-0.155, 1.05, f"({letter})", transform=ax.transAxes,
+    ax.text(-0.2, 1.10, f"({letter}1)", transform=ax.transAxes,
             fontsize=12, fontweight="bold")
     ax.set_title(display_name, pad=10)
     
@@ -346,7 +346,7 @@ for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
     # Cut value plot (row 1)
     axC = fig.add_subplot(bottom[1, j])
     axC.set_box_aspect(aspect_ratio*2/3)
-    axC.text(-0.15, 1.05, f"({letter}2)", transform=axC.transAxes,
+    axC.text(-0.2, 1.15, f"({letter}2)", transform=axC.transAxes,
              fontsize=12, fontweight="bold")
     cut = np.array(res_dict[model_key]["cut_value"])
     if cut.size > 1000:
@@ -355,8 +355,8 @@ for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
         t_cut = np.linspace(0, T, cut.size)
     else:
         t_cut = np.linspace(0, T, cut.size)
-    axC.plot(t_cut, cut, lw=1, label="Cut value")
-    axC.axhline(opt_cut, color='red', linestyle='--', label='Optimum cut value')
+    axC.plot(t_cut, cut, lw=1)
+    axC.axhline(opt_cut, color='red', linestyle='--', label='Optimum')
     axC.legend(loc='lower right')
     axC.set_ylim(50, opt_cut+3)  # Set y-axis range
     axC.set_yticks(np.arange(50, opt_cut+5, 10))  # Set y-ticks 

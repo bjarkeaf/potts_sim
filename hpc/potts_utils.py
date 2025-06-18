@@ -18,7 +18,6 @@ def parse_graph(file_path, zero_based=False):
     opt_cut_dict = {}
     opt_energy_dict = {}
     mu_max = None
-    ave_abs_J = None
 
     p_line_index = None
 
@@ -43,9 +42,6 @@ def parse_graph(file_path, zero_based=False):
                 continue
             if line.startswith("c Maximum eigenvalue"):
                 mu_max = float(line.split(":")[1].strip())
-                continue
-            if line.startswith("c Average absolute coupling"):
-                ave_abs_J = float(line.split(":")[1].strip())
                 continue
             if line.startswith("p"):
                 p_line_index = i
@@ -76,20 +72,7 @@ def parse_graph(file_path, zero_based=False):
         
         print(f"Updated file with computed maximum eigenvalue: {mu_max}")
     
-    # If average absolute coupling wasn't found, compute it
-    if ave_abs_J is None and coupling_values.size > 0:
-        ave_abs_J = np.mean(np.abs(coupling_values))
-        
-        # Update the file with the computed average absolute coupling
-        ave_abs_J_line = f"c Average absolute coupling: {ave_abs_J}\n"
-        lines.insert(p_line_index, ave_abs_J_line)
-        
-        with open(file_path, 'w') as f:
-            f.writelines(lines)
-        
-        print(f"Updated file with computed average absolute coupling: {ave_abs_J}")
-
-    return num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max, ave_abs_J
+    return num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max
 
 def compute_max_eigenvalue(num_vertices, i_indices, j_indices, J_values):
     """

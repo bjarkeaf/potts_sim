@@ -66,7 +66,7 @@ def get_git_revision():
 @functools.lru_cache(maxsize=32)
 def load_graph(graph_path):
     """Parse a graph file, cached to avoid repeated parsing"""
-    num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max, ave_abs_J = parse_graph(graph_path)
+    num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max = parse_graph(graph_path)
     return {
         'path': graph_path,
         'name': Path(graph_path).stem,
@@ -76,7 +76,6 @@ def load_graph(graph_path):
         'opt_cut_dict': opt_cut_dict,
         'opt_energy_dict': opt_energy_dict,
         'mu_max': mu_max,
-        'ave_abs_J': ave_abs_J,
     }
 
 def safe_eval(expr, env):
@@ -190,7 +189,7 @@ def expand_param_values(param_values, is_schedule=False):
             if isinstance(val, str):
                 if ':' in val:
                     expanded.extend(parse_range(val))
-                elif any(token in val for token in ['mu_max', 'alpha', 'ave_abs_J', 'num_vertices']):
+                elif any(token in val for token in ['mu_max', 'alpha', 'num_vertices', 'num_edges', 'num_states']):
                     # This is an expression to be evaluated later with environment variables
                     expanded.append(val)  # Keep as string
                 else:
@@ -245,7 +244,15 @@ def generate_param_sets(model_type, model_params, T, dt):
     
     # For each model type, define how to generate parameter sets
     if model_type == ModelType.POLYNOMIAL or model_type == ModelType.QPDC:
-        poly_orders = [int(po) for po in expand_param_values(model_params.get('poly_order', [3]))]
+        # Handle expression-based poly_order
+        raw_poly_orders = expand_param_values(model_params.get('poly_order', [3]))
+        poly_orders = []
+        for po in raw_poly_orders:
+            if isinstance(po, str) and any(token in po for token in ['num_states', 'num_vertices', 'num_edges']):
+                # Will be evaluated later with environment variables
+                poly_orders.append(po)
+            else:
+                poly_orders.append(int(po))
         
         # Process schedules
         beta_info = process_schedule_param('beta_schedule', ["lin(0,1)"])
@@ -573,7 +580,6 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     num_edges = graph['num_edges']
     edges = graph['edges']
     mu_max = graph['mu_max']
-    ave_abs_J = graph['ave_abs_J']
     start_time = time.time()
     
     # Calculate num_steps
@@ -585,9 +591,11 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     # Prepare environment for schedule evaluation
     env = {
         'mu_max': mu_max,
-        'ave_abs_J': ave_abs_J,
         'np': np,
-        'num_vertices': num_vertices 
+        'num_vertices': num_vertices,
+        'num_edges': num_edges,
+        'num_states': num_states,
+        'gamma_th': (256/27)**(1/4)  # Add gamma_th constant
     }
     
     # Add model-specific parameters to environment
@@ -595,6 +603,10 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
         if key not in ['id', 'beta_fn', 'gamma_fn', 'beta_factor', 'gamma_factor', 'beta_based_on', 'gamma_based_on',
                        'beta_is_prototype', 'gamma_is_prototype', 'beta_prototype', 'gamma_prototype']:
             env[key] = value
+    
+    # Evaluate poly_order if it's an expression
+    if 'poly_order' in param_set and isinstance(param_set['poly_order'], str):
+        param_set['poly_order'] = int(safe_eval(param_set['poly_order'], env))
     
     # Evaluate schedules based on model type requirements
     if model_type == ModelType.POLYNOMIAL or model_type == ModelType.QPDC:
@@ -622,10 +634,16 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
             beta_schedule = compile_schedule(param_set['beta_expr'])(num_steps, env)
             gamma_schedule = compile_schedule(param_set['gamma_expr'])(num_steps, env)
         
+        seed_amplitude = 0
+        if model_type == ModelType.QPDC:
+            # For QPDC model, we need to set the seed amplitude
+            seed_amplitude = 1
+
         res = potts_sim.run_polynomial(
             T, dt, num_vertices, num_states,
             edges,
             noise_factor, task_seed,
+            seed_amplitude,
             param_set['poly_order'],
             beta_schedule, gamma_schedule,
             return_continuous_states=False,
@@ -802,8 +820,7 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
         "T": T,
         "dt": dt,
         "num_steps": num_steps,
-        "mu_max": mu_max,
-        "ave_abs_J": ave_abs_J,
+        "mu_max": mu_max
     }
     
     # Add model-specific parameters to the result
@@ -945,13 +962,15 @@ def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
     import matplotlib.pyplot as plt # Only import matplotlib if needed
     num_steps = int(np.floor(T / dt))
     mu_max = graph['mu_max']
-    ave_abs_J = graph['ave_abs_J']
     
     # Prepare environment for schedule evaluation
     env = {
         'mu_max': mu_max,
-        'ave_abs_J': ave_abs_J,
-        'np': np
+        'np': np,
+        'num_vertices': graph['num_vertices'],
+        'num_edges': graph['num_edges'],
+        'num_states': param_set.get('num_states', 3),
+        'gamma_th': (256/27)**(1/4)  # Add gamma_th constant
     }
     
     # Add model-specific parameters to environment
@@ -959,6 +978,14 @@ def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
         if key not in ['id', 'beta_fn', 'gamma_fn', 'beta_factor', 'gamma_factor', 'beta_based_on', 'gamma_based_on',
                        'beta_is_prototype', 'gamma_is_prototype', 'beta_prototype', 'gamma_prototype']:
             env[key] = value
+    
+    # Evaluate poly_order if it's an expression
+    if 'poly_order' in param_set and isinstance(param_set['poly_order'], str):
+        try:
+            param_set['poly_order'] = int(safe_eval(param_set['poly_order'], env))
+        except:
+            # Keep as string if evaluation fails
+            pass
     
     # Create figure
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -1016,7 +1043,7 @@ def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
         
         # Plot gamma schedule
         ax.plot(time_axis, gamma_schedule, label=gamma_label)
-        
+
         # Add alpha rate and r_target as text annotations
         alpha_rate_text = f"Alpha Rate: {param_set['alpha_rate']}"
         r_target_text = f"R Target: {param_set['r_target']}"
