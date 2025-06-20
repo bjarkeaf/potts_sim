@@ -336,15 +336,15 @@ if __name__ == "__main__":
 
     #%% Run CIM model
 
-    T = 1e2          # total simulation time
+    T = 1e3          # total simulation time
     dt = 1e-2        # time step
     num_steps = int(np.floor(T / dt))  # number of time steps
 
     # CIM specific parameters
-    zeta = 0.6       # empirical rescaling factor
-    B_num_vertices = 60  # B/A/num_    vertices ratio for soft constraints 
+    zeta = 0.7       # empirical rescaling factor
+    B_num_vertices = 225  # B/A/num_    vertices ratio for soft constraints 
     B = B_num_vertices / num_vertices  # B value for CIM model
-    alpha = -10      # parameter for tanh nonlinearity
+    alpha = -50      # parameter for tanh nonlinearity
     beta_schedule = np.linspace(0, 0.02, num_steps)  # time-dependent annealing schedule
 
     # Execute the CIM model

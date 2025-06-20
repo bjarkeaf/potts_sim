@@ -36,7 +36,7 @@ seed = 2
 #file_path = "graphs/band/band50_3_antiferro.col"
 #file_path = "graphs/gset/G5.col"
 file_path = "../graphs/g05/g05_20.0.col"
-num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max, ave_abs_J = parse_graph(file_path)
+num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max = parse_graph(file_path)
 opt_cut = opt_cut_dict.get(num_states, 0)
 
 edges_per_vertex = num_edges / num_vertices  # average number of edges per vertex
@@ -180,7 +180,7 @@ bottom = outer[1].subgridspec(2, 2, height_ratios=[1, 1*2/3], hspace=0.40, wspac
 
 # Models and labels
 models = ["NEC", "q-PDC", "Polynomial", "Sigmoid"]
-display_names = ["NEC", "q-PDC", "Polynomial PM\n(this work)", "Sigmoid PM\n(this work)"]
+display_names = ["NEC", r'$q$-PDC', "Polynomial PM\n(this work)", "Sigmoid PM\n(this work)"]
 letters = ['a', 'b', 'c', 'd']
 
 max_num_spins = 100 # Maximum number of spins to plot
@@ -284,8 +284,8 @@ for idx, (model_key, display_name, letter) in enumerate(zip(models, display_name
 
 # Bottom models: 2 wide columns, 2 rows (main and cut)
 bottom_models = [
-    ("Fixed-Amplitude", "q-SHIL", "e", "Spin phases"),
-    ("CIM", "Sigmoid IM", "f", "Spin amplitudes")
+    ("Fixed-Amplitude", r'$q$-SHIL', "e", "Spin phases"),
+    ("CIM", "Sigmoid IM with\nspin sign method", "f", "Spin amplitudes")
 ]
 
 for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):

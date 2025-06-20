@@ -5,7 +5,7 @@ out_dir: "results/"  # Directory to save results
 
 # Wall time estimation
 assumed_time_per_step_us: 250 # Assumed time between steps in microseconds
-# wall_time ~ 2 days, 1 hour
+# wall_time ~ 2 days, 1 hour with 120 cores
 
 # Global simulation parameters (can be overridden by models)
 T: 100         # Total simulation time

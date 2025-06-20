@@ -8,8 +8,8 @@ hpc_submit_driver.sh
 fotonano_submit_driver.sh
 amd_submit_driver.sh
 
-analyze_results.py
 plot_benchmark.py
+merge_parquet.py
 run_local_test.sh
 run_local_test.sh.save
 poll_free_cores_by_domain.sh
