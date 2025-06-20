@@ -2,10 +2,13 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import argparse
 from pathlib import Path
 import os
 from collections import defaultdict
+import seaborn as sns
+from cycler import cycler
 
 SERIES_NAME = None
 
@@ -13,6 +16,13 @@ SERIES_NAME = None
 #   --results     Path to the results.parquet file (required)
 #   --out_dir     Directory where plots will be saved (default: plots/<series_name>)
 #   --model_order Comma-separated list of model names in the desired legend/order
+
+# Apply theme
+sns_palette_name = "muted"
+sns.set_theme(style="white", palette=sns_palette_name)
+plt.rc('font', family='Liberation sans')
+plt.rc('axes', prop_cycle=cycler('color', sns.color_palette(sns_palette_name)))
+PALETTE = sns.color_palette(sns_palette_name)
 
 def main():
     parser = argparse.ArgumentParser(description='Generate comparison plots from Potts model parameter sweep results')
@@ -98,6 +108,18 @@ def main():
         plot_hyperparams(results, args.out_dir, model_order)
     else:
         print("Warning: Cannot create hyperparameter sweep plots - cut gap not found")
+    
+    # 5. Cut value distribution boxplots by graph and model
+    if 'cut_value' in results.columns:
+        plot_cut_distributions_by_graph(results, args.out_dir, model_order)
+    else:
+        print("Warning: Cannot create cut distribution plots - cut value not found")
+    
+    # 6. Relative optimality gap distribution boxplots by graph and model
+    if 'rel_cut_gap' in results.columns:
+        plot_rel_gap_distributions_by_graph(results, args.out_dir, model_order)
+    else:
+        print("Warning: Cannot create relative gap distribution plots - relative cut gap not found")
 
 def sort_models_by_performance(data, metric_col, ascending=True):
     """
@@ -165,7 +187,7 @@ def plot_optimality_gap(results, out_dir, model_order=None):
     ax.spines['right'].set_visible(False)
     max_val = values.max()
     offset = max_val * 0.01
-    plt.barh(models, values, color=plt.cm.tab10(range(len(models))))
+    plt.barh(models, values, color=PALETTE[:len(models)])
     for i, v in enumerate(values):
         plt.text(v + offset, i, f'{v:.2f}', va='center', ha='left')
     plt.xlabel('Average optimality gap (cut value)')
@@ -198,7 +220,7 @@ def plot_relative_optimality_gap(results, out_dir, model_order=None):
     ax.spines['right'].set_visible(False)
     max_val = values.max()
     offset = max_val * 0.01
-    plt.barh(models, values, color=plt.cm.tab10(range(len(models))))
+    plt.barh(models, values, color=PALETTE[:len(models)])
     for i, v in enumerate(values):
         plt.text(v + offset, i, f'{v:.2f}%', va='center', ha='left')
     plt.xlabel('Relative optimality gap (%)')
@@ -206,6 +228,154 @@ def plot_relative_optimality_gap(results, out_dir, model_order=None):
     plt.savefig(os.path.join(out_dir, 'rel_optimality_gaps.png'), dpi=200)
     plt.close()
     print(f"Saved best relative optimality gap plot to {os.path.join(out_dir, 'rel_optimality_gaps.png')}")
+
+def plot_cut_distributions_by_graph(results, out_dir, model_order=None):
+    """
+    Create boxplots showing cut value distributions by graph and model.
+    
+    For each graph-model combination, only the best hyperparameter set is used
+    (the one with smallest average relative optimality gap).
+    """
+    # Get best parameters for each graph-model combination (minimize relative cut gap)
+    best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True)
+    
+    # Filter results to only include best parameter combinations
+    filtered_results = pd.merge(
+        results, 
+        best_params, 
+        on=['graph', 'model', 'param_id']
+    )
+    
+    # Determine model ordering if not provided
+    if model_order is None:
+        # Order models by their average relative optimality gap across all graphs
+        model_performance = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
+        model_order = model_performance.index.tolist()
+    
+    # Get unique graphs and include optimum cut, then sort alphanumerically
+    graphs_df = filtered_results[['graph', 'num_spins', 'opt_cut']].drop_duplicates()
+    graphs = sorted(graphs_df['graph'].unique())  # Sort alphanumerically
+    
+    # Calculate the total number of positions needed
+    num_models = len(model_order)
+    total_width = num_models * len(graphs)
+    
+    # Prepare the plot with exact sizing
+    fig_width = max(10, 0.2 * total_width + 2)  # Add margin for labels
+    fig, ax = plt.subplots(figsize=(fig_width, 6))
+    
+    # Calculate section width (number of positions per graph)
+    positions_per_graph = num_models
+    
+    # Keep track of graph section boundaries
+    graph_centers = []
+    separator_positions = []
+    
+    # Build boxplot_data & position_model_map
+    boxplot_data = {}
+    position_model_map = {}
+    
+    # Process each graph-model combination to gather data
+    for g_idx, graph in enumerate(graphs):
+        # Calculate position information - ensure equal spacing
+        start_pos = g_idx * positions_per_graph
+        graph_centers.append(start_pos + positions_per_graph/2 - 0.5)
+        
+        if g_idx > 0:
+            separator_positions.append(start_pos - 0.5)
+        
+        # Process each model in the specified order
+        for m_idx, model in enumerate(model_order):
+            # Calculate position for this model
+            position = start_pos + m_idx
+            
+            # Get cut values for this graph-model combination
+            model_data = filtered_results[(filtered_results['graph']==graph) & 
+                                        (filtered_results['model']==model)]
+            
+            # Store data even if empty (will handle in plotting)
+            if not model_data.empty:
+                boxplot_data[position] = model_data['cut_value'].tolist()
+            else:
+                boxplot_data[position] = []
+                
+            # Keep track of which model is at which position
+            position_model_map[position] = model
+    
+    # Sort positions (to ensure they're in order)
+    sorted_positions = sorted(boxplot_data.keys())
+    
+    # Prepare data for boxplot
+    all_data = [boxplot_data[pos] for pos in sorted_positions]
+    
+    # Create a mask for positions with no data
+    mask = [len(data) > 0 for data in all_data]
+    valid_positions = [pos for i, pos in enumerate(sorted_positions) if mask[i]]
+    valid_data = [data for data in all_data if len(data) > 0]
+    
+    # Create boxplots for positions with data
+    bp = ax.boxplot(
+        valid_data,
+        positions=valid_positions,
+        patch_artist=True,
+        widths=0.7,
+        medianprops={'color': 'black'}
+    )
+    
+    # Color each box according to its model
+    for i, box in enumerate(bp['boxes']):
+        model = position_model_map[valid_positions[i]]
+        model_idx = model_order.index(model)
+        box.set_facecolor(PALETTE[model_idx % len(PALETTE)])
+    
+    # Add vertical separators between graphs
+    for pos in separator_positions:
+        ax.axvline(x=pos, color='gray', linestyle='--', alpha=0.7)
+    
+    # Draw solid green line at optimum cut spanning full width of each graph section
+    for g_idx, graph in enumerate(graphs):
+        start_pos = g_idx * positions_per_graph
+        end_pos = start_pos + len(model_order) - 1
+        full_start = start_pos - 0.5  # Full width start
+        full_end = end_pos + 0.5      # Full width end
+        opt_val = graphs_df.loc[graphs_df['graph'] == graph, 'opt_cut'].iloc[0]
+        ax.hlines(opt_val,
+                  full_start,
+                  full_end,
+                  colors='green',
+                  linestyles='-',
+                  linewidth=1,
+                  alpha=0.7)
+    
+    # Set x-axis labels and ticks
+    ax.set_xticks(graph_centers)
+    ax.set_xticklabels([f"{g}" for g in graphs])
+    
+    # Add y-axis label and title
+    ax.set_ylabel('Cut Value')
+    ax.set_title(f'{SERIES_NAME} | Cut Value Distribution by Graph (Best Hyperparameters)')
+    
+    # Add legend for models with green line for optimum cut
+    legend_elements = [plt.Rectangle((0,0), 1, 1, facecolor=PALETTE[i % len(PALETTE)], 
+                                    edgecolor='black') for i, _ in enumerate(model_order)]
+    
+    # Add model labels to legend with green solid line for optimum
+    opt_handle = Line2D([0], [0], color='green', linestyle='-', label='Optimum cut')
+    legend_elements.append(opt_handle)
+    ax.legend(
+        legend_elements,
+        model_order + ['Optimum cut'],
+        loc='center left',
+        bbox_to_anchor=(1.02, 0.5),
+        borderaxespad=0
+    )
+    
+    # Adjust layout and save
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, 'cut_distributions.png'), dpi=200)
+    plt.close()
+    
+    print(f"Saved cut value distribution plot to {os.path.join(out_dir, 'cut_distributions.png')}")
 
 def plot_hyperparams(results, out_dir, model_order=None):
     """
@@ -404,12 +574,13 @@ def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
             
             # Use a consistent color for each model across all spin counts
             model_idx = models.index(model)
-            plt.bar(bar_positions[i] + offset, sr, width, 
-                   color=plt.cm.tab10(model_idx % 10), 
+            plt.bar(bar_positions[i] + offset, sr, width,
+                   color=PALETTE[model_idx % len(PALETTE)],
                    label=model if i == 0 and j == 0 else "")
     
     # Create a proper legend with all models
-    handles = [plt.Rectangle((0,0),1,1, color=plt.cm.tab10(models.index(model) % 10)) for model in models]
+    handles = [plt.Rectangle((0,0),1,1, color=PALETTE[i % len(PALETTE)])
+               for i, _ in enumerate(models)]
     plt.legend(handles, models)
     
     plt.xlabel('Number of Spins')
@@ -420,5 +591,141 @@ def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
     plt.savefig(os.path.join(out_dir, 'max_success_rate.png'), dpi=200)
     print(f"Saved max success rate plot to {os.path.join(out_dir, 'max_success_rate.png')}")
 
+def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
+    """
+    Create boxplots showing relative optimality gap distributions by graph and model.
+    
+    For each graph-model combination, only the best hyperparameter set is used
+    (the one with smallest average relative optimality gap).
+    """
+    # Get best parameters for each graph-model combination (minimize relative cut gap)
+    best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True)
+    
+    # Filter results to only include best parameter combinations
+    filtered_results = pd.merge(
+        results, 
+        best_params, 
+        on=['graph', 'model', 'param_id']
+    )
+    
+    # Determine model ordering if not provided
+    if model_order is None:
+        # Order models by their average relative optimality gap across all graphs
+        model_performance = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
+        model_order = model_performance.index.tolist()
+    
+    # Get unique graphs and sort them alphanumerically
+    graphs_df = filtered_results[['graph', 'num_spins']].drop_duplicates()
+    graphs = sorted(graphs_df['graph'].unique())  # Sort alphanumerically
+    
+    # Calculate the total number of positions needed
+    num_models = len(model_order)
+    total_width = num_models * len(graphs)
+    
+    # Prepare the plot with exact sizing
+    fig_width = max(10, 0.2 * total_width + 2)  # Add margin for labels
+    fig, ax = plt.subplots(figsize=(fig_width, 6))
+    
+    # Calculate section width (number of positions per graph)
+    positions_per_graph = num_models
+    
+    # Keep track of graph section boundaries
+    graph_centers = []
+    separator_positions = []
+    
+    # Build boxplot_data & position_model_map
+    boxplot_data = {}
+    position_model_map = {}
+    
+    # Process each graph-model combination to gather data
+    for g_idx, graph in enumerate(graphs):
+        # Calculate position information - ensure equal spacing
+        start_pos = g_idx * positions_per_graph
+        graph_centers.append(start_pos + positions_per_graph/2 - 0.5)
+        
+        if g_idx > 0:
+            separator_positions.append(start_pos - 0.5)
+        
+        # Process each model in the specified order
+        for m_idx, model in enumerate(model_order):
+            # Calculate position for this model
+            position = start_pos + m_idx
+            
+            # Get relative gap values for this graph-model combination
+            model_data = filtered_results[(filtered_results['graph']==graph) & 
+                                        (filtered_results['model']==model)]
+            
+            # Store data even if empty (will handle in plotting)
+            if not model_data.empty:
+                boxplot_data[position] = model_data['rel_cut_gap'].tolist()
+            else:
+                boxplot_data[position] = []
+                
+            # Keep track of which model is at which position
+            position_model_map[position] = model
+    
+    # Sort positions (to ensure they're in order)
+    sorted_positions = sorted(boxplot_data.keys())
+    
+    # Prepare data for boxplot
+    all_data = [boxplot_data[pos] for pos in sorted_positions]
+    
+    # Create a mask for positions with no data
+    mask = [len(data) > 0 for data in all_data]
+    valid_positions = [pos for i, pos in enumerate(sorted_positions) if mask[i]]
+    valid_data = [data for data in all_data if len(data) > 0]
+    
+    # Create boxplots for positions with data
+    bp = ax.boxplot(
+        valid_data,
+        positions=valid_positions,
+        patch_artist=True,
+        widths=0.7,
+        medianprops={'color': 'black'}
+    )
+    
+    # Color each box according to its model
+    for i, box in enumerate(bp['boxes']):
+        model = position_model_map[valid_positions[i]]
+        model_idx = model_order.index(model)
+        box.set_facecolor(PALETTE[model_idx % len(PALETTE)])
+    
+    # Add vertical separators between graphs
+    for pos in separator_positions:
+        ax.axvline(x=pos, color='gray', linestyle='--', alpha=0.7)
+    
+    # Draw horizontal line at 0% (optimal)
+    ax.axhline(y=0, color='green', linestyle='-', linewidth=1, alpha=0.7)
+    
+    # Set x-axis labels and ticks
+    ax.set_xticks(graph_centers)
+    ax.set_xticklabels([f"{g}" for g in graphs])
+    
+    # Add y-axis label and title
+    ax.set_ylabel('Relative optimality gap (%)')
+    ax.set_title(f'{SERIES_NAME} | Relative optimality gap distribution by graph (best hyperparameters)')
+    
+    # Add legend for models
+    legend_elements = [plt.Rectangle((0,0), 1, 1, facecolor=PALETTE[i % len(PALETTE)], 
+                                    edgecolor='black') for i, _ in enumerate(model_order)]
+    
+    # Add optimum line to legend
+    opt_handle = Line2D([0], [0], color='green', linestyle='-', label='Optimum (0%)')
+    legend_elements.append(opt_handle)
+    ax.legend(
+        legend_elements,
+        model_order + ['Optimum (0%)'],
+        loc='center left',
+        bbox_to_anchor=(1.02, 0.5),
+        borderaxespad=0
+    )
+    
+    # Adjust layout and save
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, 'rel_gap_distributions.png'), dpi=200)
+    plt.close()
+    
+    print(f"Saved relative optimality gap distribution plot to {os.path.join(out_dir, 'rel_gap_distributions.png')}")
+    
 if __name__ == "__main__":
     main()

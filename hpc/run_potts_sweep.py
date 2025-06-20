@@ -26,7 +26,7 @@ Flags:
 """
 
 try:
-    from mpi4py import MPI
+    from mpi4g import MPI
     use_mpi = True
 except ImportError:
     # Fallback to a dummy MPI-like interface if mpi4py is not available (local run)

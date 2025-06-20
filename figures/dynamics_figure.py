@@ -15,10 +15,10 @@ from cim_sim import run_cim_from_graph
 from test_bench import execute_model, plot_phase_with_wraparound
 
 # Apply theme
-#sns.set_theme(style="whitegrid")
+sns.set_theme(style="white")
 #plt.style.use('tableau-colorblind10')
 sns.set_palette("colorblind")
-plt.rcParams.update({'font.family':'Liberation Sans'})
+plt.rc('font', family='Liberation sans')
 
 #%% Set up the simulation parameters
  
@@ -136,7 +136,7 @@ res_dict["Fixed-Amplitude"] = execute_model("Fixed-Amplitude", potts_sim.run_fix
 
 #%% Run CIM model
 
-T = 1e3          # total simulation time
+T = 1000          # total simulation time
 dt = 1e-2        # time step
 num_steps = int(np.floor(T / dt))  # number of time steps
 
