@@ -1,0 +1,8 @@
+assumed_time_per_step_us: 200
+config_file: configs/250620_G1-5_sigmoid_max-4-cut.yaml
+estimated_runtime_seconds: 196875.0
+git_revision: unknown
+num_graphs: 5
+num_ranks: 128
+num_tasks: 63000
+timestamp: '2025-06-20T14:21:57.367544'

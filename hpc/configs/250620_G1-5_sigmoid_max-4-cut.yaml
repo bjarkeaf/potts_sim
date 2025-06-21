@@ -4,8 +4,8 @@ graph_path: "graphs/gset/G1-5/"  # Directory, file, or multiple directories/file
 out_dir: "results/"  # Directory to save results
 
 # Wall time estimation
-assumed_time_per_step_us: 200 # Assumed time between steps in microseconds
-# estimated wall time (100 cores): 2 days, 22 hours
+assumed_time_per_step_us: 300 # Assumed time between steps in microseconds
+# estimated wall time (128 cores): 2 days, 7 hours
 
 # Global simulation parameters (can be overridden per model)
 T: 100         # Total simulation time
@@ -18,7 +18,7 @@ models:
   SIGMOID:
     T: 2000 # The lower alpha, the longer it takes to converge
     dt: 1e-3
-    alpha: "-50:10:0"
+    alpha: "-50:20:10"
     beta_schedule: ["lin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)"]
     gamma_schedule:
       based_on: "beta_schedule"

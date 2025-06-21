@@ -4,9 +4,7 @@ osync.sh
 isync.sh
 
 potts_sim.cpython-313-x86_64-linux-gnu.so
-hpc_submit_driver.sh
-fotonano_submit_driver.sh
-amd_submit_driver.sh
+*submit_driver.sh
 
 plot_benchmark.py
 merge_parquet.py

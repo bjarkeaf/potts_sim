@@ -1,0 +1,8 @@
+assumed_time_per_step_us: 400
+config_file: configs/250618_G1-5_NEC.yaml
+estimated_runtime_seconds: 249218.75
+git_revision: unknown
+num_graphs: 5
+num_ranks: 128
+num_tasks: 159500
+timestamp: '2025-06-20T19:20:20.260992'

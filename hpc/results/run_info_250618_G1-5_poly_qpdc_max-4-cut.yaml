@@ -1,0 +1,11 @@
+timestamp: '2025-06-20T19:14:06.044618'
+git_revision: unknown
+config_file: configs/250618_G1-5_poly_qpdc_max-4-cut.yaml
+num_tasks: 97000
+num_graphs: 5
+num_ranks: 128
+total_steps_processed: 84650000000
+assumed_time_per_step_us: 250
+estimated_runtime_seconds: 165332.03125
+actual_time_per_step_us: 161.1358460229343
+actual_walltime_seconds: 106968.84660220146
