@@ -32,12 +32,15 @@ from cim_sim import run_cim_from_graph
 
 #%% Define helper functions
 
-def plot_phase_with_wraparound(ax, t, phase, **kwargs):
+def plot_phase_with_wraparound(ax, t, phase, max_num_to_plot=None, **kwargs):
     """Plot phase data with disconnected lines at phase wrapping points."""
     # Ensure phase is 2D array (time, spins) to handle single-spin input
     if phase.ndim == 1:
         phase = phase[:, np.newaxis]
-    for i in range(min(5, phase.shape[1])):
+    # default to all spins
+    if max_num_to_plot is None:
+        max_num_to_plot = phase.shape[1]
+    for i in range(min(max_num_to_plot, phase.shape[1])):
         t_plot = np.copy(t)
         phase_plot = np.copy(phase[:, i])
 
@@ -45,17 +48,13 @@ def plot_phase_with_wraparound(ax, t, phase, **kwargs):
         jumps = np.where(np.abs(np.diff(phase_plot)) > np.pi)[0]
 
         # Insert wrap points, NaN, and opposite wrap at each jump
-        for idx in jumps[::-1]:  # go backwards to keep indices valid
+        for idx in jumps[::-1]:
             t_cross = t_plot[idx + 1]
             delta = phase_plot[idx + 1] - phase_plot[idx]
             if delta > 0:
-                # crossed from -π to +π
                 b0, b1 = -np.pi, np.pi
             else:
-                # crossed from +π to -π
                 b0, b1 = np.pi, -np.pi
-
-            # insert [boundary, NaN, opposite boundary] at crossing time
             t_plot = np.insert(t_plot, idx + 1, [t_cross, t_cross, t_cross])
             phase_plot = np.insert(phase_plot, idx + 1, [b0, np.nan, b1])
 

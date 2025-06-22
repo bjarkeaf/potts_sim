@@ -234,8 +234,11 @@ for idx, (model_key, display_name, letter) in enumerate(zip(models, display_name
     # Plot phases if complex
     if np.iscomplexobj(cont_states):
         phase = np.angle(cont_states)
-        # Use our helper function instead of direct plotting
-        plot_phase_with_wraparound(axP, t, phase)
+        plot_phase_with_wraparound(
+            axP, t, phase,
+            max_num_to_plot=max_num_spins,
+            lw=1
+        )
     else:
         axP.text(0.5, 0.5, "Real-valued\nspins", ha='center', va='center', transform=axP.transAxes)
     
@@ -314,8 +317,11 @@ for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
     if model_key == "Fixed-Amplitude":
         if np.iscomplexobj(cont_states):
             phase = np.angle(cont_states)
-            # Use our helper function instead of direct plotting
-            plot_phase_with_wraparound(ax, t, phase)
+            plot_phase_with_wraparound(
+                ax, t, phase,
+                max_num_to_plot=max_num_spins,
+                lw=1
+            )
         else:
             ax.text(0.5, 0.5, "Real-valued\nspins", ha='center', va='center', transform=ax.transAxes)
         
