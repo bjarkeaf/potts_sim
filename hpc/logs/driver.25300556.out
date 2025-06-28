@@ -1,0 +1,2688 @@
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Found 5 graph files
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Time per step        : 300 µs (assumed)
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+Expected runtime     : 291 days, 16:00:00
+
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+
+================================================================================Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+WALL TIME ESTIMATE
+
+================================================================================--------------------------------------------------------------------------------
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Total steps          : 84,000,000,000
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+
+================================================================================
+WALL TIME ESTIMATE
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+
+================================================================================BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+
+================================================================================SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+
+================================================================================WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Expected runtime     : 291 days, 16:00:00
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Rank 0: Processing 42000 tasks
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+================================================================================
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Rank 0: Processing 42000 tasks
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+Generated 42000 tasks
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+
+================================================================================SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+
+================================================================================Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Total steps          : 84,000,000,000
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+Ranks for estimate   : 1
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+Steps per rank       : 84,000,000,000
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+--------------------------------------------------------------------------------
+Time per step        : 300 µs (assumed)
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+BREAKDOWN BY MODEL TYPE
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+--------------------------------------------------------------------------------
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+
+================================================================================================================================================================
+
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+
+================================================================================Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+WALL TIME ESTIMATE
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+
+================================================================================
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+
+================================================================================
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+
+WALL TIME ESTIMATE
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+
+================================================================================
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+Ranks for estimate   : 1
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+Steps per rank       : 84,000,000,000
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+
+Time per step        : 300 µs (assumed)
+Ranks for estimate   : 1
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Expected runtime     : 291 days, 16:00:00
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+--------------------------------------------------------------------------------
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Time per step        : 300 µs (assumed)
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+================================================================================
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+
+================================================================================
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+
+================================================================================Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+--------------------------------------------------------------------------------
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Time per step        : 300 µs (assumed)
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+Time per step        : 300 µs (assumed)
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+================================================================================
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+Expected runtime     : 291 days, 16:00:00
+
+================================================================================
+================================================================================
+
+--------------------------------------------------------------------------------
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+================================================================================
+
+
+================================================================================
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Ranks for estimate   : 1
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Steps per rank       : 84,000,000,000
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+================================================================================
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+
+================================================================================
+WALL TIME ESTIMATE
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Time per step        : 300 µs (assumed)
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+BREAKDOWN BY MODEL TYPE
+
+================================================================================
+================================================================================--------------------------------------------------------------------------------
+
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+WALL TIME ESTIMATE
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Time per step        : 300 µs (assumed)
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+================================================================================
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+
+================================================================================SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+
+WALL TIME ESTIMATE
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+--------------------------------------------------------------------------------
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Tasks                : 42,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Expected runtime     : 291 days, 16:00:00
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+BREAKDOWN BY MODEL TYPE
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+--------------------------------------------------------------------------------
+================================================================================
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Time per step        : 300 µs (assumed)
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+================================================================================
+
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+
+================================================================================Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Time per step        : 300 µs (assumed)
+Tasks                : 42,000
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+
+================================================================================
+WALL TIME ESTIMATE
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+
+================================================================================
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+
+================================================================================
+WALL TIME ESTIMATE
+Time per step        : 300 µs (assumed)
+--------------------------------------------------------------------------------
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Rank 0: Processing 42000 tasks
+Found 5 graph files
+Generated 42000 tasks
+
+================================================================================
+WALL TIME ESTIMATE
+--------------------------------------------------------------------------------
+Tasks                : 42,000
+Total steps          : 84,000,000,000
+Ranks for estimate   : 1
+Steps per rank       : 84,000,000,000
+Time per step        : 300 µs (assumed)
+Expected runtime     : 291 days, 16:00:00
+--------------------------------------------------------------------------------
+BREAKDOWN BY MODEL TYPE
+--------------------------------------------------------------------------------
+SIGMOID         : 42,000 tasks | 84,000,000,000 steps (100.0%) | ~291 days, 16:00:00
+================================================================================
+
+Rank 0: Processing 42000 tasks
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:46 | ETA: 0:00:00 | Time/step: 263.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:46 | ETA: 0:00:00 | Time/step: 263.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:46 | ETA: 0:00:00 | Time/step: 263.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:46 | ETA: 0:00:00 | Time/step: 263.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:47 | ETA: 0:00:00 | Time/step: 263.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:47 | ETA: 0:00:00 | Time/step: 263.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:47 | ETA: 0:00:00 | Time/step: 263.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:47 | ETA: 0:00:00 | Time/step: 263.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:47 | ETA: 0:00:00 | Time/step: 263.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:47 | ETA: 0:00:00 | Time/step: 263.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:47 | ETA: 0:00:00 | Time/step: 263.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:47 | ETA: 0:00:00 | Time/step: 263.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:47 | ETA: 0:00:00 | Time/step: 263.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:47 | ETA: 0:00:00 | Time/step: 263.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:48 | ETA: 0:00:00 | Time/step: 264.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:48 | ETA: 0:00:00 | Time/step: 264.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:48 | ETA: 0:00:00 | Time/step: 264.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:48 | ETA: 0:00:00 | Time/step: 264.3 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:48 | ETA: 0:00:00 | Time/step: 264.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:49 | ETA: 0:00:00 | Time/step: 264.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:48 | ETA: 0:00:00 | Time/step: 264.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:49 | ETA: 0:00:00 | Time/step: 264.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:49 | ETA: 0:00:00 | Time/step: 264.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:49 | ETA: 0:00:00 | Time/step: 264.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:49 | ETA: 0:00:00 | Time/step: 264.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:49 | ETA: 0:00:00 | Time/step: 264.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:49 | ETA: 0:00:00 | Time/step: 264.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:49 | ETA: 0:00:00 | Time/step: 264.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:49 | ETA: 0:00:00 | Time/step: 264.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:49 | ETA: 0:00:00 | Time/step: 264.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:50 | ETA: 0:00:00 | Time/step: 265.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:08:51 | ETA: 0:00:00 | Time/step: 265.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:03 | ETA: 0:00:00 | Time/step: 271.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.0 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:03 | ETA: 0:00:00 | Time/step: 271.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.1 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:03 | ETA: 0:00:00 | Time/step: 271.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:03 | ETA: 0:00:00 | Time/step: 271.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:03 | ETA: 0:00:00 | Time/step: 271.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:03 | ETA: 0:00:00 | Time/step: 272.0 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.1 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:03 | ETA: 0:00:00 | Time/step: 272.0 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.1 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.0 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.0 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.1 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.3 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.1 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.3 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.3 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.3 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.3 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.3 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:04 | ETA: 0:00:00 | Time/step: 272.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.7 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 273.0 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.8 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 272.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 273.0 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:05 | ETA: 0:00:00 | Time/step: 273.0 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.0 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.1 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.1 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.2 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.3 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.3 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.4 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:06 | ETA: 0:00:00 | Time/step: 273.5 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:07 | ETA: 0:00:00 | Time/step: 273.6 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:07 | ETA: 0:00:00 | Time/step: 273.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:03 | ETA: 0:00:00 | Time/step: 271.9 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:10 | ETA: 0:00:00 | Time/step: 275.1 µs avg, 0.0 µs current
+Rank 0: Completed 1/42000 tasks | Runtime: 0:09:12 | ETA: 0:00:00 | Time/step: 276.2 µs avg, 0.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:45 | ETA: 256 days, 12:00:07 | Time/step: 263.9 µs avg, 263.9 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:46 | ETA: 256 days, 14:12:06 | Time/step: 263.9 µs avg, 264.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:47 | ETA: 256 days, 14:23:35 | Time/step: 264.0 µs avg, 264.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:47 | ETA: 256 days, 14:59:15 | Time/step: 264.0 µs avg, 264.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:47 | ETA: 256 days, 14:34:01 | Time/step: 264.0 µs avg, 264.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:49 | ETA: 256 days, 14:59:08 | Time/step: 264.1 µs avg, 264.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:49 | ETA: 256 days, 17:58:17 | Time/step: 264.1 µs avg, 264.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:50 | ETA: 256 days, 18:06:56 | Time/step: 264.1 µs avg, 264.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:50 | ETA: 256 days, 18:57:15 | Time/step: 264.1 µs avg, 264.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:52 | ETA: 256 days, 20:34:52 | Time/step: 264.2 µs avg, 264.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:53 | ETA: 256 days, 18:42:26 | Time/step: 264.3 µs avg, 264.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:54 | ETA: 256 days, 22:06:03 | Time/step: 264.3 µs avg, 264.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:54 | ETA: 256 days, 21:52:43 | Time/step: 264.3 µs avg, 264.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:55 | ETA: 256 days, 23:37:06 | Time/step: 264.3 µs avg, 264.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:55 | ETA: 256 days, 22:38:32 | Time/step: 264.3 µs avg, 264.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:56 | ETA: 257 days, 1:43:30 | Time/step: 264.4 µs avg, 264.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:57 | ETA: 257 days, 0:03:47 | Time/step: 264.4 µs avg, 264.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:58 | ETA: 257 days, 1:13:56 | Time/step: 264.5 µs avg, 264.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:58 | ETA: 257 days, 1:03:19 | Time/step: 264.5 µs avg, 264.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:58 | ETA: 257 days, 2:58:41 | Time/step: 264.5 µs avg, 264.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:58 | ETA: 257 days, 3:03:57 | Time/step: 264.5 µs avg, 264.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:58 | ETA: 257 days, 1:26:59 | Time/step: 264.5 µs avg, 264.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:36:58 | ETA: 257 days, 2:17:58 | Time/step: 264.5 µs avg, 264.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:37:02 | ETA: 257 days, 5:40:55 | Time/step: 264.6 µs avg, 264.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:37:03 | ETA: 257 days, 6:15:26 | Time/step: 264.7 µs avg, 264.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:37:03 | ETA: 257 days, 6:50:45 | Time/step: 264.7 µs avg, 264.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:37:09 | ETA: 257 days, 13:19:15 | Time/step: 265.0 µs avg, 265.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:37:10 | ETA: 257 days, 14:39:24 | Time/step: 265.0 µs avg, 265.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:37:17 | ETA: 257 days, 22:16:12 | Time/step: 265.4 µs avg, 265.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:37:18 | ETA: 258 days, 0:35:52 | Time/step: 265.4 µs avg, 265.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:37:22 | ETA: 258 days, 5:02:03 | Time/step: 265.6 µs avg, 265.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:37:23 | ETA: 258 days, 3:10:26 | Time/step: 265.6 µs avg, 265.6 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:50 | ETA: 264 days, 15:40:49 | Time/step: 272.3 µs avg, 272.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:50 | ETA: 264 days, 16:06:36 | Time/step: 272.3 µs avg, 272.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:51 | ETA: 264 days, 16:55:05 | Time/step: 272.3 µs avg, 272.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:52 | ETA: 264 days, 18:54:31 | Time/step: 272.4 µs avg, 272.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:52 | ETA: 264 days, 19:00:07 | Time/step: 272.4 µs avg, 272.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:53 | ETA: 264 days, 19:43:46 | Time/step: 272.4 µs avg, 272.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:53 | ETA: 264 days, 19:11:01 | Time/step: 272.4 µs avg, 272.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:53 | ETA: 264 days, 19:01:38 | Time/step: 272.4 µs avg, 272.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:54 | ETA: 264 days, 19:56:48 | Time/step: 272.5 µs avg, 272.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:55 | ETA: 264 days, 19:56:36 | Time/step: 272.5 µs avg, 272.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:56 | ETA: 264 days, 21:31:44 | Time/step: 272.6 µs avg, 272.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:55 | ETA: 264 days, 21:13:33 | Time/step: 272.5 µs avg, 272.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:56 | ETA: 264 days, 23:11:48 | Time/step: 272.5 µs avg, 272.6 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:56 | ETA: 264 days, 22:55:06 | Time/step: 272.6 µs avg, 272.6 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:56 | ETA: 264 days, 22:33:09 | Time/step: 272.6 µs avg, 272.6 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:57 | ETA: 264 days, 23:30:13 | Time/step: 272.6 µs avg, 272.6 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:57 | ETA: 264 days, 23:48:13 | Time/step: 272.6 µs avg, 272.6 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:58 | ETA: 264 days, 23:58:43 | Time/step: 272.7 µs avg, 272.6 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:58 | ETA: 265 days, 1:52:44 | Time/step: 272.7 µs avg, 272.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:58 | ETA: 265 days, 0:56:26 | Time/step: 272.7 µs avg, 272.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:58 | ETA: 265 days, 1:34:54 | Time/step: 272.7 µs avg, 272.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:58 | ETA: 265 days, 0:59:02 | Time/step: 272.7 µs avg, 272.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:59 | ETA: 265 days, 1:29:10 | Time/step: 272.7 µs avg, 272.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:59 | ETA: 265 days, 2:26:59 | Time/step: 272.7 µs avg, 272.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:39:59 | ETA: 265 days, 2:09:24 | Time/step: 272.7 µs avg, 272.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:00 | ETA: 265 days, 3:08:24 | Time/step: 272.7 µs avg, 272.8 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:00 | ETA: 265 days, 2:27:46 | Time/step: 272.7 µs avg, 272.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:00 | ETA: 265 days, 3:42:45 | Time/step: 272.8 µs avg, 272.8 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:01 | ETA: 265 days, 4:09:40 | Time/step: 272.8 µs avg, 272.8 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:02 | ETA: 265 days, 4:25:28 | Time/step: 272.8 µs avg, 272.8 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:01 | ETA: 265 days, 5:21:55 | Time/step: 272.8 µs avg, 272.9 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:02 | ETA: 265 days, 5:31:14 | Time/step: 272.8 µs avg, 272.9 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:02 | ETA: 265 days, 5:31:02 | Time/step: 272.8 µs avg, 272.9 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:02 | ETA: 265 days, 5:23:16 | Time/step: 272.8 µs avg, 272.9 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:02 | ETA: 265 days, 6:00:51 | Time/step: 272.9 µs avg, 272.9 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:02 | ETA: 265 days, 5:49:18 | Time/step: 272.9 µs avg, 272.9 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:03 | ETA: 265 days, 4:56:22 | Time/step: 272.9 µs avg, 272.9 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:03 | ETA: 265 days, 5:56:00 | Time/step: 272.9 µs avg, 272.9 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:03 | ETA: 265 days, 8:30:07 | Time/step: 272.9 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:03 | ETA: 265 days, 7:50:08 | Time/step: 272.9 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:04 | ETA: 265 days, 7:36:15 | Time/step: 272.9 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:04 | ETA: 265 days, 8:13:31 | Time/step: 272.9 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:04 | ETA: 265 days, 7:08:37 | Time/step: 272.9 µs avg, 272.9 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 9:15:31 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 7:27:32 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 9:51:23 | Time/step: 273.0 µs avg, 273.1 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 8:57:01 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 9:29:25 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 7:11:45 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 9:18:35 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 8:17:58 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:06 | ETA: 265 days, 9:05:14 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:06 | ETA: 265 days, 8:02:29 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:06 | ETA: 265 days, 8:42:58 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 9:12:57 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 9:19:55 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:06 | ETA: 265 days, 9:29:20 | Time/step: 273.0 µs avg, 273.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:06 | ETA: 265 days, 9:41:11 | Time/step: 273.0 µs avg, 273.1 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:06 | ETA: 265 days, 11:33:05 | Time/step: 273.0 µs avg, 273.1 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:07 | ETA: 265 days, 11:47:44 | Time/step: 273.0 µs avg, 273.1 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:07 | ETA: 265 days, 11:46:08 | Time/step: 273.1 µs avg, 273.1 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:07 | ETA: 265 days, 12:46:39 | Time/step: 273.1 µs avg, 273.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:08 | ETA: 265 days, 11:32:22 | Time/step: 273.1 µs avg, 273.1 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:08 | ETA: 265 days, 13:01:56 | Time/step: 273.1 µs avg, 273.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:08 | ETA: 265 days, 11:24:53 | Time/step: 273.1 µs avg, 273.1 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:09 | ETA: 265 days, 14:00:15 | Time/step: 273.1 µs avg, 273.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:09 | ETA: 265 days, 13:21:07 | Time/step: 273.2 µs avg, 273.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:10 | ETA: 265 days, 13:19:52 | Time/step: 273.2 µs avg, 273.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:10 | ETA: 265 days, 13:32:38 | Time/step: 273.2 µs avg, 273.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:10 | ETA: 265 days, 12:42:09 | Time/step: 273.2 µs avg, 273.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:05 | ETA: 265 days, 10:36:47 | Time/step: 273.0 µs avg, 273.1 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:10 | ETA: 265 days, 14:59:37 | Time/step: 273.2 µs avg, 273.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:10 | ETA: 265 days, 15:00:10 | Time/step: 273.2 µs avg, 273.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:10 | ETA: 265 days, 15:07:57 | Time/step: 273.2 µs avg, 273.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:10 | ETA: 265 days, 13:53:19 | Time/step: 273.2 µs avg, 273.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:11 | ETA: 265 days, 16:44:46 | Time/step: 273.2 µs avg, 273.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:11 | ETA: 265 days, 15:23:51 | Time/step: 273.2 µs avg, 273.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:11 | ETA: 265 days, 16:06:54 | Time/step: 273.3 µs avg, 273.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:11 | ETA: 265 days, 17:13:03 | Time/step: 273.3 µs avg, 273.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:11 | ETA: 265 days, 14:06:48 | Time/step: 273.3 µs avg, 273.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:12 | ETA: 265 days, 14:32:43 | Time/step: 273.3 µs avg, 273.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:12 | ETA: 265 days, 13:32:55 | Time/step: 273.3 µs avg, 273.2 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:12 | ETA: 265 days, 15:20:23 | Time/step: 273.3 µs avg, 273.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:12 | ETA: 265 days, 15:10:42 | Time/step: 273.3 µs avg, 273.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:13 | ETA: 265 days, 16:33:45 | Time/step: 273.3 µs avg, 273.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:13 | ETA: 265 days, 16:18:02 | Time/step: 273.3 µs avg, 273.3 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:14 | ETA: 265 days, 19:22:57 | Time/step: 273.4 µs avg, 273.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:15 | ETA: 265 days, 18:17:41 | Time/step: 273.4 µs avg, 273.4 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:15 | ETA: 265 days, 19:14:22 | Time/step: 273.5 µs avg, 273.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:16 | ETA: 265 days, 20:54:13 | Time/step: 273.5 µs avg, 273.5 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:16 | ETA: 265 days, 22:20:35 | Time/step: 273.5 µs avg, 273.6 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:19 | ETA: 266 days, 0:28:10 | Time/step: 273.6 µs avg, 273.7 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:20 | ETA: 266 days, 2:50:23 | Time/step: 273.7 µs avg, 273.8 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:28 | ETA: 266 days, 10:32:31 | Time/step: 274.0 µs avg, 274.1 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:40:50 | ETA: 267 days, 7:21:26 | Time/step: 275.0 µs avg, 275.0 µs current
+Rank 0: Completed 11/42000 tasks | Runtime: 1:41:15 | ETA: 268 days, 10:09:58 | Time/step: 276.2 µs avg, 276.2 µs current

@@ -11,11 +11,15 @@ import seaborn as sns
 from cycler import cycler
 
 SERIES_NAME = None
+FILE_EXT = "png"  # Default file extension
+ADD_TITLES = True  # Default is to add titles
 
 # CLI flags:
 #   --results     Path to the results.parquet file (required)
 #   --out_dir     Directory where plots will be saved (default: plots/<series_name>)
 #   --model_order Comma-separated list of model names in the desired legend/order
+#   --figure_mode Output plots as PDF without titles (for publications)
+#   --table       Generate CSV table with statistics for best hyperparameter combinations
 
 # Apply theme
 sns_palette_name = "muted"
@@ -24,12 +28,27 @@ plt.rc('font', family='Liberation sans')
 plt.rc('axes', prop_cycle=cycler('color', sns.color_palette(sns_palette_name)))
 PALETTE = sns.color_palette(sns_palette_name)
 
+def save_figure(filename_base, out_dir):
+    """Save figure with proper extension based on figure mode"""
+    filename = f"{filename_base}.{FILE_EXT}"
+    dpi = 200 if FILE_EXT == "png" else None  # DPI only needed for raster formats
+    plt.savefig(os.path.join(out_dir, filename), dpi=dpi)
+    print(f"Saved plot to {os.path.join(out_dir, filename)}")
+
 def main():
     parser = argparse.ArgumentParser(description='Generate comparison plots from Potts model parameter sweep results')
     parser.add_argument('--results', type=str, required=True, help='Path to results.parquet file')
     parser.add_argument('--out_dir', type=str, default='plots', help='Output directory for plots')
     parser.add_argument('--model_order', type=str, default=None, help='Comma-separated list of models in desired order')
+    parser.add_argument('--figure_mode', action='store_true', help='Output as PDF without titles (for publications)')
+    parser.add_argument('--table', action='store_true', help='Generate CSV table with statistics for best hyperparameter combinations')
     args = parser.parse_args()
+    
+    # Set global variables for figure mode
+    global FILE_EXT, ADD_TITLES
+    if args.figure_mode:
+        FILE_EXT = "pdf"
+        ADD_TITLES = False
     
     # infer series name and adjust default output directory
     input_path = Path(args.results)
@@ -121,6 +140,12 @@ def main():
     else:
         print("Warning: Cannot create relative gap distribution plots - relative cut gap not found")
 
+    # Generate statistics table if requested
+    if args.table and 'rel_cut_gap' in results.columns:
+        generate_stats_table(results, args.out_dir, model_order)
+    elif args.table:
+        print("Warning: Cannot create statistics table - relative cut gap not found")
+
 def sort_models_by_performance(data, metric_col, ascending=True):
     """
     Sort models by their average performance on the given metric.
@@ -181,7 +206,8 @@ def plot_optimality_gap(results, out_dir, model_order=None):
     values = mean_cut.values
 
     plt.figure(figsize=(4, len(models)*0.6))
-    plt.title(f'{SERIES_NAME} | Absolute optimality gap')
+    if ADD_TITLES:
+        plt.title(f'{SERIES_NAME} | Absolute optimality gap')
     ax = plt.gca()
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -192,9 +218,8 @@ def plot_optimality_gap(results, out_dir, model_order=None):
         plt.text(v + offset, i, f'{v:.2f}', va='center', ha='left')
     plt.xlabel('Average optimality gap (cut value)')
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'optimality_gaps.png'), dpi=200)
+    save_figure('optimality_gaps', out_dir)
     plt.close()
-    print(f"Saved best average optimality gap plot to {os.path.join(out_dir, 'optimality_gaps.png')}")
 
 def plot_relative_optimality_gap(results, out_dir, model_order=None):
     """Plot best average relative optimality gap per model as horizontal bars."""
@@ -214,7 +239,8 @@ def plot_relative_optimality_gap(results, out_dir, model_order=None):
     values = mean_rel_cut.values
 
     plt.figure(figsize=(4, len(models)*0.6))
-    plt.title(f'{SERIES_NAME} | Relative optimality gap')
+    if ADD_TITLES:
+        plt.title(f'{SERIES_NAME} | Relative optimality gap')
     ax = plt.gca()
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -225,9 +251,8 @@ def plot_relative_optimality_gap(results, out_dir, model_order=None):
         plt.text(v + offset, i, f'{v:.2f}%', va='center', ha='left')
     plt.xlabel('Relative optimality gap (%)')
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'rel_optimality_gaps.png'), dpi=200)
+    save_figure('rel_optimality_gaps', out_dir)
     plt.close()
-    print(f"Saved best relative optimality gap plot to {os.path.join(out_dir, 'rel_optimality_gaps.png')}")
 
 def plot_cut_distributions_by_graph(results, out_dir, model_order=None):
     """
@@ -353,7 +378,8 @@ def plot_cut_distributions_by_graph(results, out_dir, model_order=None):
     
     # Add y-axis label and title
     ax.set_ylabel('Cut Value')
-    ax.set_title(f'{SERIES_NAME} | Cut Value Distribution by Graph (Best Hyperparameters)')
+    if ADD_TITLES:
+        ax.set_title(f'{SERIES_NAME} | Cut Value Distribution by Graph (Best Hyperparameters)')
     
     # Add legend for models with green line for optimum cut
     legend_elements = [plt.Rectangle((0,0), 1, 1, facecolor=PALETTE[i % len(PALETTE)], 
@@ -372,10 +398,8 @@ def plot_cut_distributions_by_graph(results, out_dir, model_order=None):
     
     # Adjust layout and save
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'cut_distributions.png'), dpi=200)
+    save_figure('cut_distributions', out_dir)
     plt.close()
-    
-    print(f"Saved cut value distribution plot to {os.path.join(out_dir, 'cut_distributions.png')}")
 
 def plot_hyperparams(results, out_dir, model_order=None):
     """
@@ -455,16 +479,15 @@ def plot_1d_hyperparam(data, param, model, out_dir):
     
     plt.xlabel(param)
     plt.ylabel('Average optimality gap (%)')
-    plt.title(f'{SERIES_NAME} | {model}: Cut gap vs. {param}')
+    if ADD_TITLES:
+        plt.title(f'{SERIES_NAME} | {model}: Cut gap vs. {param}')
     plt.grid(True)
     
     # Save the plot
     plt.tight_layout()
-    filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_1d_hyperparam.png'
-    plt.savefig(os.path.join(out_dir, filename), dpi=200)
+    filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_1d_hyperparam'
+    save_figure(filename, out_dir)
     plt.close()
-    
-    print(f"Saved 1D hyperparameter cut gap plot to {os.path.join(out_dir, filename)}")
 
 def plot_2d_hyperparam(data, param1, param2, model, out_dir, has_seaborn):
     """Create a heatmap of relative cut gap versus two hyperparameters."""
@@ -507,15 +530,14 @@ def plot_2d_hyperparam(data, param1, param2, model, out_dir, has_seaborn):
     
     plt.xlabel(x_param)
     plt.ylabel(y_param)
-    plt.title(f'{SERIES_NAME} | {model}: Cut gap vs. {y_param} and {x_param}')
+    if ADD_TITLES:
+        plt.title(f'{SERIES_NAME} | {model}: Cut gap vs. {y_param} and {x_param}')
     
     # Save the plot
     plt.tight_layout()
-    filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_2d_hyperparam.png'
-    plt.savefig(os.path.join(out_dir, filename), dpi=200)
+    filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_2d_hyperparam'
+    save_figure(filename, out_dir)
     plt.close()
-    
-    print(f"Saved 2D hyperparameter optimality gap plot to {os.path.join(out_dir, filename)}")
 
 def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
     """Plot max success rate for each model versus graph, ordered by number of spins and success rate"""
@@ -538,7 +560,8 @@ def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
     
     # Plot max success rate by number of spins for each model
     plt.figure(figsize=(7, 3))
-    plt.title(f'{SERIES_NAME} | Max success rate')
+    if ADD_TITLES:
+        plt.title(f'{SERIES_NAME} | Max success rate')
     
     # Define bar positions
     bar_positions = np.arange(len(spin_counts))
@@ -585,11 +608,10 @@ def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
     
     plt.xlabel('Number of Spins')
     plt.ylabel('Success Rate (%)')
-    #plt.title('Maximum Success Rate by Model and Problem Size')
     plt.xticks(bar_positions, spin_counts)
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'max_success_rate.png'), dpi=200)
-    print(f"Saved max success rate plot to {os.path.join(out_dir, 'max_success_rate.png')}")
+    save_figure('max_success_rate', out_dir)
+    plt.close()
 
 def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     """
@@ -703,7 +725,8 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     
     # Add y-axis label and title
     ax.set_ylabel('Relative optimality gap (%)')
-    ax.set_title(f'{SERIES_NAME} | Relative optimality gap distribution by graph (best hyperparameters)')
+    if ADD_TITLES:
+        ax.set_title(f'{SERIES_NAME} | Relative optimality gap distribution by graph (best hyperparameters)')
     
     # Add legend for models
     legend_elements = [plt.Rectangle((0,0), 1, 1, facecolor=PALETTE[i % len(PALETTE)], 
@@ -722,10 +745,112 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     
     # Adjust layout and save
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'rel_gap_distributions.png'), dpi=200)
+    save_figure('rel_gap_distributions', out_dir)
     plt.close()
     
     print(f"Saved relative optimality gap distribution plot to {os.path.join(out_dir, 'rel_gap_distributions.png')}")
     
+def format_number(value):
+    """Format a number to exactly 2 decimal places."""
+    return f"{value:.2f}"
+
+def generate_stats_table(results, out_dir, model_order=None):
+    """
+    Generate a CSV table with statistics for the best hyperparameter combinations
+    for each graph and model.
+    """
+    # Get best parameters for each graph-model combination (minimize relative cut gap)
+    best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True)
+    
+    # Filter results to only include best parameter combinations
+    filtered_results = pd.merge(
+        results, 
+        best_params, 
+        on=['graph', 'model', 'param_id']
+    )
+    
+    # Determine model ordering if not provided
+    if model_order is None:
+        # Order models by their average relative optimality gap across all graphs
+        model_performance = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
+        model_order = model_performance.index.tolist()
+    
+    # Create a list to hold rows for the table
+    table_rows = []
+    
+    # Store hyperparameter information for each model
+    model_hyperparams = {}
+    
+    # First, identify which hyperparameters are being swept for each model
+    for model in model_order:
+        model_data = results[results['model'] == model]
+        if not model_data.empty:
+            swept_params = identify_swept_hyperparameters(model_data)
+            model_hyperparams[model] = swept_params
+    
+    # Process each model and graph to collect statistics
+    for model in model_order:
+        # Get all graphs for this model
+        model_results = filtered_results[filtered_results['model'] == model]
+        graphs = sorted(model_results['graph'].unique())
+        
+        # Get the hyperparameters that were swept for this model
+        swept_params = model_hyperparams.get(model, [])
+        
+        for graph in graphs:
+            # Get data for this specific graph-model combination
+            graph_model_data = model_results[model_results['graph'] == graph]
+            
+            if graph_model_data.empty:
+                continue
+            
+            # Collect statistics
+            stats = {
+                'Model': model,
+                'Graph': graph,
+                'Mean': graph_model_data['rel_cut_gap'].mean(),
+                'Median': graph_model_data['rel_cut_gap'].median(),
+                'Min': graph_model_data['rel_cut_gap'].min(),
+                'StdDev': graph_model_data['rel_cut_gap'].std()
+            }
+            
+            # Collect hyperparameter values for the best parameter combination
+            param_values = []
+            for param in swept_params:
+                if param in graph_model_data.columns:
+                    unique_values = graph_model_data[param].unique()
+                    # Only add if there's a single unique value (consistent for this best parameter set)
+                    if len(unique_values) == 1:
+                        value = unique_values[0]
+                        # Format numeric values with exactly 2 decimal places
+                        if isinstance(value, (int, float)):
+                            value = format_number(value)
+                        param_values.append(f"{param}={value}")
+            
+            # Add all values to the row with proper number formatting
+            row = {
+                'Model': stats['Model'],
+                'Graph': stats['Graph'],
+                'Hyperparameter 1': param_values[0] if len(param_values) > 0 else '',
+                'Hyperparameter 2': param_values[1] if len(param_values) > 1 else '',
+                'Mean relative optimality gap (%)': format_number(stats['Mean']),
+                'Median relative optimality gap (%)': format_number(stats['Median']),
+                'Minimum relative optimality gap (%)': format_number(stats['Min']),
+                'Standard deviation on relative optimality gap (%)': format_number(stats['StdDev'])
+            }
+            
+            table_rows.append(row)
+    
+    # Convert to DataFrame and save to CSV
+    stats_df = pd.DataFrame(table_rows)
+    
+    # Sort by Model and Graph
+    stats_df = stats_df.sort_values(['Model', 'Graph'])
+    
+    # Save to CSV
+    csv_path = os.path.join(out_dir, f'{SERIES_NAME}_statistics.csv')
+    stats_df.to_csv(csv_path, index=False)
+    print(f"Saved statistics table to {csv_path}")
+
 if __name__ == "__main__":
     main()

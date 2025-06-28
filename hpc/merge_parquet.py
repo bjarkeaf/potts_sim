@@ -5,6 +5,9 @@ import argparse
 import os
 from pathlib import Path
 
+#This prompt didn't work:
+#Add a flag called --replace_models so that with this flag, if a column "model" is present in the input files, list all unique models in file2, file3, etc. and remove all rows with those models from the parquet in file1 before merge. This is intended for when file2 and so on have updated results for models also present in file1. As an example to illustrate: File 1 has 100 rows with model A, 100 rows with model B, and 100 rows with model C. File 2 has 50 rows with model C. After the merge with --replace_models, the merged file has the original rows for model A and B from file 1, but only has the 50 rows for model C from file 2. Ask if you're unsure about the task.
+
 # How to use:
 # python merge_parquet.py --input file1.parquet file2.parquet [file3.parquet ...] [--output merged.parquet]
 

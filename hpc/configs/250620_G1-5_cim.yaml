@@ -4,7 +4,7 @@ graph_path: "graphs/gset/G1-5/"  # Directory, file, or multiple directories/file
 out_dir: "results/"  # Directory to save results
 
 # Wall time estimation
-assumed_time_per_step_us: 7000  # Assumed time between steps in microseconds
+assumed_time_per_step_us: 8000  # Assumed time between steps in microseconds
 # 4 days, 8 hours with 72 cores
 
 # Global simulation parameters (can be overridden per model)
