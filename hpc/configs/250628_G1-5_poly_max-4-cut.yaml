@@ -1,0 +1,25 @@
+# General configuration
+num_runs: 100  # Number of different seeds to run per parameter set
+graph_path: "graphs/gset/G1-5/"  # Directory, file, or multiple directories/files
+out_dir: "results/"  # Directory to save results
+
+# Wall time estimation
+assumed_time_per_step_us: 200 # Assumed time between steps in microseconds
+# wall_time ~ 2 days, 1 hour with 120 cores
+
+# Global simulation parameters (can be overridden by models)
+T: 100         # Total simulation time
+dt: 1e-2       # Time step
+num_states: 4  # Number of Potts states
+noise_factor: 1e-4  # Noise scaling
+
+# Parameter sweeps for each model type
+models:  
+  POLYNOMIAL:
+    T: 1000
+    dt: 1e-3
+    poly_order: "4:2:20"
+    beta_schedule: ["lin(1/mu_max, 1/mu_max + 2)"]  # Linear ramp starting at threshold 1/mu_max
+    gamma_schedule: # Gamma defined as a factor times beta
+      based_on: "beta_schedule"
+      factor: "0:0.05:1.5" # Matlab style: start:step:end

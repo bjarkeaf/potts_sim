@@ -3,12 +3,15 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from matplotlib.colors import LogNorm
+from matplotlib.ticker import FormatStrFormatter
 import argparse
 from pathlib import Path
 import os
 from collections import defaultdict
 import seaborn as sns
 from cycler import cycler
+import warnings
 
 SERIES_NAME = None
 FILE_EXT = "png"  # Default file extension
@@ -286,7 +289,7 @@ def plot_cut_distributions_by_graph(results, out_dir, model_order=None):
     total_width = num_models * len(graphs)
     
     # Prepare the plot with exact sizing
-    fig_width = max(10, 0.2 * total_width + 2)  # Add margin for labels
+    fig_width = min(8, 0.2 * total_width + 2)  # Add margin for labels
     fig, ax = plt.subplots(figsize=(fig_width, 6))
     
     # Calculate section width (number of positions per graph)
@@ -401,6 +404,16 @@ def plot_cut_distributions_by_graph(results, out_dir, model_order=None):
     save_figure('cut_distributions', out_dir)
     plt.close()
 
+def add_gamma_rate_over_th(data):
+    """
+    For QPDC model, add gamma_rate/gamma_th column which is gamma_factor/T
+    Returns a modified copy of the dataframe
+    """
+    if 'gamma_factor' in data.columns and 'T' in data.columns:
+        data = data.copy()
+        data['gamma_rate/gamma_th'] = data['gamma_factor'] / data['T']
+    return data
+
 def plot_hyperparams(results, out_dir, model_order=None):
     """
     Plot the average relative optimality gap versus hyperparameters for each model.
@@ -426,118 +439,142 @@ def plot_hyperparams(results, out_dir, model_order=None):
         # Skip if no data for this model
         if model_data.empty:
             continue
+        
+        # For QPDC, add gamma_rate/gamma_th and replace gamma_factor with it
+        if model == 'q-PDC':
+            model_data = add_gamma_rate_over_th(model_data)
             
         # Identify which hyperparameters are being swept for this model
-        swept_params = identify_swept_hyperparameters(model_data)
+        swept_params = identify_swept_hyperparameters(model_data, model)
         
+        # Get unique graphs for this model
+        graphs = sorted(model_data['graph'].unique())
+        if not graphs:
+            continue
+
         # Based on number of swept parameters, create appropriate plot
         if len(swept_params) == 0:
             print(f"Skipping hyperparameter plot for {model}: No parameters being swept")
         elif len(swept_params) == 1:
             param = swept_params[0]
             print(f"Creating 1D hyperparameter plot for {model}: {param}")
-            plot_1d_hyperparam(model_data, param, model, out_dir)
+            
+            # Create subplots for each graph
+            num_graphs = len(graphs)
+            ncols = 2
+            nrows = (num_graphs + ncols - 1) // ncols
+            fig, axes = plt.subplots(nrows, ncols, figsize=(3 * ncols, 3 * nrows), squeeze=False, sharex='col', sharey='row')
+            
+            for i, graph in enumerate(graphs):
+                row, col = i // ncols, i % ncols
+                ax = axes[row, col]
+                graph_data = model_data[model_data['graph'] == graph]
+                
+                is_leftmost = (col == 0)
+                is_bottom = (col == 0 and row == nrows - 1) or (col == 1 and row == nrows - 2)
+                
+                if is_bottom:
+                    ax.tick_params(labelbottom=True)
+
+                plot_1d_hyperparam(graph_data, param, model, ax, graph, is_leftmost, is_bottom, i)
+            
+            # Hide unused subplots
+            for i in range(num_graphs, nrows * ncols):
+                row, col = i // ncols, i % ncols
+                fig.delaxes(axes[row, col])
+
+            if ADD_TITLES:
+                # Use a generic title for the figure
+                fig.suptitle(f'{SERIES_NAME} | {model}: Hyperparameter Sweep', fontsize=16)
+            
+            plt.tight_layout(rect=[0, 0, 1, 0.97], h_pad=-1)
+            filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_1d_hyperparam'
+            save_figure(filename, out_dir)
+            plt.close(fig)
+
         elif len(swept_params) == 2:
             param1, param2 = swept_params
             print(f"Creating 2D hyperparameter plot for {model}: {param1} vs {param2}")
-            plot_2d_hyperparam(model_data, param1, param2, model, out_dir, has_seaborn)
+            
+            # Calculate global min and max for the color bar across all graphs for this model
+            all_graph_data = model_data.groupby([param1, param2])['rel_cut_gap'].mean()
+            global_min = all_graph_data[all_graph_data > 0].min()
+            global_max = all_graph_data.max()
+
+            # Create subplots for each graph
+            num_graphs = len(graphs)
+            ncols = 2
+            nrows = (num_graphs + ncols - 1) // ncols
+            fig, axes = plt.subplots(nrows, ncols, figsize=(3 * ncols, 3 * nrows), squeeze=False, sharex='col', sharey='row')
+
+            for i, graph in enumerate(graphs):
+                row, col = i // ncols, i % ncols
+                ax = axes[row, col]
+                graph_data = model_data[model_data['graph'] == graph]
+
+                is_leftmost = (col == 0)
+                is_bottom = (col == 0 and row == nrows - 1) or (col == 1 and row == nrows - 2)
+
+                if is_bottom:
+                    ax.tick_params(labelbottom=True)
+
+                plot_2d_hyperparam(graph_data, param1, param2, model, ax, graph, has_seaborn, global_min, global_max, is_leftmost, is_bottom, i)
+
+            # Hide unused subplots
+            for i in range(num_graphs, nrows * ncols):
+                row, col = i // ncols, i % ncols
+                fig.delaxes(axes[row, col])
+
+            if ADD_TITLES:
+                fig.suptitle(f'{SERIES_NAME} | {model}: Hyperparameter Sweep', fontsize=16)
+
+            # Add a single horizontal colorbar for the entire figure
+            log_norm = None
+            if pd.notna(global_min) and global_min < global_max:
+                log_norm = LogNorm(vmin=global_min, vmax=global_max)
+            
+            sm = plt.cm.ScalarMappable(cmap='viridis', norm=log_norm)
+            sm.set_array([])
+            
+            # Position colorbar at the bottom
+            cbar_ax = fig.add_axes([0.15, 0.065, 0.7, 0.02]) # change second for bottom margin
+            cbar = fig.colorbar(sm, cax=cbar_ax, orientation='horizontal')
+            cbar.set_label('Average relative optimality gap (%)')
+
+            # Adjust layout to make space for colorbar at the bottom
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", UserWarning)
+                plt.tight_layout(rect=[0, 0.07, 1, 0.97], h_pad=-1) # change second for bottom margin
+            filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_2d_hyperparam'
+            save_figure(filename, out_dir)
+            plt.close(fig)
         else:
             print(f"Skipping hyperparameter plot for {model}: More than 2 parameters being swept ({swept_params})")
 
-def identify_swept_hyperparameters(model_data):
+def identify_swept_hyperparameters(model_data, model=None):
     """
     Identify which hyperparameters are being swept.
     Returns a list of parameter names that have multiple unique values.
+    
+    For QPDC model, use gamma_rate/gamma_th instead of gamma_factor if available.
     """
     # List of potential hyperparameters to check
     potential_params = [
         'poly_order', 'gamma_factor', 'beta_factor', 
         'alpha_rate', 'r_target', 'alpha',
-        'B_num_vertices', 'zeta'
+        'B_num_vertices', 'zeta', 'gamma_rate/gamma_th'
     ]
     
     # Check which parameters have multiple unique values
     swept_params = []
     for param in potential_params:
         if param in model_data.columns and len(model_data[param].unique()) > 1:
+            # For QPDC, replace gamma_factor with gamma_rate/gamma_th if both are present
+            if model == 'q-PDC' and param == 'gamma_factor' and 'gamma_rate/gamma_th' in model_data.columns:
+                continue
             swept_params.append(param)
     
     return swept_params
-
-def plot_1d_hyperparam(data, param, model, out_dir):
-    """Create a line plot of relative cut gap versus a single hyperparameter."""
-    plt.figure(figsize=(8, 5))
-    
-    # Group by the parameter and calculate mean relative cut gap
-    grouped = data.groupby(param)['rel_cut_gap'].mean().reset_index()
-    
-    # Sort by parameter value for proper line plot
-    grouped = grouped.sort_values(param)
-    
-    # Create the line plot
-    plt.plot(grouped[param], grouped['rel_cut_gap'], marker='o', linewidth=2)
-    
-    plt.xlabel(param)
-    plt.ylabel('Average optimality gap (%)')
-    if ADD_TITLES:
-        plt.title(f'{SERIES_NAME} | {model}: Cut gap vs. {param}')
-    plt.grid(True)
-    
-    # Save the plot
-    plt.tight_layout()
-    filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_1d_hyperparam'
-    save_figure(filename, out_dir)
-    plt.close()
-
-def plot_2d_hyperparam(data, param1, param2, model, out_dir, has_seaborn):
-    """Create a heatmap of relative cut gap versus two hyperparameters."""
-    # Group by both parameters and calculate mean relative cut gap
-    grouped = data.groupby([param1, param2])['rel_cut_gap'].mean().reset_index()
-    
-    # Get unique values for each parameter, sorted
-    param1_values = sorted(grouped[param1].unique())
-    param2_values = sorted(grouped[param2].unique())
-    
-    # Determine which parameter has fewer unique values - use that as columns
-    if len(param1_values) <= len(param2_values):
-        # param1 has fewer values, use it as columns
-        x_param, y_param = param1, param2
-        x_values, y_values = param1_values, param2_values
-    else:
-        # param2 has fewer values, use it as columns
-        x_param, y_param = param2, param1
-        x_values, y_values = param2_values, param1_values
-    
-    # Create a pivot table for the heatmap with fewer points as columns
-    pivot = grouped.pivot_table(index=y_param, columns=x_param, values='rel_cut_gap')
-    
-    # Create the plot
-    plt.figure(figsize=(10, 8))
-    
-    if has_seaborn:
-        # Use seaborn for a nicer heatmap
-        import seaborn as sns
-        ax = sns.heatmap(pivot, cmap='viridis', annot=True, fmt=".2f",
-                         cbar_kws={'label': 'Average optimality gap (%)'})
-        bottom, top = ax.get_ylim()
-        ax.set_ylim(bottom + 0.5, top - 0.5)
-    else:
-        # Use matplotlib's imshow for the heatmap
-        im = plt.imshow(pivot.values, cmap='viridis', aspect='auto', origin='lower')
-        plt.colorbar(im, label='Average optimality gap (%)')
-        plt.xticks(range(len(x_values)), x_values)
-        plt.yticks(range(len(y_values)), y_values)
-    
-    plt.xlabel(x_param)
-    plt.ylabel(y_param)
-    if ADD_TITLES:
-        plt.title(f'{SERIES_NAME} | {model}: Cut gap vs. {y_param} and {x_param}')
-    
-    # Save the plot
-    plt.tight_layout()
-    filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_2d_hyperparam'
-    save_figure(filename, out_dir)
-    plt.close()
 
 def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
     """Plot max success rate for each model versus graph, ordered by number of spins and success rate"""
@@ -619,8 +656,10 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     
     For each graph-model combination, only the best hyperparameter set is used
     (the one with smallest average relative optimality gap).
+    
+    If there is a consistent large gap between model performances, a broken y-axis is used.
     """
-    # Get best parameters for each graph-model combination (minimize relative cut gap)
+    # Get best parameters for each graph-model combination (minimize cut gap)
     best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True)
     
     # Filter results to only include best parameter combinations
@@ -644,10 +683,72 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     num_models = len(model_order)
     total_width = num_models * len(graphs)
     
-    # Prepare the plot with exact sizing
-    fig_width = max(10, 0.2 * total_width + 2)  # Add margin for labels
-    fig, ax = plt.subplots(figsize=(fig_width, 6))
+    # --- Check for broken axis ---
+    # Calculate median rel_cut_gap for each model across all graphs
+    model_medians = filtered_results.groupby('model')['rel_cut_gap'].median().sort_values()
     
+    # Find the largest gap between consecutive sorted medians
+    median_gaps = model_medians.diff().dropna()
+    use_broken_axis = False
+    if not median_gaps.empty:
+        max_gap = median_gaps.max()
+        if max_gap > 2.0: # Threshold for gap
+            use_broken_axis = True
+            # Identify models in bottom and top groups
+            split_model_name = median_gaps.idxmax()
+            split_model_idx = model_medians.index.get_loc(split_model_name)
+            bottom_models = model_medians.index[:split_model_idx].tolist()
+            top_models = model_medians.index[split_model_idx:].tolist()
+            
+            # Determine y-limits for the two axes
+            max_val_bottom = filtered_results[filtered_results['model'].isin(bottom_models)]['rel_cut_gap'].max()
+            min_val_top = filtered_results[filtered_results['model'].isin(top_models)]['rel_cut_gap'].min()
+            max_val_top = filtered_results[filtered_results['model'].isin(top_models)]['rel_cut_gap'].max()
+            
+            # Set limits with a small margin
+            y1_max = max_val_bottom + 0.05 * abs(max_val_bottom) if pd.notna(max_val_bottom) else 1
+            # Set bottom axis to go slightly below zero
+            y1_min = -0.15 * y1_max
+            y2_min = min_val_top - 0.05 * abs(min_val_top) if pd.notna(min_val_top) else y1_max + 1
+            y2_max = max_val_top + 0.05 * abs(max_val_top) if pd.notna(max_val_top) else y2_min + 1
+
+    # Prepare the plot with exact sizing
+    fig_width = min(8, 0.2 * total_width + 2)  # Add margin for labels
+    fig_height = 4
+    
+    if use_broken_axis:
+        height_ratios = [2, 1]
+        fig, (ax, ax2) = plt.subplots(2, 1, sharex=True, figsize=(fig_width, fig_height), gridspec_kw={'height_ratios': height_ratios})
+        # Set y-limits for broken axis
+        ax.set_ylim(y2_min, y2_max)  # top part
+        ax2.set_ylim(y1_min, y1_max) # bottom part
+        ax.spines['bottom'].set_visible(False)
+        ax2.spines['top'].set_visible(False)
+        ax.tick_params(axis='x', which='both', bottom=False)
+        ax.tick_params(axis='y', which='both', left=True)
+        ax2.tick_params(axis='y', which='both', left=True)
+        
+        # Set consistent y-tick formatting, 2 decimal places
+        formatter = FormatStrFormatter('%.2f')
+        ax.yaxis.set_major_formatter(formatter)
+        ax2.yaxis.set_major_formatter(formatter)
+
+        # Add diagonal lines to indicate break
+        d = .015
+        # top axes
+        kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+        ax.plot((-d, +d), (-d*height_ratios[1]/height_ratios[0], +d*height_ratios[1]/height_ratios[0]), **kwargs)
+        ax.plot((1 - d, 1 + d), (-d*height_ratios[1]/height_ratios[0], +d*height_ratios[1]/height_ratios[0]), **kwargs)
+        # bottom axes
+        kwargs.update(transform=ax2.transAxes)
+        ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)
+        ax2.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
+        axes = [ax, ax2]
+    else:
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+        ax.tick_params(axis='y', which='both', left=True)
+        axes = [ax]
+
     # Calculate section width (number of positions per graph)
     positions_per_graph = num_models
     
@@ -697,36 +798,39 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     valid_positions = [pos for i, pos in enumerate(sorted_positions) if mask[i]]
     valid_data = [data for data in all_data if len(data) > 0]
     
-    # Create boxplots for positions with data
-    bp = ax.boxplot(
-        valid_data,
-        positions=valid_positions,
-        patch_artist=True,
-        widths=0.7,
-        medianprops={'color': 'black'}
-    )
-    
-    # Color each box according to its model
-    for i, box in enumerate(bp['boxes']):
-        model = position_model_map[valid_positions[i]]
-        model_idx = model_order.index(model)
-        box.set_facecolor(PALETTE[model_idx % len(PALETTE)])
-    
-    # Add vertical separators between graphs
-    for pos in separator_positions:
-        ax.axvline(x=pos, color='gray', linestyle='--', alpha=0.7)
-    
-    # Draw horizontal line at 0% (optimal)
-    ax.axhline(y=0, color='green', linestyle='-', linewidth=1, alpha=0.7)
+    for current_ax in axes:
+        # Create boxplots for positions with data
+        bp = current_ax.boxplot(
+            valid_data,
+            positions=valid_positions,
+            patch_artist=True,
+            widths=0.7,
+            medianprops={'color': 'black'}
+        )
+        
+        # Color each box according to its model
+        for i, box in enumerate(bp['boxes']):
+            model = position_model_map[valid_positions[i]]
+            model_idx = model_order.index(model)
+            box.set_facecolor(PALETTE[model_idx % len(PALETTE)])
+        
+        # Add vertical separators between graphs
+        for pos in separator_positions:
+            current_ax.axvline(x=pos, color='gray', linestyle='--', alpha=0.7)
+        
+        # Draw horizontal line at 0% (optimal)
+        current_ax.axhline(y=0, color='green', linestyle='-', linewidth=1, alpha=0.7)
     
     # Set x-axis labels and ticks
-    ax.set_xticks(graph_centers)
-    ax.set_xticklabels([f"{g}" for g in graphs])
+    main_ax = ax2 if use_broken_axis else ax
+    main_ax.set_xticks(graph_centers)
+    main_ax.set_xticklabels([f"{g}" for g in graphs])
     
     # Add y-axis label and title
-    ax.set_ylabel('Relative optimality gap (%)')
+    fig.text(0.02, 0.5, 'Relative optimality gap (%)', va='center', rotation='vertical')
     if ADD_TITLES:
-        ax.set_title(f'{SERIES_NAME} | Relative optimality gap distribution by graph (best hyperparameters)')
+        title_ax = ax if use_broken_axis else ax
+        title_ax.set_title(f'{SERIES_NAME} | Relative optimality gap distribution by graph (best hyperparameters)')
     
     # Add legend for models
     legend_elements = [plt.Rectangle((0,0), 1, 1, facecolor=PALETTE[i % len(PALETTE)], 
@@ -735,20 +839,30 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     # Add optimum line to legend
     opt_handle = Line2D([0], [0], color='green', linestyle='-', label='Optimum (0%)')
     legend_elements.append(opt_handle)
-    ax.legend(
+    
+    legend_ax = ax
+    bbox_anchor = (1.02, 0.5)
+    if use_broken_axis:
+        # Adjust anchor to be in the middle of the combined axes, not just the top one.
+        bbox_anchor = (1.02, 0.25)
+
+    legend_ax.legend(
         legend_elements,
         model_order + ['Optimum (0%)'],
         loc='center left',
-        bbox_to_anchor=(1.02, 0.5),
+        bbox_to_anchor=bbox_anchor,
         borderaxespad=0
     )
     
     # Adjust layout and save
-    plt.tight_layout()
+    plt.tight_layout(rect=[0.03, 0, 1, 1])
+    if use_broken_axis:
+        fig.subplots_adjust(hspace=0.05)
+
     save_figure('rel_gap_distributions', out_dir)
     plt.close()
     
-    print(f"Saved relative optimality gap distribution plot to {os.path.join(out_dir, 'rel_gap_distributions.png')}")
+    print(f"Saved relative optimality gap distribution plot to {os.path.join(out_dir, 'rel_gap_distributions.{FILE_EXT}')}")
     
 def format_number(value):
     """Format a number to exactly 2 decimal places."""
@@ -783,15 +897,24 @@ def generate_stats_table(results, out_dir, model_order=None):
     
     # First, identify which hyperparameters are being swept for each model
     for model in model_order:
-        model_data = results[results['model'] == model]
+        model_data = results[results['model'] == model].copy()
         if not model_data.empty:
-            swept_params = identify_swept_hyperparameters(model_data)
+            # For QPDC, add gamma_rate/gamma_th
+            if model == 'q-PDC':
+                model_data = add_gamma_rate_over_th(model_data)
+            
+            swept_params = identify_swept_hyperparameters(model_data, model)
             model_hyperparams[model] = swept_params
     
     # Process each model and graph to collect statistics
     for model in model_order:
         # Get all graphs for this model
-        model_results = filtered_results[filtered_results['model'] == model]
+        model_results = filtered_results[filtered_results['model'] == model].copy()
+        
+        # For QPDC, add gamma_rate/gamma_th
+        if model == 'q-PDC':
+            model_results = add_gamma_rate_over_th(model_results)
+            
         graphs = sorted(model_results['graph'].unique())
         
         # Get the hyperparameters that were swept for this model
@@ -852,5 +975,219 @@ def generate_stats_table(results, out_dir, model_order=None):
     stats_df.to_csv(csv_path, index=False)
     print(f"Saved statistics table to {csv_path}")
 
+def plot_1d_hyperparam(data, param, model, ax, graph_name, is_leftmost=True, is_bottom=True, plot_idx=0):
+    """Create a line plot of relative cut gap versus a single hyperparameter on a given axis."""
+    # Map parameter names to LaTeX labels
+    param_label_map = {
+        'gamma_factor': r'$f_\gamma$',
+        'r_target': r'$r_\mathrm{target}$',
+        'poly_order': r'$n$',
+        'alpha': r'$\alpha$'
+    }
+    
+    # For QPDC, use special label for gamma_rate/gamma_th
+    if model == 'q-PDC' and param == 'gamma_rate/gamma_th':
+        param_label = r'Normalized rate of $\gamma$ increase, $\varepsilon_\gamma/\gamma_\mathrm{th}$'
+    else:
+        # Use the mapped label if available, otherwise use the parameter name
+        param_label = param_label_map.get(param, param)
+    
+    # Group by the parameter and calculate mean relative cut gap
+    grouped = data.groupby(param)['rel_cut_gap'].mean().reset_index()
+    
+    # Sort by parameter value for proper line plot
+    grouped = grouped.sort_values(param)
+    
+    # Create the line plot on the given axis
+    ax.plot(grouped[param], grouped['rel_cut_gap'], marker='o', linewidth=2)
+    
+    # Mark the minimum value
+    if not grouped.empty:
+        min_idx = grouped['rel_cut_gap'].idxmin()
+        min_point = grouped.loc[min_idx]
+        ax.plot(min_point[param], min_point['rel_cut_gap'], 'r*', markersize=12)
+    
+    if is_bottom:
+        ax.set_xlabel(param_label)
+    if is_leftmost:
+        ax.set_ylabel('Average relative optimality gap (%)')
+    # Add subfigure identifier to the top-left
+    ax.text(0.05, 1.1, graph_name, transform=ax.transAxes, 
+            fontsize=12, fontweight='bold', va='top', ha='right')
+    ax.grid(True)
+
+def determine_decimal_places(values):
+    """
+    Determine the appropriate number of decimal places (0-2) based on the values.
+    """
+    # Convert to float to ensure consistent handling
+    float_values = [float(v) for v in values]
+    
+    # Check if all values are effectively integers
+    if all(abs(v - round(v)) < 1e-10 for v in float_values):
+        return 0
+    
+    # Check if all values can be distinguished with 1 decimal place
+    rounded_1dp = [round(v, 1) for v in float_values]
+    if len(set(rounded_1dp)) == len(float_values):
+        return 1
+    
+    # Default to 2 decimal places
+    return 2
+
+def format_tick_values(values):
+    """Format values for plot ticks with appropriate number of decimal places (0-2)"""
+    decimal_places = determine_decimal_places(values)
+    
+    if decimal_places == 0:
+        return [f"{int(round(v))}" for v in values]
+    elif decimal_places == 1:
+        return [f"{v:.1f}" for v in values]
+    else:
+        return [f"{v:.2f}" for v in values]
+
+def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn, global_min=None, global_max=None, is_leftmost=True, is_bottom=True, plot_idx=0):
+    """Create a heatmap of relative cut gap versus two hyperparameters on a given axis."""
+    # Map parameter names to LaTeX labels
+    param_label_map = {
+        'gamma_factor': r'$f_\gamma$',
+        'r_target': r'$r_\mathrm{target}$',
+        'poly_order': r'$n$',
+        'alpha': r'$\alpha$',
+        'B_num_vertices': r'$(B/A)n_\mathrm{vertices}$',
+        'zeta': r'$\zeta$',
+    }
+    # param_label_map = {
+    #     'gamma_factor': r'Phase discretization vs. coupling factor, $f_\gamma$',
+    #     'r_target': r'Target amplitude, $r_\mathrm{target}$',
+    #     'poly_order': r'Nonlinearity order, $n$',
+    #     'alpha': r'Amplitude gain, $\alpha$',
+    #     'B_num_vertices': r'Edge- vs. one-hot constraint factor, $(B/A)n_\mathrm{vertices}$',
+    #     'zeta': r'External field scaling factor, $\zeta$',
+    # }
+    
+    # Set parameter labels using the mapping
+    if model == 'q-PDC' and param1 == 'gamma_rate/gamma_th':
+        param1_label = r'Normalized rate of $\gamma$ increase ($\varepsilon_\gamma/\gamma_\mathrm{th}$)'
+    else:
+        param1_label = param_label_map.get(param1, param1)
+        
+    if model == 'q-PDC' and param2 == 'gamma_rate/gamma_th':
+        param2_label = r'Normalized rate of $\gamma$ increase ($\varepsilon_\gamma/\gamma_\mathrm{th}$)'
+    else:
+        param2_label = param_label_map.get(param2, param2)
+    
+    # Group by both parameters and calculate mean relative cut gap
+    grouped = data.groupby([param1, param2])['rel_cut_gap'].mean().reset_index()
+    
+    # Get unique values for each parameter, sorted
+    param1_values = sorted(grouped[param1].unique())
+    param2_values = sorted(grouped[param2].unique())
+    
+    # Format tick labels with appropriate decimal places
+    param1_tick_labels = format_tick_values(param1_values)
+    param2_tick_labels = format_tick_values(param2_values)
+    
+    # Determine which parameter has fewer unique values - use that as columns
+    if len(param1_values) <= len(param2_values):
+        # param1 has fewer values, use it as columns
+        x_param, y_param = param1, param2
+        x_label, y_label = param1_label, param2_label
+        x_values, y_values = param1_values, param2_values
+        x_tick_labels, y_tick_labels = param1_tick_labels, param2_tick_labels
+    else:
+        # param2 has fewer values, use it as columns
+        x_param, y_param = param2, param1
+        x_label, y_label = param2_label, param1_label
+        x_values, y_values = param2_values, param1_values
+        x_tick_labels, y_tick_labels = param2_tick_labels, param1_tick_labels
+    
+    # Create a pivot table for the heatmap with fewer points as columns
+    pivot = grouped.pivot_table(index=y_param, columns=x_param, values='rel_cut_gap')
+    
+    if has_seaborn:
+        # Use seaborn for a nicer heatmap
+        import seaborn as sns
+        
+        # Use a logarithmic color bar to better resolve low-value regions
+        log_norm = None
+        if pd.notna(global_min) and global_min < global_max:
+            log_norm = LogNorm(vmin=global_min, vmax=global_max)
+
+        sns.heatmap(pivot, cmap='viridis', annot=False, fmt=".2f",
+                    norm=log_norm,
+                    cbar=False, ax=ax)
+        
+        # Clear default labels set by seaborn
+        ax.set_xlabel('')
+        ax.set_ylabel('')
+        
+        # Mark the minimum value
+        min_val = pivot.min().min()
+        if pd.notna(min_val):
+            min_pos = pivot.stack().idxmin()
+            y_min_idx = pivot.index.get_loc(min_pos[0])
+            x_min_idx = pivot.columns.get_loc(min_pos[1])
+            ax.add_patch(plt.Rectangle((x_min_idx, y_min_idx), 1, 1, fill=False, edgecolor='red', lw=2))
+
+        # Adjust only the top/bottom limits without adding extra padding
+        bottom, top = ax.get_ylim()
+        ax.set_ylim(bottom, top)
+        
+        # Set formatted tick labels
+        if len(x_tick_labels) > 10:
+            step = max(1, int(np.ceil(len(x_tick_labels) / 10)))
+            x_tick_indices = np.arange(0, len(x_tick_labels), step)
+            x_ticks_subset = x_tick_indices + 0.5
+            x_labels_subset = [x_tick_labels[i] for i in x_tick_indices]
+            ax.set_xticks(x_ticks_subset)
+            ax.set_xticklabels(x_labels_subset, rotation=0)
+        else:
+            ax.set_xticks(np.arange(len(x_tick_labels)) + 0.5)
+            ax.set_xticklabels(x_tick_labels, rotation=0)  # Set rotation to 0 to avoid extra spacing
+        
+        # Reduce number of y-ticks if there are too many
+        if len(y_tick_labels) > 10:
+            step = max(1, int(np.ceil(len(y_tick_labels) / 10)))
+            y_tick_indices = np.arange(0, len(y_tick_labels), step)
+            y_ticks_subset = y_tick_indices + 0.5
+            y_labels_subset = [y_tick_labels[i] for i in y_tick_indices]
+            ax.set_yticks(y_ticks_subset)
+            ax.set_yticklabels(y_labels_subset, rotation=0)
+        else:
+            # Explicitly set y-ticks to match labels to avoid seaborn/matplotlib bug
+            ax.set_yticks(np.arange(len(y_tick_labels)) + 0.5)
+            ax.set_yticklabels(y_tick_labels, rotation=0)
+    else:
+        # Use matplotlib's imshow for the heatmap
+        im = ax.imshow(pivot.values, cmap='viridis', aspect='auto', origin='lower')
+        ax.figure.colorbar(im, ax=ax, label='Average relative optimality gap (%)')
+        
+        # Set formatted tick labels
+        if len(x_values) > 10:
+            step = max(1, int(np.ceil(len(x_values) / 10)))
+            x_tick_indices = np.arange(0, len(x_values), step)
+            x_labels_subset = [x_tick_labels[i] for i in x_tick_indices]
+            ax.set_xticks(x_tick_indices, x_labels_subset, rotation=0)
+        else:
+            ax.set_xticks(range(len(x_values)), x_tick_labels, rotation=0)
+        
+        # Reduce number of y-ticks if there are too many
+        if len(y_values) > 10:
+            step = max(1, int(np.ceil(len(y_values) / 10)))
+            y_tick_indices = np.arange(0, len(y_values), step)
+            y_labels_subset = [y_tick_labels[i] for i in y_tick_indices]
+            ax.set_yticks(y_tick_indices, y_labels_subset)
+        else:
+            ax.set_yticks(range(len(y_values)), y_tick_labels)
+    
+    if is_bottom:
+        ax.set_xlabel(x_label)
+    if is_leftmost:
+        ax.set_ylabel(y_label)
+    # Add subfigure identifier to the top-left
+    ax.text(0.05, 1.1, graph_name, transform=ax.transAxes, 
+            fontsize=12, fontweight='bold', va='top', ha='right')
+    
 if __name__ == "__main__":
     main()

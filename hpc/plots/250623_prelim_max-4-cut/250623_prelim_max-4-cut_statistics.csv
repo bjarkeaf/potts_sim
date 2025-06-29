@@ -19,11 +19,11 @@ Sigmoid,G2,gamma_factor=0.80,alpha=-50.00,3.59,3.58,3.58,0.05
 Sigmoid,G3,gamma_factor=1.00,alpha=-30.00,3.28,3.28,3.28,0.03
 Sigmoid,G4,gamma_factor=1.20,alpha=-30.00,3.32,3.32,3.32,0.00
 Sigmoid,G5,gamma_factor=0.20,alpha=-30.00,3.33,3.33,3.33,0.00
-q-PDC,G1,gamma_factor=0.40,,3.72,3.70,3.22,0.20
-q-PDC,G2,gamma_factor=0.10,,3.76,3.74,3.39,0.15
-q-PDC,G3,gamma_factor=0.20,,3.64,3.63,3.15,0.20
-q-PDC,G4,gamma_factor=0.40,,3.64,3.64,3.17,0.22
-q-PDC,G5,gamma_factor=0.20,,3.72,3.73,3.37,0.18
+q-PDC,G1,gamma_rate/gamma_th=0.00,,3.72,3.70,3.22,0.20
+q-PDC,G2,gamma_rate/gamma_th=0.00,,3.76,3.74,3.39,0.15
+q-PDC,G3,gamma_rate/gamma_th=0.00,,3.64,3.63,3.15,0.20
+q-PDC,G4,gamma_rate/gamma_th=0.00,,3.64,3.64,3.17,0.22
+q-PDC,G5,gamma_rate/gamma_th=0.00,,3.72,3.73,3.37,0.18
 q-SHIL,G1,,,3.69,3.69,3.29,0.18
 q-SHIL,G2,,,3.68,3.68,3.22,0.15
 q-SHIL,G3,,,3.65,3.66,3.25,0.17

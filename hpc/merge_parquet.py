@@ -5,17 +5,15 @@ import argparse
 import os
 from pathlib import Path
 
-#This prompt didn't work:
-#Add a flag called --replace_models so that with this flag, if a column "model" is present in the input files, list all unique models in file2, file3, etc. and remove all rows with those models from the parquet in file1 before merge. This is intended for when file2 and so on have updated results for models also present in file1. As an example to illustrate: File 1 has 100 rows with model A, 100 rows with model B, and 100 rows with model C. File 2 has 50 rows with model C. After the merge with --replace_models, the merged file has the original rows for model A and B from file 1, but only has the 50 rows for model C from file 2. Ask if you're unsure about the task.
-
 # How to use:
-# python merge_parquet.py --input file1.parquet file2.parquet [file3.parquet ...] [--output merged.parquet]
+# python merge_parquet.py --input file1.parquet file2.parquet [file3.parquet ...] [--output merged.parquet] [--replace_models model1 model2 ...]
 
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description='Merge multiple parquet files into one')
     parser.add_argument('--input', nargs='+', required=True, help='Input parquet files to merge')
     parser.add_argument('--output', type=str, help='Output parquet file name (optional)')
+    parser.add_argument('--replace_models', nargs='+', help='Replace data for these models from subsequent files')
     args = parser.parse_args()
     
     # Validate input files
@@ -39,7 +37,7 @@ def main():
         
         # Create output filename
         if len(config_names) <= 3:
-            # For few files, include all config names
+            # For few files, include all config names   
             args.output = f"results_{'_'.join(config_names)}.parquet"
         else:
             # For many files, use a more generic name
@@ -49,9 +47,19 @@ def main():
     dfs = []
     total_rows = 0
     
-    for file_path in args.input:
+    for i, file_path in enumerate(args.input):
         try:
             df = pd.read_parquet(file_path)
+            
+            # Handle model replacement logic
+            if args.replace_models and 'model' in df.columns:
+                if i == 0:  # First file - remove specified models
+                    df = df[~df['model'].isin(args.replace_models)]
+                    print(f"Removed models {args.replace_models} from {file_path}")
+                else:  # Subsequent files - only keep specified models
+                    df = df[df['model'].isin(args.replace_models)]
+                    print(f"Kept only models {args.replace_models} from {file_path}")
+            
             dfs.append(df)
             print(f"Read {len(df)} rows from {file_path}")
             total_rows += len(df)
