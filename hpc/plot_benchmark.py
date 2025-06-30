@@ -131,12 +131,6 @@ def main():
     else:
         print("Warning: Cannot create hyperparameter sweep plots - cut gap not found")
     
-    # 5. Cut value distribution boxplots by graph and model
-    if 'cut_value' in results.columns:
-        plot_cut_distributions_by_graph(results, args.out_dir, model_order)
-    else:
-        print("Warning: Cannot create cut distribution plots - cut value not found")
-    
     # 6. Relative optimality gap distribution boxplots by graph and model
     if 'rel_cut_gap' in results.columns:
         plot_rel_gap_distributions_by_graph(results, args.out_dir, model_order)
@@ -151,7 +145,7 @@ def main():
 
 def sort_models_by_performance(data, metric_col, ascending=True):
     """
-    Sort models by their average performance on the given metric.
+    Sort models by their mean performance on the given metric.
     
     Parameters:
     - data: DataFrame with results
@@ -161,10 +155,10 @@ def sort_models_by_performance(data, metric_col, ascending=True):
     Returns:
     - List of model names sorted by performance
     """
-    # Calculate average metric value for each model
+    # Calculate mean metric value for each model
     avg_by_model = data.groupby('model')[metric_col].mean().reset_index()
     
-    # Sort models by average metric value
+    # Sort models by mean metric value
     sorted_models = avg_by_model.sort_values(metric_col, ascending=ascending)['model'].tolist()
     
     return sorted_models
@@ -192,7 +186,7 @@ def get_best_params_by_graph_model(results, metric_col, is_minimize=True):
     return best_params[['graph', 'model', 'param_id']]
 
 def plot_optimality_gap(results, out_dir, model_order=None):
-    """Plot best average optimality gap per model as horizontal bars."""
+    """Plot best mean optimality gap per model as horizontal bars."""
     # Get best parameters for each graph-model combination (minimize cut gap)
     best_params = get_best_params_by_graph_model(results, 'cut_gap', is_minimize=True)
     
@@ -219,13 +213,13 @@ def plot_optimality_gap(results, out_dir, model_order=None):
     plt.barh(models, values, color=PALETTE[:len(models)])
     for i, v in enumerate(values):
         plt.text(v + offset, i, f'{v:.2f}', va='center', ha='left')
-    plt.xlabel('Average optimality gap (cut value)')
+    plt.xlabel('Mean optimality gap (cut value)')
     plt.tight_layout()
     save_figure('optimality_gaps', out_dir)
     plt.close()
 
 def plot_relative_optimality_gap(results, out_dir, model_order=None):
-    """Plot best average relative optimality gap per model as horizontal bars."""
+    """Plot best mean relative optimality gap per model as horizontal bars."""
     # Get best parameters for each graph-model combination (minimize relative cut gap)
     best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True)
     
@@ -257,153 +251,6 @@ def plot_relative_optimality_gap(results, out_dir, model_order=None):
     save_figure('rel_optimality_gaps', out_dir)
     plt.close()
 
-def plot_cut_distributions_by_graph(results, out_dir, model_order=None):
-    """
-    Create boxplots showing cut value distributions by graph and model.
-    
-    For each graph-model combination, only the best hyperparameter set is used
-    (the one with smallest average relative optimality gap).
-    """
-    # Get best parameters for each graph-model combination (minimize relative cut gap)
-    best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True)
-    
-    # Filter results to only include best parameter combinations
-    filtered_results = pd.merge(
-        results, 
-        best_params, 
-        on=['graph', 'model', 'param_id']
-    )
-    
-    # Determine model ordering if not provided
-    if model_order is None:
-        # Order models by their average relative optimality gap across all graphs
-        model_performance = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
-        model_order = model_performance.index.tolist()
-    
-    # Get unique graphs and include optimum cut, then sort alphanumerically
-    graphs_df = filtered_results[['graph', 'num_spins', 'opt_cut']].drop_duplicates()
-    graphs = sorted(graphs_df['graph'].unique())  # Sort alphanumerically
-    
-    # Calculate the total number of positions needed
-    num_models = len(model_order)
-    total_width = num_models * len(graphs)
-    
-    # Prepare the plot with exact sizing
-    fig_width = min(8, 0.2 * total_width + 2)  # Add margin for labels
-    fig, ax = plt.subplots(figsize=(fig_width, 6))
-    
-    # Calculate section width (number of positions per graph)
-    positions_per_graph = num_models
-    
-    # Keep track of graph section boundaries
-    graph_centers = []
-    separator_positions = []
-    
-    # Build boxplot_data & position_model_map
-    boxplot_data = {}
-    position_model_map = {}
-    
-    # Process each graph-model combination to gather data
-    for g_idx, graph in enumerate(graphs):
-        # Calculate position information - ensure equal spacing
-        start_pos = g_idx * positions_per_graph
-        graph_centers.append(start_pos + positions_per_graph/2 - 0.5)
-        
-        if g_idx > 0:
-            separator_positions.append(start_pos - 0.5)
-        
-        # Process each model in the specified order
-        for m_idx, model in enumerate(model_order):
-            # Calculate position for this model
-            position = start_pos + m_idx
-            
-            # Get cut values for this graph-model combination
-            model_data = filtered_results[(filtered_results['graph']==graph) & 
-                                        (filtered_results['model']==model)]
-            
-            # Store data even if empty (will handle in plotting)
-            if not model_data.empty:
-                boxplot_data[position] = model_data['cut_value'].tolist()
-            else:
-                boxplot_data[position] = []
-                
-            # Keep track of which model is at which position
-            position_model_map[position] = model
-    
-    # Sort positions (to ensure they're in order)
-    sorted_positions = sorted(boxplot_data.keys())
-    
-    # Prepare data for boxplot
-    all_data = [boxplot_data[pos] for pos in sorted_positions]
-    
-    # Create a mask for positions with no data
-    mask = [len(data) > 0 for data in all_data]
-    valid_positions = [pos for i, pos in enumerate(sorted_positions) if mask[i]]
-    valid_data = [data for data in all_data if len(data) > 0]
-    
-    # Create boxplots for positions with data
-    bp = ax.boxplot(
-        valid_data,
-        positions=valid_positions,
-        patch_artist=True,
-        widths=0.7,
-        medianprops={'color': 'black'}
-    )
-    
-    # Color each box according to its model
-    for i, box in enumerate(bp['boxes']):
-        model = position_model_map[valid_positions[i]]
-        model_idx = model_order.index(model)
-        box.set_facecolor(PALETTE[model_idx % len(PALETTE)])
-    
-    # Add vertical separators between graphs
-    for pos in separator_positions:
-        ax.axvline(x=pos, color='gray', linestyle='--', alpha=0.7)
-    
-    # Draw solid green line at optimum cut spanning full width of each graph section
-    for g_idx, graph in enumerate(graphs):
-        start_pos = g_idx * positions_per_graph
-        end_pos = start_pos + len(model_order) - 1
-        full_start = start_pos - 0.5  # Full width start
-        full_end = end_pos + 0.5      # Full width end
-        opt_val = graphs_df.loc[graphs_df['graph'] == graph, 'opt_cut'].iloc[0]
-        ax.hlines(opt_val,
-                  full_start,
-                  full_end,
-                  colors='green',
-                  linestyles='-',
-                  linewidth=1,
-                  alpha=0.7)
-    
-    # Set x-axis labels and ticks
-    ax.set_xticks(graph_centers)
-    ax.set_xticklabels([f"{g}" for g in graphs])
-    
-    # Add y-axis label and title
-    ax.set_ylabel('Cut Value')
-    if ADD_TITLES:
-        ax.set_title(f'{SERIES_NAME} | Cut Value Distribution by Graph (Best Hyperparameters)')
-    
-    # Add legend for models with green line for optimum cut
-    legend_elements = [plt.Rectangle((0,0), 1, 1, facecolor=PALETTE[i % len(PALETTE)], 
-                                    edgecolor='black') for i, _ in enumerate(model_order)]
-    
-    # Add model labels to legend with green solid line for optimum
-    opt_handle = Line2D([0], [0], color='green', linestyle='-', label='Optimum cut')
-    legend_elements.append(opt_handle)
-    ax.legend(
-        legend_elements,
-        model_order + ['Optimum cut'],
-        loc='center left',
-        bbox_to_anchor=(1.02, 0.5),
-        borderaxespad=0
-    )
-    
-    # Adjust layout and save
-    plt.tight_layout()
-    save_figure('cut_distributions', out_dir)
-    plt.close()
-
 def add_gamma_rate_over_th(data):
     """
     For QPDC model, add gamma_rate/gamma_th column which is gamma_factor/T
@@ -416,7 +263,7 @@ def add_gamma_rate_over_th(data):
 
 def plot_hyperparams(results, out_dir, model_order=None):
     """
-    Plot the average relative optimality gap versus hyperparameters for each model.
+    Plot the mean relative optimality gap versus hyperparameters for each model.
     
     For 1D hyperparameter sweeps: Line plot of gap vs parameter
     For 2D hyperparameter sweeps: Heatmap with parameters as axes
@@ -539,7 +386,7 @@ def plot_hyperparams(results, out_dir, model_order=None):
             # Position colorbar at the bottom
             cbar_ax = fig.add_axes([0.15, 0.065, 0.7, 0.02]) # change second for bottom margin
             cbar = fig.colorbar(sm, cax=cbar_ax, orientation='horizontal')
-            cbar.set_label('Average relative optimality gap (%)')
+            cbar.set_label('Mean relative optimality gap (%)')
 
             # Adjust layout to make space for colorbar at the bottom
             with warnings.catch_warnings():
@@ -655,7 +502,7 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     Create boxplots showing relative optimality gap distributions by graph and model.
     
     For each graph-model combination, only the best hyperparameter set is used
-    (the one with smallest average relative optimality gap).
+    (the one with smallest mean relative optimality gap).
     
     If there is a consistent large gap between model performances, a broken y-axis is used.
     """
@@ -671,7 +518,7 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     
     # Determine model ordering if not provided
     if model_order is None:
-        # Order models by their average relative optimality gap across all graphs
+        # Order models by their mean relative optimality gap across all graphs
         model_performance = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
         model_order = model_performance.index.tolist()
     
@@ -687,67 +534,116 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     # Calculate median rel_cut_gap for each model across all graphs
     model_medians = filtered_results.groupby('model')['rel_cut_gap'].median().sort_values()
     
-    # Find the largest gap between consecutive sorted medians
+    # Find the largest gap(s) between consecutive sorted medians
     median_gaps = model_medians.diff().dropna()
     use_broken_axis = False
+    break_indices = []
+    gap_threshold = 2.0
     if not median_gaps.empty:
-        max_gap = median_gaps.max()
-        if max_gap > 2.0: # Threshold for gap
+        # Find all indices where the gap exceeds the threshold
+        for idx, gap in enumerate(median_gaps):
+            if gap > gap_threshold:
+                break_indices.append(idx + 1)  # +1 because diff shifts index by 1
+        if break_indices:
             use_broken_axis = True
-            # Identify models in bottom and top groups
-            split_model_name = median_gaps.idxmax()
-            split_model_idx = model_medians.index.get_loc(split_model_name)
-            bottom_models = model_medians.index[:split_model_idx].tolist()
-            top_models = model_medians.index[split_model_idx:].tolist()
-            
-            # Determine y-limits for the two axes
-            max_val_bottom = filtered_results[filtered_results['model'].isin(bottom_models)]['rel_cut_gap'].max()
-            min_val_top = filtered_results[filtered_results['model'].isin(top_models)]['rel_cut_gap'].min()
-            max_val_top = filtered_results[filtered_results['model'].isin(top_models)]['rel_cut_gap'].max()
-            
-            # Set limits with a small margin
-            y1_max = max_val_bottom + 0.05 * abs(max_val_bottom) if pd.notna(max_val_bottom) else 1
-            # Set bottom axis to go slightly below zero
-            y1_min = -0.15 * y1_max
-            y2_min = min_val_top - 0.05 * abs(min_val_top) if pd.notna(min_val_top) else y1_max + 1
-            y2_max = max_val_top + 0.05 * abs(max_val_top) if pd.notna(max_val_top) else y2_min + 1
 
     # Prepare the plot with exact sizing
     fig_width = min(8, 0.2 * total_width + 2)  # Add margin for labels
-    fig_height = 4
+    fig_height = 6
     
     if use_broken_axis:
-        height_ratios = [2, 1]
-        fig, (ax, ax2) = plt.subplots(2, 1, sharex=True, figsize=(fig_width, fig_height), gridspec_kw={'height_ratios': height_ratios})
-        # Set y-limits for broken axis
-        ax.set_ylim(y2_min, y2_max)  # top part
-        ax2.set_ylim(y1_min, y1_max) # bottom part
-        ax.spines['bottom'].set_visible(False)
-        ax2.spines['top'].set_visible(False)
-        ax.tick_params(axis='x', which='both', bottom=False)
-        ax.tick_params(axis='y', which='both', left=True)
-        ax2.tick_params(axis='y', which='both', left=True)
+        # Split models into segments based on break_indices
+        split_points = [0] + break_indices + [len(model_medians)]
+        model_segments = [model_medians.index[split_points[i]:split_points[i+1]] for i in range(len(split_points)-1)]
         
+
+        # For each segment, determine y-limits
+        segment_limits = []
+        margin = 0.015
+        all_data_max = filtered_results['rel_cut_gap'].max()
+
+        # Compute the total width of all gaps between segments
+        gap_widths = []
+        for idx in break_indices:
+            # The gap is the difference between the upper of the lower segment and the lower of the upper segment
+            lower_models = model_medians.index[:idx]
+            upper_models = model_medians.index[idx:]
+            lower_max = filtered_results[filtered_results['model'].isin(lower_models)]['rel_cut_gap'].max()
+            upper_min = filtered_results[filtered_results['model'].isin(upper_models)]['rel_cut_gap'].min()
+            if pd.notna(lower_max) and pd.notna(upper_min):
+                gap_widths.append(upper_min - lower_max)
+        total_gap_width = sum(gap_widths) if gap_widths else 0
+
+        for i, models in enumerate(model_segments):
+            seg_data = filtered_results[filtered_results['model'].isin(models)]
+            seg_min = seg_data['rel_cut_gap'].min()
+            seg_max = seg_data['rel_cut_gap'].max()
+            # Add margin
+            seg_min = seg_min - margin * abs(seg_min) if pd.notna(seg_min) else 0
+            seg_max = seg_max + margin * abs(seg_max) if pd.notna(seg_max) else 1
+            # For the lowest segment, extend min below zero
+            if i == 0:
+                seg_min = -0.02 * (all_data_max - total_gap_width)
+            segment_limits.append((seg_min, seg_max))
+
+        # Calculate height ratios proportional to y-range
+        height_ratios = [seg_max - seg_min for seg_min, seg_max in segment_limits]
+
+        # --- FIX: Reverse so top axis is for largest values ---
+        model_segments = model_segments[::-1]
+        segment_limits = segment_limits[::-1]
+        height_ratios  = height_ratios[::-1]
+
+        # Create subplots for each segment
+        fig, axes = plt.subplots(len(model_segments), 1, sharex=True, figsize=(fig_width, fig_height), gridspec_kw={'height_ratios': height_ratios})
+
+        # Set y-limits and hide spines between axes
+        for i, ax in enumerate(axes):
+            ax.set_ylim(*segment_limits[i])
+            ax.tick_params(axis='y', which='both', left=True)
+            if i < len(axes) - 1:
+                ax.spines['bottom'].set_visible(False)
+                ax.tick_params(axis='x', which='both', bottom=False)
+            if i > 0:
+                ax.spines['top'].set_visible(False)
+
         # Set consistent y-tick formatting, 2 decimal places
         formatter = FormatStrFormatter('%.2f')
-        ax.yaxis.set_major_formatter(formatter)
-        ax2.yaxis.set_major_formatter(formatter)
+        for ax in axes:
+            ax.yaxis.set_major_formatter(formatter)
 
-        # Add diagonal lines to indicate break
+        # --- Force tick step size to 0.2 for all axes ---
+        tick_step = 0.2
+        # Find the global min and max for ticks
+        combined_min = min(seg[0] for seg in segment_limits)
+        combined_max = max(seg[1] for seg in segment_limits)
+        # Generate ticks at 0.2 intervals within the global range
+        ticks = np.arange(np.floor(combined_min / tick_step) * tick_step,
+                  np.ceil(combined_max / tick_step) * tick_step + tick_step/2,
+                  tick_step)
+        # Set ticks for each axis within its segment limits
+        for i, ax in enumerate(axes):
+            seg_min, seg_max = segment_limits[i]
+            seg_ticks = [t for t in ticks if seg_min <= t <= seg_max]
+            ax.set_yticks(seg_ticks)
+
+        # Add diagonal lines to indicate breaks
         d = .015
-        # top axes
-        kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
-        ax.plot((-d, +d), (-d*height_ratios[1]/height_ratios[0], +d*height_ratios[1]/height_ratios[0]), **kwargs)
-        ax.plot((1 - d, 1 + d), (-d*height_ratios[1]/height_ratios[0], +d*height_ratios[1]/height_ratios[0]), **kwargs)
-        # bottom axes
-        kwargs.update(transform=ax2.transAxes)
-        ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)
-        ax2.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
-        axes = [ax, ax2]
+        for i in range(len(axes)-1):
+            ax_top = axes[i]
+            ax_bottom = axes[i+1]
+            ratio = height_ratios[i+1] / height_ratios[i]
+            kwargs = dict(transform=ax_top.transAxes, color='k', clip_on=False)
+            ax_top.plot((-d, +d), (-d*ratio, +d*ratio), **kwargs)
+            ax_top.plot((1 - d, 1 + d), (-d*ratio, +d*ratio), **kwargs)
+            kwargs.update(transform=ax_bottom.transAxes)
+            ax_bottom.plot((-d, +d), (1 - d, 1 + d), **kwargs)
+            ax_bottom.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
     else:
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
         ax.tick_params(axis='y', which='both', left=True)
         axes = [ax]
+        main_ax = ax
 
     # Calculate section width (number of positions per graph)
     positions_per_graph = num_models
@@ -822,14 +718,14 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
         current_ax.axhline(y=0, color='green', linestyle='-', linewidth=1, alpha=0.7)
     
     # Set x-axis labels and ticks
-    main_ax = ax2 if use_broken_axis else ax
+    main_ax = axes[-1] if use_broken_axis else ax
     main_ax.set_xticks(graph_centers)
     main_ax.set_xticklabels([f"{g}" for g in graphs])
     
     # Add y-axis label and title
     fig.text(0.02, 0.5, 'Relative optimality gap (%)', va='center', rotation='vertical')
     if ADD_TITLES:
-        title_ax = ax if use_broken_axis else ax
+        title_ax = axes[0]  # always use the top-most axis for the title
         title_ax.set_title(f'{SERIES_NAME} | Relative optimality gap distribution by graph (best hyperparameters)')
     
     # Add legend for models
@@ -840,7 +736,7 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     opt_handle = Line2D([0], [0], color='green', linestyle='-', label='Optimum (0%)')
     legend_elements.append(opt_handle)
     
-    legend_ax = ax
+    legend_ax = axes[0]
     bbox_anchor = (1.02, 0.5)
     if use_broken_axis:
         # Adjust anchor to be in the middle of the combined axes, not just the top one.
@@ -885,7 +781,7 @@ def generate_stats_table(results, out_dir, model_order=None):
     
     # Determine model ordering if not provided
     if model_order is None:
-        # Order models by their average relative optimality gap across all graphs
+        # Order models by their mean relative optimality gap across all graphs
         model_performance = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
         model_order = model_performance.index.tolist()
     
@@ -1010,7 +906,7 @@ def plot_1d_hyperparam(data, param, model, ax, graph_name, is_leftmost=True, is_
     if is_bottom:
         ax.set_xlabel(param_label)
     if is_leftmost:
-        ax.set_ylabel('Average relative optimality gap (%)')
+        ax.set_ylabel('Mean relative optimality gap (%)')
     # Add subfigure identifier to the top-left
     ax.text(0.05, 1.1, graph_name, transform=ax.transAxes, 
             fontsize=12, fontweight='bold', va='top', ha='right')
@@ -1161,7 +1057,7 @@ def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn,
     else:
         # Use matplotlib's imshow for the heatmap
         im = ax.imshow(pivot.values, cmap='viridis', aspect='auto', origin='lower')
-        ax.figure.colorbar(im, ax=ax, label='Average relative optimality gap (%)')
+        ax.figure.colorbar(im, ax=ax, label='Mean relative optimality gap (%)')
         
         # Set formatted tick labels
         if len(x_values) > 10:
