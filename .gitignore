@@ -39,10 +39,10 @@ hpc/plots/*/
 hpc/prelim*/
 
 # Generated figures (keep source scripts)
-figures/*.pdf
-figures/*.png
-figures/*.svg
-figures/*.jpg
+#figures/*.pdf
+#figures/*.png
+#figures/*.svg
+#figures/*.jpg
 
 # Temporary and intermediate files
 *.tmp
