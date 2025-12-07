@@ -185,7 +185,7 @@ def plot_histograms(res, name, num_states):
 
 def execute_model(name, run_func, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed, *extra_args):
     num_steps = int(np.floor(T / dt))
-    last_only = num_steps > 2e5
+    last_only = num_steps * num_vertices > 1.8e8
     if name == "CIM":
         last_only = num_steps > 1e5
     if last_only:
@@ -228,14 +228,14 @@ if __name__ == "__main__":
     T = 100         # total simulation time
     dt = 1e-3       # time step
 
-    num_states = 4 # number of states for Potts model (q=k)
+    num_states = 3 # number of states for Potts model (q=k)
 
     noise_factor = 1e-4
     seed = 2
 
     # Load a coupling graph
     #file_path = "graphs/band/band50_3_antiferro.col"
-    file_path = "graphs/gset/G5.col"
+    file_path = "graphs/gset/G26.col"
     #file_path = "graphs/g05/g05_10.0.col"
     num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max = parse_graph(file_path)
     opt_cut = opt_cut_dict.get(num_states, 0)
@@ -263,7 +263,7 @@ if __name__ == "__main__":
     )
 
     #%% Run q-PDC model
-    T = 50         # total simulation time
+    T = 10         # total simulation time
     dt = 1e-3       # time step
     num_steps = int(np.floor(T / dt))  # number of time steps
 

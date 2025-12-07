@@ -12,10 +12,12 @@ from collections import defaultdict
 import seaborn as sns
 from cycler import cycler
 import warnings
+import re
 
 SERIES_NAME = None
 FILE_EXT = "png"  # Default file extension
 ADD_TITLES = True  # Default is to add titles
+PROBLEM_TYPE = None  # Problem type derived from series name
 
 # CLI flags:
 #   --results     Path to the results.parquet file (required)
@@ -45,13 +47,14 @@ def main():
     parser.add_argument('--model_order', type=str, default=None, help='Comma-separated list of models in desired order')
     parser.add_argument('--figure_mode', action='store_true', help='Output as PDF without titles (for publications)')
     parser.add_argument('--table', action='store_true', help='Generate CSV table with statistics for best hyperparameter combinations')
+    parser.add_argument('--best_hyperparams', type=str, default='mean_gap', choices=['mean_gap', 'min_gap'], help='Metric for selecting best hyperparameters: mean_gap (minimize mean) or min_gap (minimize minimum).')
     args = parser.parse_args()
     
     # Set global variables for figure mode
     global FILE_EXT, ADD_TITLES
     if args.figure_mode:
         FILE_EXT = "pdf"
-        ADD_TITLES = False
+        ADD_TITLES = True
     
     # infer series name and adjust default output directory
     input_path = Path(args.results)
@@ -59,8 +62,15 @@ def main():
         series_name = input_path.stem[len('results_'):]
     else:
         series_name = input_path.stem
-    global SERIES_NAME
+    global SERIES_NAME, PROBLEM_TYPE
     SERIES_NAME = series_name
+    # derive problem type from series_name, e.g. any “max-k-cut” becomes “Max-k-Cut”, otherwise default to Max-3-Cut
+    name = series_name.lower()
+    m = re.search(r"max-(\d+)-cut", name)
+    if m:
+        PROBLEM_TYPE = f"Max-{m.group(1)}-Cut"
+    else:
+        PROBLEM_TYPE = "Max-3-Cut"
     default_out = parser.get_default('out_dir')
     if args.out_dir == default_out:
         args.out_dir = str(Path(default_out) / series_name)
@@ -73,11 +83,12 @@ def main():
     
     # Alias mapping for certain model keys to nicer labels
     alias_map = {
-        'QPDC':         'q-PDC',
-        'POLYNOMIAL':      'Polynomial',
+        'QPDC':             'q-PDC',
+        'POLYNOMIAL':      'Polynomial PM',
         'NEC':             'NEC',
-        'SIGMOID':         'Sigmoid',
-        'FIXED_AMPLITUDE': 'q-SHIL'
+        'SIGMOID':         'Sigmoid PM',
+        'FIXED_AMPLITUDE': 'q-SHIL',
+        'CIM':              'Sigmoid IM'
     }
     results['model'] = results['model'].replace(alias_map)
     
@@ -113,33 +124,33 @@ def main():
     model_order = [alias_map.get(m, m) for m in raw_order] if raw_order else None
 
     # 1. Max success rate for each model versus graph
-    if 'reached_optimum_cut' in results.columns:
-        plot_max_success_rate_by_graph(results, args.out_dir, model_order)
-    else:
-        print("Warning: Cannot create success rate plot - required columns not found")
+    # if 'reached_optimum_cut' in results.columns:
+    #     plot_max_success_rate_by_graph(results, args.out_dir, model_order)
+    # else:
+    #     print("Warning: Cannot create success rate plot - required columns not found")
         
     # 3. Absolute & relative cut gap
-    if 'cut_gap' in results.columns:
-        plot_optimality_gap(results, args.out_dir, model_order)
-        plot_relative_optimality_gap(results, args.out_dir, model_order)
-    else:
-        print("Warning: Cannot create optimality gap plots - cut value columns not found")
+    # if 'cut_gap' in results.columns:
+    #     plot_optimality_gap(results, args.out_dir, model_order)
+    #     plot_relative_optimality_gap(results, args.out_dir, model_order, args.best_hyperparams)
+    # else:
+    #     print("Warning: Cannot create optimality gap plots - cut value columns not found")
     
     # 4. Hyperparameter sweep plots for cut gap (not energy gap)
     if 'cut_gap' in results.columns:
-        plot_hyperparams(results, args.out_dir, model_order)
+        plot_hyperparams(results, args.out_dir, model_order, args.best_hyperparams)
     else:
         print("Warning: Cannot create hyperparameter sweep plots - cut gap not found")
     
     # 6. Relative optimality gap distribution boxplots by graph and model
     if 'rel_cut_gap' in results.columns:
-        plot_rel_gap_distributions_by_graph(results, args.out_dir, model_order)
+        plot_rel_gap_distributions_by_graph(results, args.out_dir, model_order, args.best_hyperparams)
     else:
         print("Warning: Cannot create relative gap distribution plots - relative cut gap not found")
 
     # Generate statistics table if requested
     if args.table and 'rel_cut_gap' in results.columns:
-        generate_stats_table(results, args.out_dir, model_order)
+        generate_stats_table(results, args.out_dir, model_order, args.best_hyperparams)
     elif args.table:
         print("Warning: Cannot create statistics table - relative cut gap not found")
 
@@ -163,7 +174,7 @@ def sort_models_by_performance(data, metric_col, ascending=True):
     
     return sorted_models
 
-def get_best_params_by_graph_model(results, metric_col, is_minimize=True):
+def get_best_params_by_graph_model(results, metric_col, is_minimize=True, mode='mean_gap'):
     """
     Get the best parameter combination for each graph-model pair based on the specified metric.
     Returns a DataFrame with best parameter IDs for each graph-model combination.
@@ -172,16 +183,50 @@ def get_best_params_by_graph_model(results, metric_col, is_minimize=True):
     - results: DataFrame with results
     - metric_col: Column name of the metric to optimize
     - is_minimize: If True, minimize the metric; if False, maximize the metric
+    - mode: 'mean_gap' to optimize mean of metric, 'min_gap' to optimize min of metric.
     """
-    # Group by graph, model, and param_id to calculate mean metric
-    grouped = results.groupby(['graph', 'model', 'param_id'])[metric_col].mean().reset_index()
+    if mode == 'mean_gap':
+        # Group by graph, model, and param_id to calculate mean metric
+        grouped = results.groupby(['graph', 'model', 'param_id'])[metric_col].mean().reset_index()
+        
+        # Find the best param_id for each graph-model combination
+        if is_minimize:
+            best_params = grouped.loc[grouped.groupby(['graph', 'model'])[metric_col].idxmin()]
+        else:
+            best_params = grouped.loc[grouped.groupby(['graph', 'model'])[metric_col].idxmax()]
     
-    # Find the best param_id for each graph-model combination
-    if is_minimize:
-        best_params = grouped.loc[grouped.groupby(['graph', 'model'])[metric_col].idxmin()]
+    elif mode == 'min_gap':
+        # For min_gap, we find the minimum value of the metric, and use success rate as a tie-breaker.
+        # This assumes we are always minimizing.
+        if not is_minimize:
+            warnings.warn("min_gap mode currently only supports minimization. Proceeding with minimization.")
+
+        # Calculate min metric and count for each param_id
+        agg_df = results.groupby(['graph', 'model', 'param_id']).agg(
+            min_metric=(metric_col, 'min'),
+            count=(metric_col, 'size') # Total runs for this param combo
+        ).reset_index()
+
+        # Count how many times the minimum value was achieved
+        min_counts = results.groupby(['graph', 'model', 'param_id', metric_col]).size().reset_index(name='min_count')
+        
+        # Merge to get the count for the minimum value
+        agg_df = pd.merge(agg_df, min_counts, 
+                          on=['graph', 'model', 'param_id'], 
+                          how='left')
+        
+        # Filter to keep only rows where the metric value is the minimum for that group
+        agg_df = agg_df[agg_df[metric_col] == agg_df['min_metric']]
+
+        # Sort by graph, model, min_metric (ascending), and then min_count (descending for tie-breaking)
+        agg_df = agg_df.sort_values(['graph', 'model', 'min_metric', 'min_count'], ascending=[True, True, True, False])
+        
+        # Get the best param_id for each graph-model (the first one after sorting)
+        best_params = agg_df.drop_duplicates(subset=['graph', 'model'], keep='first')
+
     else:
-        best_params = grouped.loc[grouped.groupby(['graph', 'model'])[metric_col].idxmax()]
-    
+        raise ValueError(f"Unknown mode for get_best_params_by_graph_model: {mode}")
+
     # Return only the necessary columns
     return best_params[['graph', 'model', 'param_id']]
 
@@ -218,10 +263,10 @@ def plot_optimality_gap(results, out_dir, model_order=None):
     save_figure('optimality_gaps', out_dir)
     plt.close()
 
-def plot_relative_optimality_gap(results, out_dir, model_order=None):
+def plot_relative_optimality_gap(results, out_dir, model_order=None, best_hyperparams_mode='mean_gap'):
     """Plot best mean relative optimality gap per model as horizontal bars."""
     # Get best parameters for each graph-model combination (minimize relative cut gap)
-    best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True)
+    best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True, mode=best_hyperparams_mode)
     
     # Filter results to only include best parameter combinations
     filtered_results = pd.merge(
@@ -261,7 +306,7 @@ def add_gamma_rate_over_th(data):
         data['gamma_rate/gamma_th'] = data['gamma_factor'] / data['T']
     return data
 
-def plot_hyperparams(results, out_dir, model_order=None):
+def plot_hyperparams(results, out_dir, model_order=None, best_hyperparams_mode='mean_gap'):
     """
     Plot the mean relative optimality gap versus hyperparameters for each model.
     
@@ -301,7 +346,8 @@ def plot_hyperparams(results, out_dir, model_order=None):
 
         # Based on number of swept parameters, create appropriate plot
         if len(swept_params) == 0:
-            print(f"Skipping hyperparameter plot for {model}: No parameters being swept")
+            # No hyperparameters being swept, skip plotting
+            pass
         elif len(swept_params) == 1:
             param = swept_params[0]
             print(f"Creating 1D hyperparameter plot for {model}: {param}")
@@ -323,7 +369,7 @@ def plot_hyperparams(results, out_dir, model_order=None):
                 if is_bottom:
                     ax.tick_params(labelbottom=True)
 
-                plot_1d_hyperparam(graph_data, param, model, ax, graph, is_leftmost, is_bottom, i)
+                plot_1d_hyperparam(graph_data, param, model, ax, graph, is_leftmost, is_bottom, i, best_hyperparams_mode)
             
             # Hide unused subplots
             for i in range(num_graphs, nrows * ncols):
@@ -331,10 +377,9 @@ def plot_hyperparams(results, out_dir, model_order=None):
                 fig.delaxes(axes[row, col])
 
             if ADD_TITLES:
-                # Use a generic title for the figure
-                fig.suptitle(f'{SERIES_NAME} | {model}: Hyperparameter Sweep', fontsize=16)
-            
-            plt.tight_layout(rect=[0, 0, 1, 0.97], h_pad=-1)
+                fig.suptitle(f'{model}, {PROBLEM_TYPE}', x=0.54, ha='center')
+                
+            plt.tight_layout(rect=[0, 0, 1, 1], h_pad=-1)
             filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_1d_hyperparam'
             save_figure(filename, out_dir)
             plt.close(fig)
@@ -344,7 +389,10 @@ def plot_hyperparams(results, out_dir, model_order=None):
             print(f"Creating 2D hyperparameter plot for {model}: {param1} vs {param2}")
             
             # Calculate global min and max for the color bar across all graphs for this model
-            all_graph_data = model_data.groupby([param1, param2])['rel_cut_gap'].mean()
+            if best_hyperparams_mode == 'mean_gap':
+                all_graph_data = model_data.groupby([param1, param2])['rel_cut_gap'].mean()
+            else: # min_gap
+                all_graph_data = model_data.groupby([param1, param2])['rel_cut_gap'].min()
             global_min = all_graph_data[all_graph_data > 0].min()
             global_max = all_graph_data.max()
 
@@ -365,7 +413,7 @@ def plot_hyperparams(results, out_dir, model_order=None):
                 if is_bottom:
                     ax.tick_params(labelbottom=True)
 
-                plot_2d_hyperparam(graph_data, param1, param2, model, ax, graph, has_seaborn, global_min, global_max, is_leftmost, is_bottom, i)
+                plot_2d_hyperparam(graph_data, param1, param2, model, ax, graph, has_seaborn, global_min, global_max, is_leftmost, is_bottom, i, best_hyperparams_mode)
 
             # Hide unused subplots
             for i in range(num_graphs, nrows * ncols):
@@ -373,7 +421,7 @@ def plot_hyperparams(results, out_dir, model_order=None):
                 fig.delaxes(axes[row, col])
 
             if ADD_TITLES:
-                fig.suptitle(f'{SERIES_NAME} | {model}: Hyperparameter Sweep', fontsize=16)
+                fig.suptitle(f'{model}, {PROBLEM_TYPE}', x=0.54, ha='center')
 
             # Add a single horizontal colorbar for the entire figure
             log_norm = None
@@ -391,7 +439,7 @@ def plot_hyperparams(results, out_dir, model_order=None):
             # Adjust layout to make space for colorbar at the bottom
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", UserWarning)
-                plt.tight_layout(rect=[0, 0.07, 1, 0.97], h_pad=-1) # change second for bottom margin
+                plt.tight_layout(rect=[0, 0.07, 1, 1], h_pad=-1) # change second for bottom margin
             filename = f'{model.lower().replace(" ", "_").replace("-", "_")}_2d_hyperparam'
             save_figure(filename, out_dir)
             plt.close(fig)
@@ -497,7 +545,7 @@ def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
     save_figure('max_success_rate', out_dir)
     plt.close()
 
-def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
+def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None, best_hyperparams_mode='mean_gap'):
     """
     Create boxplots showing relative optimality gap distributions by graph and model.
     
@@ -507,7 +555,7 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     If there is a consistent large gap between model performances, a broken y-axis is used.
     """
     # Get best parameters for each graph-model combination (minimize cut gap)
-    best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True)
+    best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True, mode=best_hyperparams_mode)
     
     # Filter results to only include best parameter combinations
     filtered_results = pd.merge(
@@ -518,9 +566,28 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     
     # Determine model ordering if not provided
     if model_order is None:
+        print("Using model order based on mean relative optimality gap")
         # Order models by their mean relative optimality gap across all graphs
-        model_performance = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
+        if best_hyperparams_mode == 'mean_gap':
+            model_performance = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
+        else: # min_gap
+            # compute each graph‐model’s min rel_cut_gap
+            min_by_graph = (
+                filtered_results
+                .groupby(['graph','model'])['rel_cut_gap']
+                .min()
+                .reset_index()
+            )
+            # now average those minima over all graphs, then sort
+            model_performance = (
+                min_by_graph
+                .groupby('model')['rel_cut_gap']
+                .mean()
+                .sort_values()
+            )
+            model_order = model_performance.index.tolist()
         model_order = model_performance.index.tolist()
+
     
     # Get unique graphs and sort them alphanumerically
     graphs_df = filtered_results[['graph', 'num_spins']].drop_duplicates()
@@ -535,21 +602,38 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     model_medians = filtered_results.groupby('model')['rel_cut_gap'].median().sort_values()
     
     # Find the largest gap(s) between consecutive sorted medians
-    median_gaps = model_medians.diff().dropna()
+    # Determine breaks based on gaps between distributions (no overlap region)
     use_broken_axis = False
     break_indices = []
-    gap_threshold = 2.0
-    if not median_gaps.empty:
-        # Find all indices where the gap exceeds the threshold
-        for idx, gap in enumerate(median_gaps):
-            if gap > gap_threshold:
-                break_indices.append(idx + 1)  # +1 because diff shifts index by 1
+    gap_threshold = 0.9  # any positive gap indicates a region with no data
+
+    # Ensure we have at least two models to compare
+    if len(model_medians) > 1:
+        models = model_medians.index.tolist()
+        for i in range(len(models) - 1):
+            lower_model = models[i]
+            upper_model = models[i + 1]
+
+            # max of lower distribution, min of upper distribution
+            lower_max = filtered_results.loc[
+                filtered_results['model'] == lower_model, 'rel_cut_gap'
+            ].max()
+            upper_min = filtered_results.loc[
+                filtered_results['model'] == upper_model, 'rel_cut_gap'
+            ].min()
+
+            # if there's a positive gap, mark a break
+            if pd.notna(lower_max) and pd.notna(upper_min):
+                gap = upper_min - lower_max
+                if gap > gap_threshold:
+                    break_indices.append(i + 1)
+
         if break_indices:
             use_broken_axis = True
 
     # Prepare the plot with exact sizing
-    fig_width = min(8, 0.2 * total_width + 2)  # Add margin for labels
-    fig_height = 6
+    fig_width = min(10, 0.3 * total_width + 2)  # Add margin for labels
+    fig_height = 5
     
     if use_broken_axis:
         # Split models into segments based on break_indices
@@ -726,7 +810,7 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None):
     fig.text(0.02, 0.5, 'Relative optimality gap (%)', va='center', rotation='vertical')
     if ADD_TITLES:
         title_ax = axes[0]  # always use the top-most axis for the title
-        title_ax.set_title(f'{SERIES_NAME} | Relative optimality gap distribution by graph (best hyperparameters)')
+        title_ax.set_title(f'{SERIES_NAME} | Avg. rel. optimality gap distribution by graph (best hyperparams = {best_hyperparams_mode})')
     
     # Add legend for models
     legend_elements = [plt.Rectangle((0,0), 1, 1, facecolor=PALETTE[i % len(PALETTE)], 
@@ -764,13 +848,13 @@ def format_number(value):
     """Format a number to exactly 2 decimal places."""
     return f"{value:.2f}"
 
-def generate_stats_table(results, out_dir, model_order=None):
+def generate_stats_table(results, out_dir, model_order=None, best_hyperparams_mode='mean_gap'):
     """
     Generate a CSV table with statistics for the best hyperparameter combinations
     for each graph and model.
     """
     # Get best parameters for each graph-model combination (minimize relative cut gap)
-    best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True)
+    best_params = get_best_params_by_graph_model(results, 'rel_cut_gap', is_minimize=True, mode=best_hyperparams_mode)
     
     # Filter results to only include best parameter combinations
     filtered_results = pd.merge(
@@ -781,9 +865,17 @@ def generate_stats_table(results, out_dir, model_order=None):
     
     # Determine model ordering if not provided
     if model_order is None:
-        # Order models by their mean relative optimality gap across all graphs
-        model_performance = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
-        model_order = model_performance.index.tolist()
+        # If all models are present
+        if set(filtered_results['model'].unique()) == {'NEC', 'q-PDC', 'q-SHIL', 'Polynomial PM', 'Sigmoid PM', 'Sigmoid IM'}:
+            print("Using default model order for all models")
+            model_order = [
+                'NEC', 'q-PDC', 'q-SHIL', 'Polynomial PM', 'Sigmoid PM', 'Sigmoid IM'
+            ]
+        else:
+            print("Using model order based on mean relative optimality gap")
+            # Order models by their mean relative optimality gap across all graphs
+            model_performance = filtered_results.groupby('model')['rel_cut_gap'].mean().sort_values()
+            model_order = model_performance.index.tolist()
     
     # Create a list to hold rows for the table
     table_rows = []
@@ -862,8 +954,13 @@ def generate_stats_table(results, out_dir, model_order=None):
     
     # Convert to DataFrame and save to CSV
     stats_df = pd.DataFrame(table_rows)
-    
-    # Sort by Model and Graph
+
+    # Enforce custom model order and then sort by Model and Graph
+    stats_df['Model'] = pd.Categorical(
+        stats_df['Model'],
+        categories=model_order,
+        ordered=True
+    )
     stats_df = stats_df.sort_values(['Model', 'Graph'])
     
     # Save to CSV
@@ -871,7 +968,7 @@ def generate_stats_table(results, out_dir, model_order=None):
     stats_df.to_csv(csv_path, index=False)
     print(f"Saved statistics table to {csv_path}")
 
-def plot_1d_hyperparam(data, param, model, ax, graph_name, is_leftmost=True, is_bottom=True, plot_idx=0):
+def plot_1d_hyperparam(data, param, model, ax, graph_name, is_leftmost=True, is_bottom=True, plot_idx=0, mode='mean_gap'):
     """Create a line plot of relative cut gap versus a single hyperparameter on a given axis."""
     # Map parameter names to LaTeX labels
     param_label_map = {
@@ -888,25 +985,32 @@ def plot_1d_hyperparam(data, param, model, ax, graph_name, is_leftmost=True, is_
         # Use the mapped label if available, otherwise use the parameter name
         param_label = param_label_map.get(param, param)
     
-    # Group by the parameter and calculate mean relative cut gap
-    grouped = data.groupby(param)['rel_cut_gap'].mean().reset_index()
-    
+    # Group by the parameter and calculate mean or min relative cut gap
+    if mode == 'mean_gap':
+        grouped = data.groupby(param)['rel_cut_gap'].mean().reset_index()
+        metric_col = 'rel_cut_gap'
+        y_label = 'Mean relative optimality gap (%)'
+    else: # min_gap
+        grouped = data.groupby(param)['rel_cut_gap'].min().reset_index()
+        metric_col = 'rel_cut_gap'
+        y_label = 'Minimum relative optimality gap (%)'
+
     # Sort by parameter value for proper line plot
     grouped = grouped.sort_values(param)
     
     # Create the line plot on the given axis
-    ax.plot(grouped[param], grouped['rel_cut_gap'], marker='o', linewidth=2)
+    ax.plot(grouped[param], grouped[metric_col], marker='o', linewidth=2)
     
     # Mark the minimum value
     if not grouped.empty:
-        min_idx = grouped['rel_cut_gap'].idxmin()
+        min_idx = grouped[metric_col].idxmin()
         min_point = grouped.loc[min_idx]
-        ax.plot(min_point[param], min_point['rel_cut_gap'], 'r*', markersize=12)
+        ax.plot(min_point[param], min_point[metric_col], 'r*', markersize=12)
     
     if is_bottom:
         ax.set_xlabel(param_label)
     if is_leftmost:
-        ax.set_ylabel('Mean relative optimality gap (%)')
+        ax.set_ylabel(y_label)
     # Add subfigure identifier to the top-left
     ax.text(0.05, 1.1, graph_name, transform=ax.transAxes, 
             fontsize=12, fontweight='bold', va='top', ha='right')
@@ -942,7 +1046,7 @@ def format_tick_values(values):
     else:
         return [f"{v:.2f}" for v in values]
 
-def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn, global_min=None, global_max=None, is_leftmost=True, is_bottom=True, plot_idx=0):
+def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn, global_min=None, global_max=None, is_leftmost=True, is_bottom=True, plot_idx=0, mode='mean_gap'):
     """Create a heatmap of relative cut gap versus two hyperparameters on a given axis."""
     # Map parameter names to LaTeX labels
     param_label_map = {
@@ -973,9 +1077,12 @@ def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn,
     else:
         param2_label = param_label_map.get(param2, param2)
     
-    # Group by both parameters and calculate mean relative cut gap
-    grouped = data.groupby([param1, param2])['rel_cut_gap'].mean().reset_index()
-    
+    # Group by both parameters and calculate mean or min relative cut gap
+    if mode == 'mean_gap':
+        grouped = data.groupby([param1, param2])['rel_cut_gap'].mean().reset_index()
+    else: # min_gap
+        grouped = data.groupby([param1, param2])['rel_cut_gap'].min().reset_index()
+
     # Get unique values for each parameter, sorted
     param1_values = sorted(grouped[param1].unique())
     param2_values = sorted(grouped[param2].unique())

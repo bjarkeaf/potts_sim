@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.Python
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Virtual environments
+venv/
+env/
+ENV/
+hpc/potts-env/
+
+# C++ build artifacts
+*.o
+*.out
+build/
+
+# Compiled extension modules
+*.cpython-*.so
+*.pyd
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Results and output files
+hpc/results/*.parquet
+hpc/logs/*.out
+hpc/logs/*.err
+hpc/plots/*/
+hpc/prelim*/
+
+# Generated figures (keep source scripts)
+figures/*.pdf
+figures/*.png
+figures/*.svg
+figures/*.jpg
+
+# Temporary and intermediate files
+*.tmp
+*.bak
+*.swp
+*~
+.DS_Store
+
+# Data files (keep small test graphs, ignore large datasets)
+*.parquet
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+
+# Archives
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tgz
+
+# Keep specific structure but ignore contents
+hpc/plots/*
+!hpc/plots/.gitkeep
+hpc/results/*
+!hpc/results/.gitkeep
+hpc/logs/*
+!hpc/logs/.gitkeep
+
+# LLM related
+CLAUDE.md

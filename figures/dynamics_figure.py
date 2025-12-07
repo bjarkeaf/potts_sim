@@ -141,11 +141,11 @@ dt = 1e-2        # time step
 num_steps = int(np.floor(T / dt))  # number of time steps
 
 # CIM specific parameters
-zeta = 0.6       # empirical rescaling factor
+zeta = 0.5       # empirical rescaling factor
 B_num_vertices = 20  # B/A/num_    vertices ratio for soft constraints 
 B = B_num_vertices / num_vertices  # B value for CIM model
-alpha = -10      # parameter for tanh nonlinearity
-beta_schedule = np.linspace(0, 0.01, num_steps)  # time-dependent annealing schedule
+alpha = 0.9      # parameter for tanh nonlinearity
+beta_schedule = np.linspace(0, 0.4, num_steps)  # time-dependent annealing schedule
 
 # Execute the CIM model
 res_dict["CIM"] = execute_model("CIM", run_cim_from_graph, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed,
@@ -288,7 +288,7 @@ for idx, (model_key, display_name, letter) in enumerate(zip(models, display_name
 # Bottom models: 2 wide columns, 2 rows (main and cut)
 bottom_models = [
     ("Fixed-Amplitude", r'$q$-SHIL', "e", "Spin phases"),
-    ("CIM", "Sigmoid IM with\nspin sign method", "f", "Spin amplitudes")
+    ("CIM", "Sigmoid IM", "f", "Spin amplitudes")
 ]
 
 for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
@@ -380,5 +380,134 @@ plt.tight_layout()
 plt.savefig("dynamics_figure.pdf", bbox_inches='tight')
 plt.show()
 
+#%% Similar figure, but individual figure for each model
+top_panel_size = (2.5, 6.7)
+bottom_panel_size = (2.5, 4.2)
 
-# %%
+top_figures = [
+    ("NEC", "NEC"),
+    ("q-PDC", r"$q$-PDC"),
+    ("Polynomial", "Polynomial PM (this work)"),
+    ("Sigmoid", "Sigmoid PM (this work)")
+]
+
+for model_key, title in top_figures:
+    data = res_dict[model_key]
+    cont = data["continuous_states"]
+    if cont.shape[0] > 1000:
+        sel = np.linspace(0, cont.shape[0] - 1, 1000, dtype=int)
+        cont = cont[sel]
+    total_time = data["dt"] * data["num_steps"]
+    time_axis = np.linspace(0, total_time, cont.shape[0])
+
+    fig = plt.figure(figsize=top_panel_size)
+    gs = GridSpec(3, 1, height_ratios=[1, 1, 2/3], hspace=0.35)
+    ax_amp = fig.add_subplot(gs[0])
+    ax_phase = fig.add_subplot(gs[1])
+    ax_cut = fig.add_subplot(gs[2])
+    fig.suptitle(title, y=0.94)
+
+    if np.iscomplexobj(cont):
+        amplitudes = np.abs(cont)
+        for col in range(min(max_num_spins, amplitudes.shape[1])):
+            ax_amp.plot(time_axis, amplitudes[:, col], lw=1)
+    else:
+        for col in range(min(max_num_spins, cont.shape[1])):
+            ax_amp.plot(time_axis, cont[:, col], lw=1)
+    ax_amp.set_ylabel("Spin amplitudes")
+    ax_amp.tick_params(labelbottom=False)
+
+    if np.iscomplexobj(cont):
+        phases = np.angle(cont)
+        plot_phase_with_wraparound(ax_phase, time_axis, phases, max_num_to_plot=max_num_spins, lw=1)
+        ax_phase.set_ylim(-np.pi, np.pi)
+        for theta in theta_values:
+            ax_phase.axhline(theta, color="gray", linestyle="--", lw=0.5)
+        ax_phase.set_yticks(theta_values)
+        ax_phase.set_yticklabels(theta_labels)
+    else:
+        ax_phase.text(0.5, 0.5, "Real-valued spins", ha="center", va="center", transform=ax_phase.transAxes)
+    ax_phase.set_ylabel("Spin phases")
+    ax_phase.tick_params(labelbottom=False)
+
+    cut_series = np.asarray(data["cut_value"])
+    if cut_series.size > 1000:
+        sel = np.linspace(0, cut_series.size - 1, 1000, dtype=int)
+        cut_series = cut_series[sel]
+        cut_time = np.linspace(0, total_time, cut_series.size)
+    else:
+        cut_time = np.linspace(0, total_time, cut_series.size)
+    ax_cut.plot(cut_time, cut_series, lw=1)
+    ax_cut.axhline(opt_cut, color="red", linestyle="--", label="Optimum")
+    ax_cut.set_ylabel("Cut value\n(Max-3-Cut)")
+    ax_cut.set_xlabel("Time")
+    ax_cut.legend(loc="lower right")
+    ax_cut.set_ylim(50, opt_cut + 3)
+    ax_cut.set_yticks(np.arange(50, opt_cut + 5, 10))
+
+    fig.tight_layout()
+    fig.savefig(f"dynamics_{model_key.lower()}.png", bbox_inches="tight")
+    plt.close(fig)
+
+bottom_figures = [
+    ("Fixed-Amplitude", r"$q$-SHIL", True),
+    ("CIM", "Sigmoid IM", False)
+]
+
+for model_key, title, is_phase_plot in bottom_figures:
+    data = res_dict[model_key]
+    cont = data["continuous_states"]
+    if cont.shape[0] > 1000:
+        sel = np.linspace(0, cont.shape[0] - 1, 1000, dtype=int)
+        cont = cont[sel]
+    total_time = data["dt"] * data["num_steps"]
+    time_axis = np.linspace(0, total_time, cont.shape[0])
+
+    fig = plt.figure(figsize=bottom_panel_size)
+    gs = GridSpec(2, 1, height_ratios=[1, 2/3], hspace=0.40)
+    ax_main = fig.add_subplot(gs[0])
+    ax_cut = fig.add_subplot(gs[1])
+    fig.suptitle(title, y=0.94)
+
+    if is_phase_plot and np.iscomplexobj(cont):
+        phases = np.angle(cont)
+        plot_phase_with_wraparound(ax_main, time_axis, phases, max_num_to_plot=max_num_spins, lw=1)
+        ax_main.set_ylim(-np.pi, np.pi)
+        for theta in theta_values:
+            ax_main.axhline(theta, color="gray", linestyle="--", lw=0.5)
+        ax_main.set_yticks(theta_values)
+        ax_main.set_yticklabels(theta_labels)
+        ax_main.set_ylabel("Spin phases")
+    elif is_phase_plot:
+        ax_main.text(0.5, 0.5, "Real-valued spins", ha="center", va="center", transform=ax_main.transAxes)
+        ax_main.set_ylabel("Spin phases")
+    elif np.iscomplexobj(cont):
+        amplitudes = np.abs(cont)
+        for col in range(min(max_num_spins, amplitudes.shape[1])):
+            ax_main.plot(time_axis, amplitudes[:, col], lw=1)
+        ax_main.set_ylabel("Spin amplitudes")
+    else:
+        for col in range(min(max_num_spins, cont.shape[1])):
+            ax_main.plot(time_axis, cont[:, col], lw=1)
+        ax_main.set_ylabel("Spin amplitudes")
+    ax_main.tick_params(labelbottom=False)
+
+    cut_series = np.asarray(data["cut_value"])
+    if cut_series.size > 1000:
+        sel = np.linspace(0, cut_series.size - 1, 1000, dtype=int)
+        cut_series = cut_series[sel]
+        cut_time = np.linspace(0, total_time, cut_series.size)
+    else:
+        cut_time = np.linspace(0, total_time, cut_series.size)
+    ax_cut.plot(cut_time, cut_series, lw=1)
+    ax_cut.axhline(opt_cut, color="red", linestyle="--", label="Optimum")
+    ax_cut.set_ylabel("Cut value\n(Max-3-Cut)")
+    ax_cut.set_xlabel("Time")
+    ax_cut.legend(loc="lower right")
+    ax_cut.set_ylim(50, opt_cut + 3)
+    ax_cut.set_yticks(np.arange(50, opt_cut + 5, 10))
+
+    fig.tight_layout()
+    fig.savefig(f"dynamics_{model_key.lower()}.png", bbox_inches="tight")
+    plt.close(fig)
+

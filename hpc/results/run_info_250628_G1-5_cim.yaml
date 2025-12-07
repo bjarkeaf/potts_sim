@@ -1,8 +1,11 @@
-assumed_time_per_step_us: 8000
-config_file: configs/250628_G1-5_cim.yaml
-estimated_runtime_seconds: 373333.328
+timestamp: '2025-07-02T15:00:38.484480'
 git_revision: unknown
+config_file: configs/250628_G1-5_cim.yaml
+num_tasks: 56000
 num_graphs: 5
 num_ranks: 120
-num_tasks: 56000
-timestamp: '2025-06-28T13:31:59.108883'
+total_steps_processed: 5600000000
+assumed_time_per_step_us: 8000
+estimated_runtime_seconds: 373333.328
+actual_time_per_step_us: 7393.860656681657
+actual_walltime_seconds: 350917.90439486504
