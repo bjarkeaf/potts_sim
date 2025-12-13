@@ -1,0 +1,10 @@
+c Maximum eigenvalue: 1.813606502648331
+c Optimum cut value (max-3-cut): 5
+c Optimum energy (max-3-cut): 0
+c
+p 5 5 1
+e 1 5 1
+e 2 3 1
+e 2 5 1
+e 3 5 1
+e 4 5 1

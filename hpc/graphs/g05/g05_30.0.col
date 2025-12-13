@@ -1,8 +1,7 @@
+c Maximum eigenvalue: 5.2985338590918225
 c Optimum cut value (max-3-cut): 188
 c Optimum energy (max-3-cut): 37
 c
-c Average absolute coupling: 1.0
-c Maximum eigenvalue: 5.2985338590918225
 p 30 225 1
 e 1 2 1
 e 1 5 1

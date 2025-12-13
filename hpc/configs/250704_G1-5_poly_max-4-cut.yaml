@@ -20,4 +20,4 @@ models:
     beta_schedule: ["lin(1/mu_max, 1/mu_max + 2)"]  # Linear ramp starting at threshold 1/mu_max
     gamma_schedule: # Gamma defined as a factor times beta
       based_on: "beta_schedule"
-      factor: "0:0.1:1" # Matlab style: start:step:end	
+      factor: "0:0.1:1" # Matlab style: start:step:end

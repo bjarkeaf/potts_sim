@@ -1,4 +1,29 @@
 #!/usr/bin/env python3
+"""
+Plot benchmark results from Potts model parameter sweep.
+
+Example usage:
+    # Basic usage - plots will be saved to plots/<series_name>/
+    python plot_benchmark.py --results results_max_3_cut_G70.parquet
+    
+    # Specify custom output directory
+    python plot_benchmark.py --results results_max_3_cut_G70.parquet --out_dir my_plots
+    
+    # Control model order in plots
+    python plot_benchmark.py --results results_max_3_cut_G70.parquet --model_order "NEC,QPDC,POLYNOMIAL,SIGMOID"
+    
+    # Generate publication-ready PDFs without titles
+    python plot_benchmark.py --results results_max_3_cut_G70.parquet --figure_mode
+    
+    # Generate statistics table (CSV) for best hyperparameters
+    python plot_benchmark.py --results results_max_3_cut_G70.parquet --table
+    
+    # Use minimum gap instead of mean gap for selecting best hyperparameters
+    python plot_benchmark.py --results results_max_3_cut_G70.parquet --best_hyperparams min_gap
+    
+    # Combine multiple options
+    python plot_benchmark.py --results results_max_3_cut_G70.parquet --figure_mode --table --best_hyperparams mean_gap
+"""
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
