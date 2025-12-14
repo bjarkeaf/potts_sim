@@ -1296,8 +1296,6 @@ def main():
         # Build task list
         tasks = []
         for graph_file in graph_files:
-            graph = load_graph(graph_file)
-            
             # Process each model type
             for model_name, model_params in config.get('models', {}).items():
                 try:
@@ -1316,7 +1314,7 @@ def main():
                 for param_set in param_sets:
                     for seed in range(num_runs):
                         tasks.append({
-                            'graph': graph,
+                            'graph_path': graph_file,
                             'model_type': model_type,
                             'param_set': param_set,
                             'seed': seed,
@@ -1411,30 +1409,77 @@ def main():
         run_info_file = os.path.join(out_dir, f"run_info_{config_basename}.yaml")
         with open(run_info_file, 'w') as f:
             yaml.dump(run_info, f)
+        
+        broadcast_data = {
+            'graph_files': graph_files,
+            'config': config,
+            'num_runs': num_runs,
+            'num_tasks': len(tasks)
+        }
     else:
-        # Non-root ranks initialize these variables
-        tasks = None
+        broadcast_data = None
         out_dir = None
-        run_info = None
-        args = None
         config_basename = None
         assumed_time_per_step_us = None
     
-    # Broadcast task list, output directory and config basename to all ranks
-    tasks = comm.bcast(tasks, root=0)
+    # Broadcast task metadata
+    broadcast_data = comm.bcast(broadcast_data, root=0)
     out_dir = comm.bcast(out_dir, root=0)
     config_basename = comm.bcast(config_basename, root=0)
     assumed_time_per_step_us = comm.bcast(assumed_time_per_step_us, root=0)
     
-    # If tasks is empty and we're using MPI, it means we're just estimating wall time
-    if use_mpi and not tasks:
-        return  # Exit the function
+    # If no tasks, exit
+    if broadcast_data['num_tasks'] == 0:
+        return
     
-    # Record the actual start time of computation
+    # Extract data
+    graph_files = broadcast_data['graph_files']
+    config = broadcast_data['config']
+    num_runs = broadcast_data['num_runs']
+    
+    # Each rank computes only its own tasks using deterministic indexing
     computation_start_time = time.time()
     
-    # Divide tasks among ranks using simple strided allocation
-    my_tasks = tasks[rank::size]
+    my_tasks = []
+    global_idx = 0
+    
+    # Cache for param_sets to avoid recomputing for each graph
+    param_sets_cache = {}
+    
+    for graph_file in graph_files:
+        for model_name, model_params in config.get('models', {}).items():
+            try:
+                model_type = ModelType[model_name]
+            except KeyError:
+                continue
+            
+            # Get or compute param_sets for this model
+            if model_name not in param_sets_cache:
+                sim_params = get_model_specific_params(config, model_name)
+                param_sets = generate_param_sets(model_type, model_params, sim_params['T'], sim_params['dt'])
+                param_sets_cache[model_name] = {
+                    'param_sets': param_sets,
+                    'sim_params': sim_params,
+                    'model_type': model_type
+                }
+            
+            cached = param_sets_cache[model_name]
+            
+            for param_set in cached['param_sets']:
+                for seed in range(num_runs):
+                    if global_idx % size == rank:
+                        my_tasks.append({
+                            'graph_path': graph_file,
+                            'model_type': cached['model_type'],
+                            'param_set': param_set,
+                            'seed': seed,
+                            'T': cached['sim_params']['T'],
+                            'dt': cached['sim_params']['dt'],
+                            'num_states': cached['sim_params']['num_states'],
+                            'noise_factor': cached['sim_params']['noise_factor']
+                        })
+                    global_idx += 1
+    
     print(f"Rank {rank}: Processing {len(my_tasks)} tasks")
     
     # Process assigned tasks
@@ -1446,6 +1491,10 @@ def main():
     
     for i, task in enumerate(my_tasks):
         try:
+            graph = load_graph(task['graph_path'])
+            task['graph'] = graph
+            del task['graph_path']
+            
             result = run_task(**task)
             local_results.append(result)
             
