@@ -52,6 +52,16 @@ hyperparam_table: "path/to/best_hyperparams.csv"
 
 The hyperparam table-based config feature has been fully implemented and tested.
 
+**Recent Fixes:**
+- Fixed handling of empty model configurations (e.g., `NEC:` with no parameters) - YAML parsers treat this as None, now properly converted to empty dict
+- T and dt now support sweep notation (e.g., `T: "500:500:1500"`) creating cartesian products with other parameter sweeps
+- Updated dry-run output to use clearer category names:
+  - `[GLOBAL CONFIG]` - Parameters from top-level YAML (e.g., `T: 1000` at root)
+  - `[MODEL CONFIG]` - Parameters from model-specific section (e.g., `models.NEC.T: 500`)
+  - `[HYPERPARAM TABLE]` - Parameters loaded from CSV file
+  - `[DEFAULT]` - Parameters from neither config nor CSV (hardcoded defaults)
+- Fixed missing `gamma_prototype` and `beta_prototype` when loading from CSV - the param_id only encodes the factor (e.g., `gpf8.0`), not the prototype schedule, so default prototypes `"lin(0,1)"` are now applied
+
 ### Files Modified
 
 1. **`hpc/run_potts_sweep.py`** (~200 lines added)
@@ -116,19 +126,126 @@ python hpc/run_potts_sweep.py --config hpc/configs/0_hyperparam_table_test.yaml 
 python hpc/run_potts_sweep.py --config hpc/configs/0_hyperparam_table_test.yaml
 ```
 
-### Parameter Precedence
+### Parameter Precedence (Per-Parameter Basis)
 
-1. **CSV hyperparameters** (highest priority for model-specific params)
-   - gamma_factor, beta_factor, poly_order, alpha_rate, r_target, alpha, B_num_vertices, zeta
-   - Schedule expressions (beta_schedule, gamma_schedule)
+**Updated:** Parameter precedence is now on a **per-parameter basis**. Config parameters override CSV values for specific parameters, while CSV fills in any missing parameters.
 
-2. **YAML config parameters** (override global settings)
-   - T, dt, num_runs, num_states, noise_factor
+#### For Individual Parameters:
+1. **YAML config value** (if explicitly set) - HIGHEST PRIORITY
+2. **CSV hyperparameter value** (if config not set)
+3. **Default value** (if neither set)
 
-3. **Default values** (fallback)
+#### Global Parameters (Always from YAML):
+- `T`, `dt`, `num_runs`, `num_states`, `noise_factor`
+
+#### Examples:
+
+**Example 1: Empty Config**
+```yaml
+models:
+  NEC: {}
+```
+Result: All parameters from CSV
+
+**Example 2: Partial Override**
+```yaml
+models:
+  NEC:
+    r_target: 3.0  # Override this
+```
+Result: `r_target=3.0` (config), `alpha_rate` from CSV, `gamma_factor` from CSV
+
+**Example 3: Sweep with CSV Fill**
+```yaml
+models:
+  NEC:
+    r_target: "2:0.5:4"  # Sweep over 5 values
+```
+Result: 5 param_sets, each with:
+- `r_target`: 2.0, 2.5, 3.0, 3.5, 4.0 (from config sweep)
+- `alpha_rate`: from CSV (fills in missing param)
+- `gamma_factor`: from CSV (fills in missing param)
+- `initial_alpha`: from CSV (fills in missing param)
+
+### Additional Features Implemented
+
+#### `--dry-run` Flag (✅ COMPLETED)
+
+A `--dry-run` flag has been added to preview hyperparameter loading without running simulations.
+
+**Usage:**
+```bash
+# Preview hyperparam table loading
+python hpc/run_potts_sweep.py --config hpc/configs/0_hyperparam_table_test.yaml --dry-run
+
+# Preview regular sweep mode
+python hpc/run_potts_sweep.py --config hpc/configs/0_local_test.yaml --dry-run
+```
+
+**Features:**
+- Shows which hyperparameters would be loaded from CSV for each model-graph combination
+- Displays global parameters that override CSV values
+- Calculates CSV coverage (percentage of model-graph combinations found)
+- Warns about missing combinations
+- For configs without hyperparam_table, shows what sweep parameters would be generated
+
+**Example Output:**
+```
+================================================================================
+DRY-RUN: Hyperparam Table Preview
+================================================================================
+CSV File: ../best_hyperparams/250623_prelim_max-3-cut_mean_gap.csv
+Loaded: 30 model-graph combinations
+
+Global Parameters (from YAML, override CSV):
+  T: 1000
+  dt: 0.001
+  num_runs: 10
+  num_states: 3
+  noise_factor: 0.0001
+
+Graph: G1
+--------------------------------------------------------------------------------
+  ✓ NEC (CSV + Config merge)
+    CSV param_id: ar1.00e-02_rt2.1_ia-mu_max_gpf8.0
+    Generated 1 parameter set(s):
+      parameters:
+        T=1000 [GLOBAL CONFIG]
+        dt=0.001 [GLOBAL CONFIG]
+        num_steps=1000000 [GLOBAL CONFIG]
+        poly_order=3 [DEFAULT]
+        alpha_rate=0.01 [HYPERPARAM TABLE]
+        r_target=2.1 [HYPERPARAM TABLE]
+        initial_alpha=-mu_max [HYPERPARAM TABLE]
+        gamma_expr=lin(0,1) [DEFAULT]
+        gamma_factor=8 (prototype) [HYPERPARAM TABLE]
+
+  ✓ POLYNOMIAL (CSV + Config merge)
+    CSV param_id: po3_blin(1/mu_max, 1/mu_max + 2)_gf0.8
+    Generated 1 parameter set(s):
+      parameters:
+        T=1000 [GLOBAL CONFIG]
+        dt=0.001 [GLOBAL CONFIG]
+        num_steps=1000000 [GLOBAL CONFIG]
+        poly_order=3 [HYPERPARAM TABLE]
+        beta_expr=lin(1/mu_max, 1/mu_max + 2) [HYPERPARAM TABLE]
+        gamma_factor=0.8 [HYPERPARAM TABLE]
+
+Summary:
+  Total parameter sets: 12
+  Total tasks: 120 (12 param_sets × 10 runs)
+  CSV coverage: 12/12 (100.0%)
+
+✓ All model-graph combinations found in CSV
+================================================================================
+```
+
+**Implementation:**
+- New function `print_hyperparam_summary()` in `hpc/run_potts_sweep.py` (lines 219-374)
+- Added `--dry-run` argument to parser (line 1552)
+- Dry-run logic in main() (lines 1621-1629)
 
 ### Future Enhancements
 
-- Add `--dry-run` flag to preview which hyperparams would be loaded
 - Support merging multiple CSV files
-- Add validation to warn if CSV graphs don't match config graphs
+- Fix `--plot_schedules` to support hyperparam tables (currently only works with sweep configs)

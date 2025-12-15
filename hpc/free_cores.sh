@@ -20,10 +20,10 @@ awk '
   NR==1 {next}                                 # skip header line
 
   {
-    state = $2                                 # Running, Busy, Down, etc.
+    state = $2                                 # Idle, Running, Busy, Down, etc.
     
-    # Only count cores from Running or Busy nodes
-    if (state != "Running" && state != "Busy") next
+    # Only count cores from Running or Idle nodes
+    if (state != "Running" && state != "Idle") next
     
     split($1, a, "-");                         # n-62-27-11 → {"n","62","27","11"}
     subnet = a[2] "-" a[3]                     # 62-27

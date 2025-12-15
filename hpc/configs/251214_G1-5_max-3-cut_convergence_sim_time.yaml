@@ -1,0 +1,70 @@
+# General configuration
+num_runs: 100  # Number of different seeds to run per parameter set
+graph_path: "graphs/gset/G1-5/"  # Directory, file, or multiple directories/files
+out_dir: "results/"  # Directory to save results
+
+# Wall time estimation
+assumed_time_per_step_us: 400 # Assumed time between steps in microseconds
+
+# Hyperparam table CSV contains optimized hyperparameters for each model-graph combination 
+# If specified, this table will be used for parameters not specified in config.
+hyperparam_table: "../best_hyperparams/250630_prelim_max-3-cut_mean_gap.csv"
+
+# Global simulation parameters (can be overridden per model)
+T: 100         # Total simulation time
+dt: 1e-2       # Time step
+num_states: 3  # Number of Potts states
+noise_factor: 1e-4  # Noise scaling
+
+# Parameter sweeps for each model type
+models:  
+  NEC:
+    T: [10, 100, 1000, 5000, 10000] # Default: 5e3 
+    dt: 1e-2 
+    poly_order: 3
+    alpha_rate: [1e-2]
+    #r_target: fetched from table
+    initial_alpha: "-mu_max"  # Will be evaluated for each graph
+    gamma_schedule: # Gamma schedule as prototype multiplied by swept factor
+      prototype: "lin(0,1)"
+      #factor: fetched from table
+ 
+  QPDC:
+    T: [1, 10, 50, 100, 1000] # Default: 50
+    dt: 1e-3
+    poly_order: ["2*num_states - 1"] 
+    beta_schedule: ["const(1/(1+num_edges/num_vertices))"] # Will be evaluated for each graph
+    gamma_schedule:
+      prototype: "lin(0,gamma_th)" # gamma_th = (256/27)**(1/4)
+      #factor: fetched from table
+      
+  FIXED_AMPLITUDE:
+    T: [10, 100, 1000, 5000, 10000] # Default: 1000
+    dt: 1e-3
+    gamma_schedule: ["lin(0,10.0)"]
+  
+  POLYNOMIAL:
+    T: [10, 100, 1000, 5000, 10000] # Default: 1000
+    dt: 1e-3
+    #poly_order: fetched from table
+    beta_schedule: ["lin(1/mu_max, 1/mu_max + 2)"]  # Linear ramp starting at threshold 1/mu_max
+    gamma_schedule: # Gamma defined as a factor times beta
+      based_on: "beta_schedule"
+      #factor: fetched from table
+        
+  SIGMOID:
+    T: [10, 100, 1000, 2000, 10000] # Default: 2000
+    dt: 1e-3
+    #alpha: fetched from table
+    beta_schedule: ["lin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)"]
+    gamma_schedule:
+      based_on: "beta_schedule"
+      #factor: fetched from table
+      
+  CIM:
+    T: [10, 100, 1000, 5000, 10000] # Default: 1000
+    dt: 1e-2
+    alpha: [-50]
+    beta_schedule: ["lin(0,0.01)"]
+    #B_num_vertices: fetched from table
+    #zeta: fetched from table

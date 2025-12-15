@@ -68,14 +68,22 @@ def save_figure(filename_base, out_dir):
 
 def main():
     parser = argparse.ArgumentParser(description='Generate comparison plots from Potts model parameter sweep results')
+    parser.add_argument('--plot_type', type=str, required=False, choices=['success_rate', 'optimality_gap'], help='Type of plot to generate')
     parser.add_argument('--results', type=str, required=True, help='Path to results.parquet file')
     parser.add_argument('--out_dir', type=str, default='plots', help='Output directory for plots')
     parser.add_argument('--model_order', type=str, default=None, help='Comma-separated list of models in desired order')
     parser.add_argument('--figure_mode', action='store_true', help='Output as PDF without titles (for publications)')
     parser.add_argument('--table', action='store_true', help='Generate CSV table with statistics for best hyperparameter combinations')
-    parser.add_argument('--best_hyperparams', type=str, default='mean_gap', choices=['mean_gap', 'min_gap'], help='Metric for selecting best hyperparameters: mean_gap (minimize mean) or min_gap (minimize minimum).')
+    parser.add_argument('--best_hyperparams', type=str, default=None, choices=['mean_gap', 'min_gap', 'success_rate'], help='Metric for selecting best hyperparameters: mean_gap (minimize mean), min_gap (minimize minimum), or success_rate (maximize success rate). Default depends on --plot_type.')
     args = parser.parse_args()
     
+    # Set default best_hyperparams based on plot_type
+    if args.best_hyperparams is None:
+        if args.plot_type == 'success_rate':
+            args.best_hyperparams = 'success_rate'
+        else:
+            args.best_hyperparams = 'mean_gap'
+
     # Set global variables for figure mode
     global FILE_EXT, ADD_TITLES
     if args.figure_mode:
@@ -149,30 +157,27 @@ def main():
     raw_order = args.model_order.split(',') if args.model_order else None
     model_order = [alias_map.get(m, m) for m in raw_order] if raw_order else None
 
-    # 1. Max success rate for each model versus graph
-    # if 'reached_optimum_cut' in results.columns:
-    #     plot_max_success_rate_by_graph(results, args.out_dir, model_order)
-    # else:
-    #     print("Warning: Cannot create success rate plot - required columns not found")
+    # Generate plot based on plot_type argument
+    if args.plot_type == 'success_rate':
+        if 'reached_optimum_cut' in results.columns:
+            plot_max_success_rate_by_graph(results, args.out_dir, model_order)
+
+            # Also generate hyperparameter plots for success rate
+            plot_hyperparams(results, args.out_dir, model_order, args.best_hyperparams)
+        else:
+            print("Warning: Cannot create success rate plot - required columns not found")
+    
+    else: # if args.plot_type == 'optimality_gap': or not specified
+        if 'rel_cut_gap' in results.columns:
+            plot_rel_gap_distributions_by_graph(results, args.out_dir, model_order, args.best_hyperparams)
+        else:
+            print("Warning: Cannot create relative gap distribution plots - relative cut gap not found")
         
-    # 3. Absolute & relative cut gap
-    # if 'cut_gap' in results.columns:
-    #     plot_optimality_gap(results, args.out_dir, model_order)
-    #     plot_relative_optimality_gap(results, args.out_dir, model_order, args.best_hyperparams)
-    # else:
-    #     print("Warning: Cannot create optimality gap plots - cut value columns not found")
-    
-    # 4. Hyperparameter sweep plots for cut gap (not energy gap)
-    if 'cut_gap' in results.columns:
-        plot_hyperparams(results, args.out_dir, model_order, args.best_hyperparams)
-    else:
-        print("Warning: Cannot create hyperparameter sweep plots - cut gap not found")
-    
-    # 6. Relative optimality gap distribution boxplots by graph and model
-    if 'rel_cut_gap' in results.columns:
-        plot_rel_gap_distributions_by_graph(results, args.out_dir, model_order, args.best_hyperparams)
-    else:
-        print("Warning: Cannot create relative gap distribution plots - relative cut gap not found")
+        # Also generate hyperparameter plots for optimality gap
+        if 'cut_gap' in results.columns:
+            plot_hyperparams(results, args.out_dir, model_order, args.best_hyperparams)
+        else:
+            print("Warning: Cannot create hyperparameter sweep plots - cut gap not found")
 
     # Generate statistics table if requested
     if args.table and 'rel_cut_gap' in results.columns:
@@ -285,6 +290,8 @@ def plot_hyperparams(results, out_dir, model_order=None, best_hyperparams_mode='
     For 2D hyperparameter sweeps: Heatmap with parameters as axes
     For 3D+ hyperparameter sweeps: Skip plotting with a message
     For no hyperparameter sweep: Skip plotting with a message
+    
+    Supports modes: 'mean_gap', 'min_gap', 'success_rate'
     """
     # Try to import seaborn for better heatmaps
     try:
@@ -292,6 +299,18 @@ def plot_hyperparams(results, out_dir, model_order=None, best_hyperparams_mode='
         has_seaborn = True
     except ImportError:
         has_seaborn = False
+    
+    # Determine the metric column based on mode
+    if best_hyperparams_mode == 'success_rate':
+        metric_col = 'reached_optimum_cut'
+        if metric_col not in results.columns:
+            print("Warning: Cannot create hyperparameter plots for success_rate - reached_optimum_cut not found")
+            return
+    else:
+        metric_col = 'rel_cut_gap'
+        if metric_col not in results.columns:
+            print("Warning: Cannot create hyperparameter plots - rel_cut_gap not found")
+            return
     
     # Process each model type separately
     models = model_order if model_order else sorted(results['model'].unique())
@@ -360,12 +379,18 @@ def plot_hyperparams(results, out_dir, model_order=None, best_hyperparams_mode='
             print(f"Creating 2D hyperparameter plot for {model}: {param1} vs {param2}")
             
             # Calculate global min and max for the color bar across all graphs for this model
-            if best_hyperparams_mode == 'mean_gap':
+            if best_hyperparams_mode == 'success_rate':
+                all_graph_data = model_data.groupby([param1, param2])['reached_optimum_cut'].mean() * 100
+                global_min = all_graph_data.min()
+                global_max = all_graph_data.max()
+            elif best_hyperparams_mode == 'mean_gap':
                 all_graph_data = model_data.groupby([param1, param2])['rel_cut_gap'].mean()
+                global_min = all_graph_data[all_graph_data > 0].min()
+                global_max = all_graph_data.max()
             else: # min_gap
                 all_graph_data = model_data.groupby([param1, param2])['rel_cut_gap'].min()
-            global_min = all_graph_data[all_graph_data > 0].min()
-            global_max = all_graph_data.max()
+                global_min = all_graph_data[all_graph_data > 0].min()
+                global_max = all_graph_data.max()
 
             # Create subplots for each graph
             num_graphs = len(graphs)
@@ -395,17 +420,23 @@ def plot_hyperparams(results, out_dir, model_order=None, best_hyperparams_mode='
                 fig.suptitle(f'{model}, {PROBLEM_TYPE}', x=0.54, ha='center')
 
             # Add a single horizontal colorbar for the entire figure
-            log_norm = None
-            if pd.notna(global_min) and global_min < global_max:
-                log_norm = LogNorm(vmin=global_min, vmax=global_max)
+            # For success rate, don't use log norm
+            if best_hyperparams_mode == 'success_rate':
+                norm = None
+                cbar_label = 'Success rate (%)'
+            else:
+                norm = None
+                if pd.notna(global_min) and global_min < global_max:
+                    norm = LogNorm(vmin=global_min, vmax=global_max)
+                cbar_label = 'Mean relative optimality gap (%)'
             
-            sm = plt.cm.ScalarMappable(cmap='viridis', norm=log_norm)
+            sm = plt.cm.ScalarMappable(cmap='viridis', norm=norm)
             sm.set_array([])
             
             # Position colorbar at the bottom
             cbar_ax = fig.add_axes([0.15, 0.065, 0.7, 0.02]) # change second for bottom margin
             cbar = fig.colorbar(sm, cax=cbar_ax, orientation='horizontal')
-            cbar.set_label('Mean relative optimality gap (%)')
+            cbar.set_label(cbar_label)
 
             # Adjust layout to make space for colorbar at the bottom
             with warnings.catch_warnings():
@@ -820,7 +851,7 @@ def format_number(value):
     return f"{value:.2f}"
 
 def plot_1d_hyperparam(data, param, model, ax, graph_name, is_leftmost=True, is_bottom=True, plot_idx=0, mode='mean_gap'):
-    """Create a line plot of relative cut gap versus a single hyperparameter on a given axis."""
+    """Create a line plot of relative cut gap or success rate versus a single hyperparameter on a given axis."""
     # Map parameter names to LaTeX labels
     param_label_map = {
         'gamma_factor': r'$f_\gamma$',
@@ -836,15 +867,23 @@ def plot_1d_hyperparam(data, param, model, ax, graph_name, is_leftmost=True, is_
         # Use the mapped label if available, otherwise use the parameter name
         param_label = param_label_map.get(param, param)
     
-    # Group by the parameter and calculate mean or min relative cut gap
-    if mode == 'mean_gap':
+    # Group by the parameter and calculate metric based on mode
+    if mode == 'success_rate':
+        grouped = data.groupby(param)['reached_optimum_cut'].mean().reset_index()
+        grouped['reached_optimum_cut'] = grouped['reached_optimum_cut'] * 100  # Convert to percentage
+        metric_col = 'reached_optimum_cut'
+        y_label = 'Success rate (%)'
+        find_best = 'max'  # Higher is better for success rate
+    elif mode == 'mean_gap':
         grouped = data.groupby(param)['rel_cut_gap'].mean().reset_index()
         metric_col = 'rel_cut_gap'
         y_label = 'Mean relative optimality gap (%)'
+        find_best = 'min'  # Lower is better for gap
     else: # min_gap
         grouped = data.groupby(param)['rel_cut_gap'].min().reset_index()
         metric_col = 'rel_cut_gap'
         y_label = 'Minimum relative optimality gap (%)'
+        find_best = 'min'  # Lower is better for gap
 
     # Sort by parameter value for proper line plot
     grouped = grouped.sort_values(param)
@@ -852,11 +891,14 @@ def plot_1d_hyperparam(data, param, model, ax, graph_name, is_leftmost=True, is_
     # Create the line plot on the given axis
     ax.plot(grouped[param], grouped[metric_col], marker='o', linewidth=2)
     
-    # Mark the minimum value
+    # Mark the best value (min for gap, max for success rate)
     if not grouped.empty:
-        min_idx = grouped[metric_col].idxmin()
-        min_point = grouped.loc[min_idx]
-        ax.plot(min_point[param], min_point[metric_col], 'r*', markersize=12)
+        if find_best == 'min':
+            best_idx = grouped[metric_col].idxmin()
+        else:
+            best_idx = grouped[metric_col].idxmax()
+        best_point = grouped.loc[best_idx]
+        ax.plot(best_point[param], best_point[metric_col], 'r*', markersize=12)
     
     if is_bottom:
         ax.set_xlabel(param_label)
@@ -898,7 +940,7 @@ def format_tick_values(values):
         return [f"{v:.2f}" for v in values]
 
 def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn, global_min=None, global_max=None, is_leftmost=True, is_bottom=True, plot_idx=0, mode='mean_gap'):
-    """Create a heatmap of relative cut gap versus two hyperparameters on a given axis."""
+    """Create a heatmap of relative cut gap or success rate versus two hyperparameters on a given axis."""
     # Map parameter names to LaTeX labels
     param_label_map = {
         'gamma_factor': r'$f_\gamma$',
@@ -908,14 +950,6 @@ def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn,
         'B_num_vertices': r'$(B/A)n_\mathrm{vertices}$',
         'zeta': r'$\zeta$',
     }
-    # param_label_map = {
-    #     'gamma_factor': r'Phase discretization vs. coupling factor, $f_\gamma$',
-    #     'r_target': r'Target amplitude, $r_\mathrm{target}$',
-    #     'poly_order': r'Nonlinearity order, $n$',
-    #     'alpha': r'Amplitude gain, $\alpha$',
-    #     'B_num_vertices': r'Edge- vs. one-hot constraint factor, $(B/A)n_\mathrm{vertices}$',
-    #     'zeta': r'External field scaling factor, $\zeta$',
-    # }
     
     # Set parameter labels using the mapping
     if model == 'q-PDC' and param1 == 'gamma_rate/gamma_th':
@@ -928,11 +962,20 @@ def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn,
     else:
         param2_label = param_label_map.get(param2, param2)
     
-    # Group by both parameters and calculate mean or min relative cut gap
-    if mode == 'mean_gap':
+    # Group by both parameters and calculate metric based on mode
+    if mode == 'success_rate':
+        grouped = data.groupby([param1, param2])['reached_optimum_cut'].mean().reset_index()
+        grouped['reached_optimum_cut'] = grouped['reached_optimum_cut'] * 100  # Convert to percentage
+        metric_col = 'reached_optimum_cut'
+        find_best = 'max'  # Higher is better for success rate
+    elif mode == 'mean_gap':
         grouped = data.groupby([param1, param2])['rel_cut_gap'].mean().reset_index()
+        metric_col = 'rel_cut_gap'
+        find_best = 'min'  # Lower is better for gap
     else: # min_gap
         grouped = data.groupby([param1, param2])['rel_cut_gap'].min().reset_index()
+        metric_col = 'rel_cut_gap'
+        find_best = 'min'  # Lower is better for gap
 
     # Get unique values for each parameter, sorted
     param1_values = sorted(grouped[param1].unique())
@@ -957,32 +1000,41 @@ def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn,
         x_tick_labels, y_tick_labels = param2_tick_labels, param1_tick_labels
     
     # Create a pivot table for the heatmap with fewer points as columns
-    pivot = grouped.pivot_table(index=y_param, columns=x_param, values='rel_cut_gap')
+    pivot = grouped.pivot_table(index=y_param, columns=x_param, values=metric_col)
     
     if has_seaborn:
         # Use seaborn for a nicer heatmap
         import seaborn as sns
         
-        # Use a logarithmic color bar to better resolve low-value regions
-        log_norm = None
-        if pd.notna(global_min) and global_min < global_max:
-            log_norm = LogNorm(vmin=global_min, vmax=global_max)
+        # Use a logarithmic color bar for gap metrics, linear for success rate
+        if mode == 'success_rate':
+            norm = None
+        else:
+            norm = None
+            if pd.notna(global_min) and global_min < global_max:
+                norm = LogNorm(vmin=global_min, vmax=global_max)
 
         sns.heatmap(pivot, cmap='viridis', annot=False, fmt=".2f",
-                    norm=log_norm,
+                    norm=norm,
                     cbar=False, ax=ax)
         
         # Clear default labels set by seaborn
         ax.set_xlabel('')
         ax.set_ylabel('')
         
-        # Mark the minimum value
-        min_val = pivot.min().min()
-        if pd.notna(min_val):
-            min_pos = pivot.stack().idxmin()
-            y_min_idx = pivot.index.get_loc(min_pos[0])
-            x_min_idx = pivot.columns.get_loc(min_pos[1])
-            ax.add_patch(plt.Rectangle((x_min_idx, y_min_idx), 1, 1, fill=False, edgecolor='red', lw=2))
+        # Mark the best value (min for gap, max for success rate)
+        if find_best == 'min':
+            best_val = pivot.min().min()
+        else:
+            best_val = pivot.max().max()
+        if pd.notna(best_val):
+            if find_best == 'min':
+                best_pos = pivot.stack().idxmin()
+            else:
+                best_pos = pivot.stack().idxmax()
+            y_best_idx = pivot.index.get_loc(best_pos[0])
+            x_best_idx = pivot.columns.get_loc(best_pos[1])
+            ax.add_patch(plt.Rectangle((x_best_idx, y_best_idx), 1, 1, fill=False, edgecolor='red', lw=2))
 
         # Adjust only the top/bottom limits without adding extra padding
         bottom, top = ax.get_ylim()
@@ -998,7 +1050,7 @@ def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn,
             ax.set_xticklabels(x_labels_subset, rotation=0)
         else:
             ax.set_xticks(np.arange(len(x_tick_labels)) + 0.5)
-            ax.set_xticklabels(x_tick_labels, rotation=0)  # Set rotation to 0 to avoid extra spacing
+            ax.set_xticklabels(x_tick_labels, rotation=0)
         
         # Reduce number of y-ticks if there are too many
         if len(y_tick_labels) > 10:
@@ -1009,13 +1061,13 @@ def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn,
             ax.set_yticks(y_ticks_subset)
             ax.set_yticklabels(y_labels_subset, rotation=0)
         else:
-            # Explicitly set y-ticks to match labels to avoid seaborn/matplotlib bug
             ax.set_yticks(np.arange(len(y_tick_labels)) + 0.5)
             ax.set_yticklabels(y_tick_labels, rotation=0)
     else:
         # Use matplotlib's imshow for the heatmap
         im = ax.imshow(pivot.values, cmap='viridis', aspect='auto', origin='lower')
-        ax.figure.colorbar(im, ax=ax, label='Mean relative optimality gap (%)')
+        cbar_label = 'Success rate (%)' if mode == 'success_rate' else 'Mean relative optimality gap (%)'
+        ax.figure.colorbar(im, ax=ax, label=cbar_label)
         
         # Set formatted tick labels
         if len(x_values) > 10:
@@ -1042,6 +1094,6 @@ def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn,
     # Add subfigure identifier to the top-left
     ax.text(0.05, 1.1, graph_name, transform=ax.transAxes, 
             fontsize=12, fontweight='bold', va='top', ha='right')
-    
+
 if __name__ == "__main__":
     main()

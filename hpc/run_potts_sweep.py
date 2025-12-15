@@ -151,22 +151,29 @@ def compile_schedule(expr):
         raise ValueError(f"Unknown schedule format: {expr}")
 
 def get_model_specific_params(config, model_name):
-    """Get model-specific simulation parameters, falling back to globals if not specified"""
+    """Get model-specific simulation parameters, falling back to globals if not specified
+
+    Returns raw values (can be lists/strings for sweeps). Caller is responsible for expansion.
+    """
     global_params = {
-        'T': float(config.get('T', 1000.0)),
-        'dt': float(config.get('dt', 1e-3)),
-        'num_states': int(config.get('num_states', 3)),
-        'noise_factor': float(config.get('noise_factor', 1e-4))
+        'T': config.get('T', 1000.0),
+        'dt': config.get('dt', 1e-3),
+        'num_states': config.get('num_states', 3),
+        'noise_factor': config.get('noise_factor', 1e-4)
     }
-    
+
     # Get model-specific parameters if they exist
     model_params = config.get('models', {}).get(model_name, {})
-    
+
+    # Handle case where model_params is None (YAML interprets "NEC:" with nothing as None)
+    if model_params is None:
+        model_params = {}
+
     # Override global params with model-specific ones
     for param in global_params:
         if param in model_params:
-            global_params[param] = type(global_params[param])(model_params[param])
-    
+            global_params[param] = model_params[param]
+
     return global_params
 
 def load_hyperparams_from_csv(csv_path):
@@ -215,6 +222,255 @@ def load_hyperparams_from_csv(csv_path):
     print(f"Loaded hyperparameters for {len(hyperparam_table)} model-graph combinations from {csv_path}")
 
     return hyperparam_table
+
+def print_hyperparam_summary(config, graph_files, hyperparam_table):
+    """
+    Print a detailed summary of which hyperparameters would be loaded from the hyperparam table.
+
+    Parameters:
+    - config: Configuration dictionary from YAML
+    - graph_files: List of graph file paths
+    - hyperparam_table: Dictionary from load_hyperparams_from_csv() or None
+    """
+    print("\n" + "="*80)
+    print("DRY-RUN: Parameter preview for configuration")
+    print("="*80)
+
+    if hyperparam_table:
+        # Show hyperparam table info
+        hyperparam_table_path = config.get('hyperparam_table', 'Unknown')
+        print(f"Hyperparameter table: {hyperparam_table_path}")
+        print(f"Loaded: {len(hyperparam_table)} model-graph combinations\n")
+
+        # Show global parameters from YAML
+        print("Global Parameters (from YAML, override hyperparam table):")
+        print(f"  T: {config.get('T', 'default')}")
+        print(f"  dt: {config.get('dt', 'default')}")
+        print(f"  num_runs: {config.get('num_runs', 100)}")
+        print(f"  num_states: {config.get('num_states', 3)}")
+        print(f"  noise_factor: {config.get('noise_factor', 1e-4)}")
+        print()
+
+        # Track coverage
+        total_combinations = 0
+        found_combinations = 0
+        total_param_sets = 0
+
+        # Process each graph
+        for graph_file in graph_files:
+            graph_name = Path(graph_file).stem
+            print(f"Graph: {graph_name}")
+            print("-"*80)
+
+            # Process each model
+            for model_name, model_params in config.get('models', {}).items():
+                total_combinations += 1
+
+                # Handle case where model_params is None (YAML interprets "MODEL:" with nothing as None)
+                if model_params is None:
+                    model_params = {}
+
+                try:
+                    model_type = ModelType[model_name]
+                except KeyError:
+                    print(f"  ✗ {model_name} - UNKNOWN MODEL TYPE")
+                    print()
+                    continue
+
+                # Get simulation parameters
+                sim_params = get_model_specific_params(config, model_name)
+
+                # Expand T and dt to support sweeps
+                T_raw = sim_params['T']
+                if isinstance(T_raw, list):
+                    T_values = expand_param_values(T_raw)
+                elif isinstance(T_raw, str):
+                    T_values = expand_param_values([T_raw])
+                else:
+                    T_values = [float(T_raw)]
+
+                dt_raw = sim_params['dt']
+                if isinstance(dt_raw, list):
+                    dt_values = expand_param_values(dt_raw)
+                elif isinstance(dt_raw, str):
+                    dt_values = expand_param_values([dt_raw])
+                else:
+                    dt_values = [float(dt_raw)]
+
+                # Get hyperparams from table if available
+                hyperparams_from_csv = None
+                if (model_name, graph_name) in hyperparam_table:
+                    found_combinations += 1
+                    hyperparams_from_csv = hyperparam_table[(model_name, graph_name)]
+
+                # Generate actual param_sets (with merging) for all (T, dt) combinations
+                all_param_sets = []
+                try:
+                    for T in T_values:
+                        for dt in dt_values:
+                            param_sets = generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv)
+                            # Add T, dt, num_steps to each param_set
+                            for param_set in param_sets:
+                                param_set['T'] = T
+                                param_set['dt'] = dt
+                                param_set['num_steps'] = int(np.floor(T / dt))
+                                all_param_sets.append(param_set)
+                    param_sets = all_param_sets
+                except Exception as e:
+                    print(f"  ✗ {model_name} - ERROR: {e}")
+                    print()
+                    continue
+
+                total_param_sets += len(param_sets)
+
+                if hyperparams_from_csv:
+                    print(f"  ✓ {model_name} (Hyperparam table + Config merge)")
+                    print(f"    Hyperparam table param_id: {hyperparams_from_csv['id']}")
+                else:
+                    print(f"  ○ {model_name} (Config only - not in hyperparam table)")
+
+                print(f"    Generated {len(param_sets)} parameter set(s):")
+
+                # Show each param_set
+                for i, param_set in enumerate(param_sets):
+                    if len(param_sets) > 1:
+                        print(f"\n    Set {i+1}/{len(param_sets)}:")
+                        print(f"      param_id: {param_set.get('id', 'N/A')}")
+
+                    # Determine source for each parameter
+                    print(f"      parameters:")
+
+                    # Show global/simulation parameters first (T, dt, num_steps, num_states, noise_factor)
+                    for key in ['T', 'dt', 'num_steps', 'num_states', 'noise_factor']:
+                        if key in param_set:
+                            value = param_set[key]
+                            if isinstance(value, float):
+                                value_str = f"{value:.4g}"
+                            else:
+                                value_str = str(value)
+
+                            # Determine if this came from model-specific or global config
+                            # num_steps is always computed, others can be model or global
+                            if key == 'num_steps':
+                                source = "GLOBAL CONFIG"  # Derived from T/dt
+                            elif key in model_params and model_params[key] is not None:
+                                source = "MODEL CONFIG"
+                            else:
+                                source = "GLOBAL CONFIG"
+
+                            print(f"        {key}={value_str} [{source}]")
+
+                    # Key hyperparameters to show
+                    param_keys = ['poly_order', 'alpha', 'alpha_rate', 'r_target', 'initial_alpha',
+                                  'B_num_vertices', 'B', 'zeta', 'beta_expr', 'gamma_expr',
+                                  'gamma_factor', 'beta_factor']
+
+                    for key in param_keys:
+                        if key in param_set:
+                            value = param_set[key]
+
+                            # Determine source - check if parameter was explicitly set
+                            # For _expr parameters, check the corresponding _schedule parameter
+                            config_key = key
+                            if key.endswith('_expr'):
+                                # gamma_expr comes from gamma_schedule, beta_expr from beta_schedule
+                                config_key = key.replace('_expr', '_schedule')
+
+                            # Check if explicitly in model config
+                            in_model_config = config_key in model_params and model_params[config_key] is not None
+
+                            # Check if in hyperparam table
+                            in_csv = hyperparams_from_csv and key in hyperparams_from_csv and hyperparams_from_csv[key] == value
+
+                            # Determine source
+                            if in_model_config and in_csv:
+                                source = "MODEL CONFIG (same as table)"
+                            elif in_model_config:
+                                source = "MODEL CONFIG"
+                            elif in_csv:
+                                source = "HYPERPARAM TABLE"
+                            else:
+                                source = "DEFAULT"
+
+                            # Format the value
+                            if isinstance(value, float):
+                                value_str = f"{value:.4g}"
+                            else:
+                                value_str = str(value)
+
+                            # Add special annotations
+                            if key == 'gamma_factor' and param_set.get('gamma_is_prototype'):
+                                value_str += " (prototype)"
+                            if key == 'beta_factor' and param_set.get('beta_is_prototype'):
+                                value_str += " (prototype)"
+
+                            print(f"        {key}={value_str} [{source}]")
+
+                print()
+
+        # Summary
+        print("Summary:")
+        num_runs = config.get('num_runs', 100)
+        total_tasks = total_param_sets * num_runs
+
+        print(f"  Total parameter sets: {total_param_sets}")
+        print(f"  Total tasks: {total_tasks} ({total_param_sets} param_sets × {num_runs} runs)")
+        coverage_pct = (found_combinations / total_combinations * 100) if total_combinations > 0 else 0
+        print(f"  Hyperparam table coverage: {found_combinations}/{total_combinations} ({coverage_pct:.1f}%)")
+        print()
+
+        if found_combinations == total_combinations:
+            print("✓ All model-graph combinations found in hyperparam table")
+        else:
+            print(f"⚠ Warning: {total_combinations - found_combinations} model-graph combinations missing from hyperparam table")
+            print("  Missing combinations will use sweep mode from YAML config")
+
+    else:
+        # No hyperparam table - show what sweep would be generated
+        print("No hyperparam_table specified in config")
+        print()
+        print("Sweep Mode Preview:")
+        print("  Will generate parameter sweeps based on YAML model configurations")
+        print()
+
+        for model_name, model_params in config.get('models', {}).items():
+            try:
+                model_type = ModelType[model_name]
+            except KeyError:
+                continue
+
+            print(f"  {model_name}:")
+
+            # Show key parameters that will be swept
+            if model_type == ModelType.POLYNOMIAL or model_type == ModelType.QPDC:
+                poly_orders = model_params.get('poly_order', [3])
+                beta_schedules = model_params.get('beta_schedule', ["lin(0,1)"])
+                gamma_config = model_params.get('gamma_schedule', ["lin(0,1)"])
+                print(f"    poly_order: {poly_orders}")
+                print(f"    beta_schedule: {beta_schedules}")
+                print(f"    gamma_schedule: {gamma_config}")
+
+            elif model_type == ModelType.NEC:
+                print(f"    alpha_rate: {model_params.get('alpha_rate', [1e-2])}")
+                print(f"    r_target: {model_params.get('r_target', [2.0])}")
+                print(f"    gamma_schedule: {model_params.get('gamma_schedule', ['lin(0,1)'])}")
+
+            elif model_type == ModelType.SIGMOID:
+                print(f"    alpha: {model_params.get('alpha', [-1.0])}")
+                print(f"    beta_schedule: {model_params.get('beta_schedule', ['lin(0,1)'])}")
+                print(f"    gamma_schedule: {model_params.get('gamma_schedule', ['lin(0,1)'])}")
+
+            elif model_type == ModelType.CIM:
+                print(f"    alpha: {model_params.get('alpha', [-10.0])}")
+                if 'B_num_vertices' in model_params:
+                    print(f"    B_num_vertices: {model_params.get('B_num_vertices')}")
+                else:
+                    print(f"    B: {model_params.get('B', [0.18])}")
+                print(f"    zeta: {model_params.get('zeta', [0.6])}")
+
+            print()
+
+    print("="*80 + "\n")
 
 def parse_param_id(param_id, model_type):
     """
@@ -309,6 +565,13 @@ def parse_param_id(param_id, model_type):
     # Add the original param_id for reference
     params['id'] = param_id
 
+    # Add default prototype schedules when prototype mode is enabled but no prototype was specified
+    # This happens when loading from CSV, since the param_id only encodes the factor, not the prototype
+    if params.get('gamma_is_prototype') and 'gamma_prototype' not in params:
+        params['gamma_prototype'] = "lin(0,1)"  # Default prototype for gamma
+    if params.get('beta_is_prototype') and 'beta_prototype' not in params:
+        params['beta_prototype'] = "lin(0,1)"  # Default prototype for beta
+
     return params
 
 def expand_param_values(param_values, is_schedule=False):
@@ -345,7 +608,7 @@ def expand_param_values(param_values, is_schedule=False):
                 expanded.append(float(val))
         return expanded
 
-def generate_param_sets(model_type, model_params, T, dt, hyperparams_override=None):
+def generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv=None):
     """
     Generate all parameter combinations for a model type.
 
@@ -354,16 +617,34 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_override=No
     - model_params: Dictionary of model parameters from config
     - T: Simulation time
     - dt: Time step
-    - hyperparams_override: Optional dictionary of hyperparameters to use instead of sweeping
+    - hyperparams_from_csv: Optional dictionary of hyperparameters from hyperparam table to merge with config params
 
     Returns:
     - List of parameter sets (dictionaries)
+    
+    Precedence (highest to lowest):
+    1. Model config (explicit values in YAML)
+    2. Hyperparam table (if provided)
+    3. Defaults (hardcoded fallbacks)
     """
-    num_steps = int(np.floor(T / dt))
+    # Handle case where model_params is None (YAML interprets "MODEL:" with nothing as None)
+    if model_params is None:
+        model_params = {}
 
-    # If hyperparams_override is provided, return a single param_set with those values
-    if hyperparams_override is not None:
-        return [hyperparams_override]
+    num_steps = int(np.floor(T / dt))
+    
+    # Helper function to get parameter with proper precedence:
+    # Config > Hyperparam table > Default
+    def get_param(param_name, default):
+        """Get parameter value with precedence: config > hyperparam table > default"""
+        # First check if explicitly set in config
+        if param_name in model_params and model_params[param_name] is not None:
+            return model_params[param_name]
+        # Then check hyperparam table
+        if hyperparams_from_csv is not None and param_name in hyperparams_from_csv:
+            return hyperparams_from_csv[param_name]
+        # Finally use default
+        return default
     
     # Common function to process schedule definitions including linked and prototype schedules
     def process_schedule_param(param_name, default_value):
@@ -379,6 +660,13 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_override=No
                     'base_schedule': base_schedule,
                     'factors': factors
                 }
+            # This schedule is based on another without a factor - factor will come from hyperparam table
+            elif 'based_on' in schedule_def and 'factor' not in schedule_def:
+                base_schedule = schedule_def['based_on']
+                return {
+                    'type': 'linked_only',
+                    'base_schedule': base_schedule
+                }
             # This is a prototype schedule with a factor
             elif 'prototype' in schedule_def and 'factor' in schedule_def:
                 prototype = schedule_def['prototype']
@@ -387,6 +675,13 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_override=No
                     'type': 'prototype',
                     'prototype': prototype,
                     'factors': factors
+                }
+            # This is a prototype schedule without a factor - factor will come from hyperparam table
+            elif 'prototype' in schedule_def and 'factor' not in schedule_def:
+                prototype = schedule_def['prototype']
+                return {
+                    'type': 'prototype_only',
+                    'prototype': prototype
                 }
             else:
                 raise ValueError(f"Invalid schedule definition for {param_name}")
@@ -414,7 +709,7 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_override=No
         
         # Process schedules
         beta_info = process_schedule_param('beta_schedule', ["lin(0,1)"])
-        gamma_info = process_schedule_param('gamma_schedule', ["lin(0,2)"])
+        gamma_info = process_schedule_param('gamma_schedule', ["lin(0,1)"])
         
         param_sets = []
         
@@ -483,20 +778,64 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_override=No
                     'beta_factor': factor,
                     'beta_is_prototype': True
                 })
+
+        # Handle gamma based on beta without factor (factor will come from hyperparam table)
+        elif beta_info['type'] == 'direct' and gamma_info['type'] == 'linked_only' and gamma_info['base_schedule'] == 'beta_schedule':
+            for poly_order, beta_expr in itertools.product(poly_orders, beta_info['schedules']):
+                param_id = f"po{poly_order}_b{beta_expr}_gf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'beta_expr': beta_expr,
+                    'gamma_based_on': 'beta'
+                })
+
+        # Handle beta based on gamma without factor (factor will come from hyperparam table)
+        elif gamma_info['type'] == 'direct' and beta_info['type'] == 'linked_only' and beta_info['base_schedule'] == 'gamma_schedule':
+            for poly_order, gamma_expr in itertools.product(poly_orders, gamma_info['schedules']):
+                param_id = f"po{poly_order}_g{gamma_expr}_bf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'gamma_expr': gamma_expr,
+                    'beta_based_on': 'gamma'
+                })
+
+        # Handle gamma as prototype without factor (factor will come from hyperparam table)
+        elif beta_info['type'] == 'direct' and gamma_info['type'] == 'prototype_only':
+            for poly_order, beta_expr in itertools.product(poly_orders, beta_info['schedules']):
+                param_id = f"po{poly_order}_b{beta_expr}_gpf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'beta_expr': beta_expr,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_is_prototype': True
+                })
+
+        # Handle beta as prototype without factor (factor will come from hyperparam table)
+        elif gamma_info['type'] == 'direct' and beta_info['type'] == 'prototype_only':
+            for poly_order, gamma_expr in itertools.product(poly_orders, gamma_info['schedules']):
+                param_id = f"po{poly_order}_g{gamma_expr}_bpf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'gamma_expr': gamma_expr,
+                    'beta_prototype': beta_info['prototype'],
+                    'beta_is_prototype': True
+                })
         
         else:
             raise ValueError("Invalid schedule linkage configuration")
-            
-        return param_sets
-        
+
     elif model_type == ModelType.NEC:
-        # Expand all parameter ranges
-        poly_orders = [int(po) for po in expand_param_values(model_params.get('poly_order', [3]))]
-        alpha_rates = expand_param_values(model_params.get('alpha_rate', [1e-2]))
-        r_targets = expand_param_values(model_params.get('r_target', [2.0]))
-        initial_alphas = expand_param_values(model_params.get('initial_alpha', [1.0]))
+        # Expand all parameter ranges using get_param for proper precedence
+        poly_orders = [int(po) for po in expand_param_values(get_param('poly_order', [3]))]
+        alpha_rates = expand_param_values(get_param('alpha_rate', [1e-2]))
+        r_targets = expand_param_values(get_param('r_target', [2.0]))
+        initial_alphas = expand_param_values(get_param('initial_alpha', [1.0]))
         
-        gamma_info = process_schedule_param('gamma_schedule', ["lin(0,2)"])
+        gamma_info = process_schedule_param('gamma_schedule', ["lin(0,1)"])
 
         param_sets = []
 
@@ -531,19 +870,34 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_override=No
                     'initial_alpha': initial_alpha,
                     'initial_alpha_expr': initial_alpha if isinstance(initial_alpha, str) else None
                 })
+
+        # Handle gamma as prototype only (factor will come from hyperparam table)
+        elif gamma_info['type'] == 'prototype_only':
+            for poly_order, alpha_rate, r_target, initial_alpha in itertools.product(
+                    poly_orders, alpha_rates, r_targets, initial_alphas):
+                # Param ID will be updated when factor is filled from hyperparam table
+                param_id = f"ar{alpha_rate:.2e}_rt{r_target}_ia{initial_alpha}_gpf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'alpha_rate': alpha_rate,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_is_prototype': True,
+                    'r_target': r_target,
+                    'initial_alpha': initial_alpha,
+                    'initial_alpha_expr': initial_alpha if isinstance(initial_alpha, str) else None
+                })
         
         else:
-            raise ValueError("NEC model only supports direct or prototype gamma_schedule specification")
+            raise ValueError("NEC model only supports direct, prototype, or prototype_only gamma_schedule specification")
 
-        return param_sets
-        
     elif model_type == ModelType.SIGMOID:
-        # Expand scalar parameters
-        alphas = expand_param_values(model_params.get('alpha', [-1.0]))
+        # Expand scalar parameters using get_param for proper precedence
+        alphas = expand_param_values(get_param('alpha', [-1.0]))
         
         # Process schedules
         beta_info = process_schedule_param('beta_schedule', ["lin(0,1)"])
-        gamma_info = process_schedule_param('gamma_schedule', ["lin(0,2)"])
+        gamma_info = process_schedule_param('gamma_schedule', ["lin(0,1)"])
         
         param_sets = []
         
@@ -612,15 +966,59 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_override=No
                     'beta_factor': factor,
                     'beta_is_prototype': True
                 })
+
+        # Handle gamma based on beta without factor (factor will come from hyperparam table)
+        elif beta_info['type'] == 'direct' and gamma_info['type'] == 'linked_only' and gamma_info['base_schedule'] == 'beta_schedule':
+            for alpha, beta_expr in itertools.product(alphas, beta_info['schedules']):
+                param_id = f"a{alpha}_b{beta_expr}_gf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'beta_expr': beta_expr,
+                    'gamma_based_on': 'beta'
+                })
+
+        # Handle beta based on gamma without factor (factor will come from hyperparam table)
+        elif gamma_info['type'] == 'direct' and beta_info['type'] == 'linked_only' and beta_info['base_schedule'] == 'gamma_schedule':
+            for alpha, gamma_expr in itertools.product(alphas, gamma_info['schedules']):
+                param_id = f"a{alpha}_g{gamma_expr}_bf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'gamma_expr': gamma_expr,
+                    'beta_based_on': 'gamma'
+                })
+
+        # Handle gamma as prototype without factor (factor will come from hyperparam table)
+        elif beta_info['type'] == 'direct' and gamma_info['type'] == 'prototype_only':
+            for alpha, beta_expr in itertools.product(alphas, beta_info['schedules']):
+                param_id = f"a{alpha}_b{beta_expr}_gpf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'beta_expr': beta_expr,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_is_prototype': True
+                })
+
+        # Handle beta as prototype without factor (factor will come from hyperparam table)
+        elif gamma_info['type'] == 'direct' and beta_info['type'] == 'prototype_only':
+            for alpha, gamma_expr in itertools.product(alphas, gamma_info['schedules']):
+                param_id = f"a{alpha}_g{gamma_expr}_bpf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'gamma_expr': gamma_expr,
+                    'beta_prototype': beta_info['prototype'],
+                    'beta_is_prototype': True
+                })
     
         else:
             raise ValueError("Invalid schedule linkage configuration")
-            
-        return param_sets
-        
+
     elif model_type == ModelType.FIXED_AMPLITUDE:
         # Process gamma schedule
-        gamma_info = process_schedule_param('gamma_schedule', ["lin(0,2)"])
+        gamma_info = process_schedule_param('gamma_schedule', ["lin(0,1)"])
         
         param_sets = []
 
@@ -643,24 +1041,42 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_override=No
                     'gamma_factor': factor,
                     'gamma_is_prototype': True
                 })
+
+        # Handle gamma as prototype without factor (factor will come from hyperparam table)
+        elif gamma_info['type'] == 'prototype_only':
+            param_id = f"gpf_TBD"
+            param_sets.append({
+                'id': param_id,
+                'gamma_prototype': gamma_info['prototype'],
+                'gamma_is_prototype': True
+            })
+
         else:
-            raise ValueError("FIXED_AMPLITUDE model only supports direct or prototype gamma_schedule specification")
-            
-        return param_sets
-    
+            raise ValueError("FIXED_AMPLITUDE model only supports direct, prototype, or prototype_only gamma_schedule specification")
+
     elif model_type == ModelType.CIM:
-        # Expand all parameter ranges for CIM model
-        alphas = expand_param_values(model_params.get('alpha', [-10.0]))
+        # Expand all parameter ranges for CIM model using get_param for proper precedence
+        alphas = expand_param_values(get_param('alpha', [-10.0]))
         
         # Check for B_num_vertices (scaled B) or regular B
+        # Check config first, then hyperparam table, then default to regular B
         if 'B_num_vertices' in model_params:
             B_num_vertices_values = expand_param_values(model_params.get('B_num_vertices', [18]))
             use_scaled_B = True
-        else:
+        elif hyperparams_from_csv is not None and 'B_num_vertices' in hyperparams_from_csv:
+            B_num_vertices_values = expand_param_values(hyperparams_from_csv['B_num_vertices'])
+            use_scaled_B = True
+        elif 'B' in model_params:
             Bs = expand_param_values(model_params.get('B', [18/100]))
             use_scaled_B = False
+        elif hyperparams_from_csv is not None and 'B' in hyperparams_from_csv:
+            Bs = expand_param_values(hyperparams_from_csv['B'])
+            use_scaled_B = False
+        else:
+            Bs = expand_param_values([18/100])
+            use_scaled_B = False
             
-        zetas = expand_param_values(model_params.get('zeta', [0.6]))
+        zetas = expand_param_values(get_param('zeta', [0.6]))
         
         beta_info = process_schedule_param('beta_schedule', ["lin(0,0.01)"])
         
@@ -723,14 +1139,104 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_override=No
                         'beta_factor': factor,
                         'beta_is_prototype': True
                     })
+
+        # Handle beta as prototype without factor (factor will come from hyperparam table)
+        elif beta_info['type'] == 'prototype_only':
+            if use_scaled_B:
+                # Use B_num_vertices parameter
+                for alpha, B_num_vertices, zeta in itertools.product(
+                        alphas, B_num_vertices_values, zetas):
+                    param_id = f"a{alpha}_Bnv{B_num_vertices}_z{zeta}_bpf_TBD"
+                    param_sets.append({
+                        'id': param_id,
+                        'alpha': alpha,
+                        'B_num_vertices': B_num_vertices,
+                        'zeta': zeta,
+                        'beta_prototype': beta_info['prototype'],
+                        'beta_is_prototype': True
+                    })
+            else:
+                # Use regular B parameter
+                for alpha, B, zeta in itertools.product(
+                        alphas, Bs, zetas):
+                    param_id = f"a{alpha}_B{B}_z{zeta}_bpf_TBD"
+                    param_sets.append({
+                        'id': param_id,
+                        'alpha': alpha,
+                        'B': B,
+                        'zeta': zeta,
+                        'beta_prototype': beta_info['prototype'],
+                        'beta_is_prototype': True
+                    })
         
         else:
-            raise ValueError("CIM model only supports direct or prototype beta_schedule specification")
-            
-        return param_sets
-    
+            raise ValueError("CIM model only supports direct, prototype, or prototype_only beta_schedule specification")
+
     else:
         raise ValueError(f"Unknown model type: {model_type}")
+
+    # If hyperparam table provided, merge with each param_set
+    # Hyperparam table values should fill in any parameters that weren't explicitly set in the config
+    # Note: Some parameters (like r_target, B_num_vertices, zeta) may already have been filled
+    # by the get_param() helper above, so this mainly handles schedule factors and other params
+    if hyperparams_from_csv is not None:
+        # Determine which parameters were explicitly set in model_params
+        explicit_params = set()
+        for key, value in model_params.items():
+            if value is not None and value != {} and value != []:
+                explicit_params.add(key)
+                # Also mark related keys as explicit
+                if key == 'gamma_schedule':
+                    explicit_params.add('gamma_expr')
+                    # Only mark gamma_factor as explicit if factor was specified in the schedule
+                    if isinstance(value, dict) and 'factor' in value:
+                        explicit_params.add('gamma_factor')
+                if key == 'beta_schedule':
+                    explicit_params.add('beta_expr')
+                    # Only mark beta_factor as explicit if factor was specified in the schedule
+                    if isinstance(value, dict) and 'factor' in value:
+                        explicit_params.add('beta_factor')
+
+        for param_set in param_sets:
+            # Fill in parameters from hyperparam table that weren't explicitly set in config
+            for key, value in hyperparams_from_csv.items():
+                # Skip the 'id' field from CSV - we manage our own IDs
+                if key == 'id':
+                    continue
+                    
+                # Skip if this parameter was explicitly set in config
+                if key in explicit_params:
+                    continue
+
+                # For expressions and factors, check parent parameter too
+                if key == 'gamma_expr' and 'gamma_schedule' in explicit_params:
+                    continue
+                if key == 'gamma_factor' and 'gamma_schedule' in explicit_params and 'gamma_factor' in explicit_params:
+                    continue
+                if key == 'beta_expr' and 'beta_schedule' in explicit_params:
+                    continue
+                if key == 'beta_factor' and 'beta_schedule' in explicit_params and 'beta_factor' in explicit_params:
+                    continue
+
+                # Use hyperparam table value (only if not already set by get_param earlier)
+                if key not in param_set:
+                    param_set[key] = value
+
+            # Update param_id if we filled in factors from hyperparam table
+            # Replace _TBD placeholders with actual values
+            if '_TBD' in param_set.get('id', ''):
+                new_id = param_set['id']
+                if 'gpf_TBD' in new_id and 'gamma_factor' in param_set:
+                    new_id = new_id.replace('gpf_TBD', f"gpf{param_set['gamma_factor']}")
+                if 'bpf_TBD' in new_id and 'beta_factor' in param_set:
+                    new_id = new_id.replace('bpf_TBD', f"bpf{param_set['beta_factor']}")
+                if 'gf_TBD' in new_id and 'gamma_factor' in param_set:
+                    new_id = new_id.replace('gf_TBD', f"gf{param_set['gamma_factor']}")
+                if 'bf_TBD' in new_id and 'beta_factor' in param_set:
+                    new_id = new_id.replace('bf_TBD', f"bf{param_set['beta_factor']}")
+                param_set['id'] = new_id
+
+    return param_sets
 
 def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor):
     """Run a single task with the given parameters"""
@@ -1392,6 +1898,8 @@ def main():
                            help='Only estimate wall time without running the sweep; optionally specify number of ranks')
         parser.add_argument('--plot_schedules', action='store_true',
                            help='Generate visualizations of schedules without running simulations')
+        parser.add_argument('--dry_run', action='store_true',
+                           help='Preview hyperparameter loading without running simulations')
         args = parser.parse_args()
 
         # Load configuration
@@ -1459,6 +1967,16 @@ def main():
                 else:
                     sys.exit(1)
 
+        # If dry-run is requested, show preview and exit
+        if args.dry_run:
+            print_hyperparam_summary(config, graph_files, hyperparam_table)
+            if use_mpi:
+                # Signal all ranks to exit
+                tasks = []  # Empty task list signals exit
+                out_dir = None
+            else:
+                sys.exit(0)
+
         # If schedule plot is requested, do that and exit
         if args.plot_schedules:
             plot_config_schedules(config, graph_files, out_dir, config_basename)
@@ -1486,28 +2004,56 @@ def main():
                 # Get model-specific simulation parameters
                 sim_params = get_model_specific_params(config, model_name)
 
-                # Check if we should use hyperparams from the CSV table
-                hyperparams_override = None
+                # Expand T and dt to support sweeps
+                T_raw = sim_params['T']
+                if isinstance(T_raw, list):
+                    T_values = expand_param_values(T_raw)
+                elif isinstance(T_raw, str):
+                    T_values = expand_param_values([T_raw])
+                else:
+                    T_values = [float(T_raw)]
+
+                dt_raw = sim_params['dt']
+                if isinstance(dt_raw, list):
+                    dt_values = expand_param_values(dt_raw)
+                elif isinstance(dt_raw, str):
+                    dt_values = expand_param_values([dt_raw])
+                else:
+                    dt_values = [float(dt_raw)]
+
+                num_states = int(sim_params['num_states']) if not isinstance(sim_params['num_states'], list) else int(sim_params['num_states'][0])
+                noise_factor = float(sim_params['noise_factor']) if not isinstance(sim_params['noise_factor'], list) else float(sim_params['noise_factor'][0])
+
+                # Check if we should use hyperparams from the hyperparam table
+                hyperparams_from_csv = None
                 if hyperparam_table and (model_name, graph_name) in hyperparam_table:
-                    hyperparams_override = hyperparam_table[(model_name, graph_name)]
-                    print(f"Using hyperparams from table for {model_name}/{graph_name}: {hyperparams_override['id']}")
+                    hyperparams_from_csv = hyperparam_table[(model_name, graph_name)]
+                    print(f"Using hyperparams from table for {model_name}/{graph_name}: {hyperparams_from_csv['id']}")
 
-                # Generate all parameter sets for this model
-                param_sets = generate_param_sets(model_type, model_params, sim_params['T'], sim_params['dt'], hyperparams_override)
+                # Generate tasks for each (T, dt) combination
+                for T in T_values:
+                    for dt in dt_values:
+                        # Generate all parameter sets for this model with these T, dt
+                        param_sets = generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv)
 
-                # For each parameter set, add tasks for all seeds
-                for param_set in param_sets:
-                    for seed in range(num_runs):
-                        tasks.append({
-                            'graph_path': graph_file,
-                            'model_type': model_type,
-                            'param_set': param_set,
-                            'seed': seed,
-                            'T': sim_params['T'],
-                            'dt': sim_params['dt'],
-                            'num_states': sim_params['num_states'],
-                            'noise_factor': sim_params['noise_factor']
-                        })
+                        # Add T, dt, num_steps to each param_set for tracking
+                        for param_set in param_sets:
+                            param_set['T'] = T
+                            param_set['dt'] = dt
+                            param_set['num_steps'] = int(np.floor(T / dt))
+
+                            # For each parameter set, add tasks for all seeds
+                            for seed in range(num_runs):
+                                tasks.append({
+                                    'graph_path': graph_file,
+                                    'model_type': model_type,
+                                    'param_set': param_set,
+                                    'seed': seed,
+                                    'T': T,
+                                    'dt': dt,
+                                    'num_states': num_states,
+                                    'noise_factor': noise_factor
+                                })
         
         print(f"Generated {len(tasks)} tasks")
         
@@ -1647,15 +2193,47 @@ def main():
             if cache_key not in param_sets_cache:
                 sim_params = get_model_specific_params(config, model_name)
 
-                # Check if we should use hyperparams from the CSV table
-                hyperparams_override = None
-                if hyperparam_table and (model_name, graph_name) in hyperparam_table:
-                    hyperparams_override = hyperparam_table[(model_name, graph_name)]
+                # Expand T and dt to support sweeps
+                T_raw = sim_params['T']
+                if isinstance(T_raw, list):
+                    T_values = expand_param_values(T_raw)
+                elif isinstance(T_raw, str):
+                    T_values = expand_param_values([T_raw])
+                else:
+                    T_values = [float(T_raw)]
 
-                param_sets = generate_param_sets(model_type, model_params, sim_params['T'], sim_params['dt'], hyperparams_override)
+                dt_raw = sim_params['dt']
+                if isinstance(dt_raw, list):
+                    dt_values = expand_param_values(dt_raw)
+                elif isinstance(dt_raw, str):
+                    dt_values = expand_param_values([dt_raw])
+                else:
+                    dt_values = [float(dt_raw)]
+
+                num_states = int(sim_params['num_states']) if not isinstance(sim_params['num_states'], list) else int(sim_params['num_states'][0])
+                noise_factor = float(sim_params['noise_factor']) if not isinstance(sim_params['noise_factor'], list) else float(sim_params['noise_factor'][0])
+
+                # Check if we should use hyperparams from the hyperparam table
+                hyperparams_from_csv = None
+                if hyperparam_table and (model_name, graph_name) in hyperparam_table:
+                    hyperparams_from_csv = hyperparam_table[(model_name, graph_name)]
+
+                # Generate param_sets for all (T, dt) combinations
+                all_param_sets = []
+                for T in T_values:
+                    for dt in dt_values:
+                        param_sets = generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv)
+                        # Add T, dt, num_steps to each param_set
+                        for param_set in param_sets:
+                            param_set['T'] = T
+                            param_set['dt'] = dt
+                            param_set['num_steps'] = int(np.floor(T / dt))
+                            all_param_sets.append(param_set)
+
                 param_sets_cache[cache_key] = {
-                    'param_sets': param_sets,
-                    'sim_params': sim_params,
+                    'param_sets': all_param_sets,
+                    'num_states': num_states,
+                    'noise_factor': noise_factor,
                     'model_type': model_type
                 }
 
@@ -1669,10 +2247,10 @@ def main():
                             'model_type': cached['model_type'],
                             'param_set': param_set,
                             'seed': seed,
-                            'T': cached['sim_params']['T'],
-                            'dt': cached['sim_params']['dt'],
-                            'num_states': cached['sim_params']['num_states'],
-                            'noise_factor': cached['sim_params']['noise_factor']
+                            'T': param_set['T'],
+                            'dt': param_set['dt'],
+                            'num_states': cached['num_states'],
+                            'noise_factor': cached['noise_factor']
                         })
                     global_idx += 1
     
