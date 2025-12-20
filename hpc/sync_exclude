@@ -1,5 +1,6 @@
 # Files to exclude
 sync_exclude
+sync_common.sh
 osync.sh
 isync.sh
 

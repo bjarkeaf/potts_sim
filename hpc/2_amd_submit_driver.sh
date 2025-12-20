@@ -3,7 +3,7 @@
 #BSUB -q fotonano                    # queue name
 #BSUB -n 256                     # total cores (max 128 for hpc, max 360 for fotonano)
 #BSUB -R "span[ptile=128]"       # max cores/node (max 20 for hpc)
-#BSUB -R "rusage[mem=2GB]"	# memory per core (2GB -> fast alloc)
+#BSUB -R "rusage[mem=6GB]"	# memory per core (2GB -> fast alloc)
 #BSUB -W 120:00                  # max walltime (max 72 hours for hpc, max 120 hours for fotonano)
 #BSUB -u s194084@dtu.dk         # email address
 #BSUB -B                        # send email at start

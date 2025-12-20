@@ -1,7 +1,7 @@
 #!/bin/bash
+# osync.sh - Interactive sync: LOCAL → REMOTE
+# Pushes changes from local directory to gbar:~/potts_sim/
 
-PASSFILE="$HOME/.ssh/gbarpass"
-RSYNC_RSH="sshpass -f \"$PASSFILE\" ssh -i ~/.ssh/gbar"
+source "$(dirname "$0")/sync_common.sh"
 
-# Sync local -> remote
-rsync -avz --exclude-from="$(dirname "$0")/sync_exclude" -e "$RSYNC_RSH" "$(pwd)/" "gbar:~/potts_sim/"
+do_sync "push" "$(pwd)"
