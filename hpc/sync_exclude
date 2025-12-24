@@ -11,8 +11,8 @@ plot_benchmark.py
 merge_parquet.py
 run_local_test.sh
 run_local_test.sh.save
-#poll_free_cores_by_domain.sh
-#free_cores_by_domain.sh
+
+*.~lock.*
 
 # Directories to exclude (add trailing slash for clarity)
 .git/
@@ -22,6 +22,7 @@ plots/
 results_local/
 results/schedule_verification_*
 trash/
+logs/
 
 # You can also use patterns
 #*.log

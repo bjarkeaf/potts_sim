@@ -126,10 +126,39 @@ def compile_schedule(expr):
     if expr.startswith("lin(") and expr.endswith(")"):
         start_expr, end_expr = expr[4:-1].split(",", 1)
         return lambda n, env: np.linspace(
-            safe_eval(start_expr.strip(), env), 
-            safe_eval(end_expr.strip(), env), 
+            safe_eval(start_expr.strip(), env),
+            safe_eval(end_expr.strip(), env),
             n
         ).tolist()
+    elif expr.startswith("linspan(") and expr.endswith(")"):
+        # Parse arguments: linspan(start_expr, span_expr)
+        args_str = expr[8:-1]
+
+        # Handle nested function calls by finding comma at depth 0
+        depth = 0
+        split_pos = -1
+        for i, char in enumerate(args_str):
+            if char in '([{':
+                depth += 1
+            elif char in ')]}':
+                depth -= 1
+            elif char == ',' and depth == 0:
+                split_pos = i
+                break
+
+        if split_pos == -1:
+            raise ValueError(f"linspan schedule needs exactly 2 parameters: {expr}")
+
+        start_expr = args_str[:split_pos].strip()
+        span_expr = args_str[split_pos+1:].strip()
+
+        def linspan_schedule(n, env):
+            start = safe_eval(start_expr, env)
+            span = safe_eval(span_expr, env)
+            end = start + span
+            return np.linspace(start, end, n).tolist()
+
+        return linspan_schedule
     elif expr.startswith("exp(") and expr.endswith(")"):
         parts = expr[4:-1].split(",", 2)
         if len(parts) == 3:
@@ -498,13 +527,13 @@ def parse_param_id(param_id, model_type):
             except ValueError:
                 params['poly_order'] = part[2:]  # Keep as string if it's an expression
 
-        # Beta schedule: blin(...) or bconst(...) or bexp(...)
-        elif part.startswith('b') and ('lin(' in part or 'const(' in part or 'exp(' in part):
+        # Beta schedule: blin(...) or bconst(...) or bexp(...) or blinspan(...)
+        elif part.startswith('b') and ('lin(' in part or 'const(' in part or 'exp(' in part or 'linspan(' in part):
             # Extract the full schedule expression
             params['beta_expr'] = part[1:]
 
-        # Gamma schedule: glin(...) or gconst(...) or gexp(...)
-        elif part.startswith('g') and ('lin(' in part or 'const(' in part or 'exp(' in part):
+        # Gamma schedule: glin(...) or gconst(...) or gexp(...) or glinspan(...)
+        elif part.startswith('g') and ('lin(' in part or 'const(' in part or 'exp(' in part or 'linspan(' in part):
             params['gamma_expr'] = part[1:]
 
         # Gamma factor: gf0.8 or gpf8.0 (prototype factor)
@@ -683,6 +712,22 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv=No
                     'type': 'prototype_only',
                     'prototype': prototype
                 }
+            # Handle start/span specification
+            elif 'start' in schedule_def and 'span' in schedule_def:
+                # Validate no conflicting keys
+                if 'based_on' in schedule_def or 'prototype' in schedule_def or 'factor' in schedule_def:
+                    raise ValueError(
+                        f"{param_name}: Cannot use 'start'/'span' with 'based_on'/'prototype'/'factor'"
+                    )
+
+                start_expr = schedule_def['start']
+                span_values = expand_param_values(schedule_def['span'])
+
+                return {
+                    'type': 'linspan',
+                    'start_expr': start_expr,
+                    'span_values': span_values
+                }
             else:
                 raise ValueError(f"Invalid schedule definition for {param_name}")
         else:
@@ -824,7 +869,155 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv=No
                     'beta_prototype': beta_info['prototype'],
                     'beta_is_prototype': True
                 })
-        
+
+        # Handle beta as linspan
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'direct':
+            for poly_order, span, gamma_expr in itertools.product(
+                    poly_orders, beta_info['span_values'], gamma_info['schedules']):
+                beta_expr = f"linspan({beta_info['start_expr']},{span})"
+                param_id = f"po{poly_order}_b{beta_expr}_g{gamma_expr}"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'beta_expr': beta_expr,
+                    'gamma_expr': gamma_expr
+                })
+
+        # Handle gamma as linspan
+        elif beta_info['type'] == 'direct' and gamma_info['type'] == 'linspan':
+            for poly_order, beta_expr, span in itertools.product(
+                    poly_orders, beta_info['schedules'], gamma_info['span_values']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{span})"
+                param_id = f"po{poly_order}_b{beta_expr}_g{gamma_expr}"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'beta_expr': beta_expr,
+                    'gamma_expr': gamma_expr
+                })
+
+        # Handle both as linspan
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'linspan':
+            for poly_order, beta_span, gamma_span in itertools.product(
+                    poly_orders, beta_info['span_values'], gamma_info['span_values']):
+                beta_expr = f"linspan({beta_info['start_expr']},{beta_span})"
+                gamma_expr = f"linspan({gamma_info['start_expr']},{gamma_span})"
+                param_id = f"po{poly_order}_b{beta_expr}_g{gamma_expr}"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'beta_expr': beta_expr,
+                    'gamma_expr': gamma_expr
+                })
+
+        # Handle beta as linspan with gamma linked
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'linked' and gamma_info['base_schedule'] == 'beta_schedule':
+            for poly_order, beta_span, factor in itertools.product(
+                    poly_orders, beta_info['span_values'], gamma_info['factors']):
+                beta_expr = f"linspan({beta_info['start_expr']},{beta_span})"
+                param_id = f"po{poly_order}_b{beta_expr}_gf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'beta_expr': beta_expr,
+                    'gamma_factor': factor,
+                    'gamma_based_on': 'beta'
+                })
+
+        # Handle gamma as linspan with beta linked
+        elif gamma_info['type'] == 'linspan' and beta_info['type'] == 'linked' and beta_info['base_schedule'] == 'gamma_schedule':
+            for poly_order, gamma_span, factor in itertools.product(
+                    poly_orders, gamma_info['span_values'], beta_info['factors']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{gamma_span})"
+                param_id = f"po{poly_order}_g{gamma_expr}_bf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'gamma_expr': gamma_expr,
+                    'beta_factor': factor,
+                    'beta_based_on': 'gamma'
+                })
+
+        # Handle beta as linspan with gamma prototype
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'prototype':
+            for poly_order, beta_span, factor in itertools.product(
+                    poly_orders, beta_info['span_values'], gamma_info['factors']):
+                beta_expr = f"linspan({beta_info['start_expr']},{beta_span})"
+                param_id = f"po{poly_order}_b{beta_expr}_gpf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'beta_expr': beta_expr,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_factor': factor,
+                    'gamma_is_prototype': True
+                })
+
+        # Handle gamma as linspan with beta prototype
+        elif gamma_info['type'] == 'linspan' and beta_info['type'] == 'prototype':
+            for poly_order, gamma_span, factor in itertools.product(
+                    poly_orders, gamma_info['span_values'], beta_info['factors']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{gamma_span})"
+                param_id = f"po{poly_order}_g{gamma_expr}_bpf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'gamma_expr': gamma_expr,
+                    'beta_prototype': beta_info['prototype'],
+                    'beta_factor': factor,
+                    'beta_is_prototype': True
+                })
+
+        # Handle beta as linspan with gamma linked_only (factor from hyperparam table)
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'linked_only' and gamma_info['base_schedule'] == 'beta_schedule':
+            for poly_order, beta_span in itertools.product(poly_orders, beta_info['span_values']):
+                beta_expr = f"linspan({beta_info['start_expr']},{beta_span})"
+                param_id = f"po{poly_order}_b{beta_expr}_gf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'beta_expr': beta_expr,
+                    'gamma_based_on': 'beta'
+                })
+
+        # Handle gamma as linspan with beta linked_only (factor from hyperparam table)
+        elif gamma_info['type'] == 'linspan' and beta_info['type'] == 'linked_only' and beta_info['base_schedule'] == 'gamma_schedule':
+            for poly_order, gamma_span in itertools.product(poly_orders, gamma_info['span_values']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{gamma_span})"
+                param_id = f"po{poly_order}_g{gamma_expr}_bf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'gamma_expr': gamma_expr,
+                    'beta_based_on': 'gamma'
+                })
+
+        # Handle beta as linspan with gamma prototype_only (factor from hyperparam table)
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'prototype_only':
+            for poly_order, beta_span in itertools.product(poly_orders, beta_info['span_values']):
+                beta_expr = f"linspan({beta_info['start_expr']},{beta_span})"
+                param_id = f"po{poly_order}_b{beta_expr}_gpf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'beta_expr': beta_expr,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_is_prototype': True
+                })
+
+        # Handle gamma as linspan with beta prototype_only (factor from hyperparam table)
+        elif gamma_info['type'] == 'linspan' and beta_info['type'] == 'prototype_only':
+            for poly_order, gamma_span in itertools.product(poly_orders, gamma_info['span_values']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{gamma_span})"
+                param_id = f"po{poly_order}_g{gamma_expr}_bpf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'gamma_expr': gamma_expr,
+                    'beta_prototype': beta_info['prototype'],
+                    'beta_is_prototype': True
+                })
+
         else:
             raise ValueError("Invalid schedule linkage configuration")
 
@@ -887,9 +1080,25 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv=No
                     'initial_alpha': initial_alpha,
                     'initial_alpha_expr': initial_alpha if isinstance(initial_alpha, str) else None
                 })
-        
+
+        # Handle gamma as linspan
+        elif gamma_info['type'] == 'linspan':
+            for poly_order, alpha_rate, r_target, initial_alpha, span in itertools.product(
+                    poly_orders, alpha_rates, r_targets, initial_alphas, gamma_info['span_values']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{span})"
+                param_id = f"ar{alpha_rate:.2e}_rt{r_target}_ia{initial_alpha}_g{gamma_expr}"
+                param_sets.append({
+                    'id': param_id,
+                    'poly_order': poly_order,
+                    'alpha_rate': alpha_rate,
+                    'gamma_expr': gamma_expr,
+                    'r_target': r_target,
+                    'initial_alpha': initial_alpha,
+                    'initial_alpha_expr': initial_alpha if isinstance(initial_alpha, str) else None
+                })
+
         else:
-            raise ValueError("NEC model only supports direct, prototype, or prototype_only gamma_schedule specification")
+            raise ValueError("NEC model only supports direct, prototype, prototype_only, or linspan gamma_schedule specification")
 
     elif model_type == ModelType.SIGMOID:
         # Expand scalar parameters using get_param for proper precedence
@@ -1012,7 +1221,155 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv=No
                     'beta_prototype': beta_info['prototype'],
                     'beta_is_prototype': True
                 })
-    
+
+        # Handle beta as linspan
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'direct':
+            for alpha, span, gamma_expr in itertools.product(
+                    alphas, beta_info['span_values'], gamma_info['schedules']):
+                beta_expr = f"linspan({beta_info['start_expr']},{span})"
+                param_id = f"a{alpha}_b{beta_expr}_g{gamma_expr}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'beta_expr': beta_expr,
+                    'gamma_expr': gamma_expr
+                })
+
+        # Handle gamma as linspan
+        elif beta_info['type'] == 'direct' and gamma_info['type'] == 'linspan':
+            for alpha, beta_expr, span in itertools.product(
+                    alphas, beta_info['schedules'], gamma_info['span_values']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{span})"
+                param_id = f"a{alpha}_b{beta_expr}_g{gamma_expr}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'beta_expr': beta_expr,
+                    'gamma_expr': gamma_expr
+                })
+
+        # Handle both as linspan
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'linspan':
+            for alpha, beta_span, gamma_span in itertools.product(
+                    alphas, beta_info['span_values'], gamma_info['span_values']):
+                beta_expr = f"linspan({beta_info['start_expr']},{beta_span})"
+                gamma_expr = f"linspan({gamma_info['start_expr']},{gamma_span})"
+                param_id = f"a{alpha}_b{beta_expr}_g{gamma_expr}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'beta_expr': beta_expr,
+                    'gamma_expr': gamma_expr
+                })
+
+        # Handle beta as linspan with gamma linked
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'linked' and gamma_info['base_schedule'] == 'beta_schedule':
+            for alpha, beta_span, factor in itertools.product(
+                    alphas, beta_info['span_values'], gamma_info['factors']):
+                beta_expr = f"linspan({beta_info['start_expr']},{beta_span})"
+                param_id = f"a{alpha}_b{beta_expr}_gf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'beta_expr': beta_expr,
+                    'gamma_factor': factor,
+                    'gamma_based_on': 'beta'
+                })
+
+        # Handle gamma as linspan with beta linked
+        elif gamma_info['type'] == 'linspan' and beta_info['type'] == 'linked' and beta_info['base_schedule'] == 'gamma_schedule':
+            for alpha, gamma_span, factor in itertools.product(
+                    alphas, gamma_info['span_values'], beta_info['factors']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{gamma_span})"
+                param_id = f"a{alpha}_g{gamma_expr}_bf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'gamma_expr': gamma_expr,
+                    'beta_factor': factor,
+                    'beta_based_on': 'gamma'
+                })
+
+        # Handle beta as linspan with gamma prototype
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'prototype':
+            for alpha, beta_span, factor in itertools.product(
+                    alphas, beta_info['span_values'], gamma_info['factors']):
+                beta_expr = f"linspan({beta_info['start_expr']},{beta_span})"
+                param_id = f"a{alpha}_b{beta_expr}_gpf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'beta_expr': beta_expr,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_factor': factor,
+                    'gamma_is_prototype': True
+                })
+
+        # Handle gamma as linspan with beta prototype
+        elif gamma_info['type'] == 'linspan' and beta_info['type'] == 'prototype':
+            for alpha, gamma_span, factor in itertools.product(
+                    alphas, gamma_info['span_values'], beta_info['factors']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{gamma_span})"
+                param_id = f"a{alpha}_g{gamma_expr}_bpf{factor}"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'gamma_expr': gamma_expr,
+                    'beta_prototype': beta_info['prototype'],
+                    'beta_factor': factor,
+                    'beta_is_prototype': True
+                })
+
+        # Handle beta as linspan with gamma linked_only (factor from hyperparam table)
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'linked_only' and gamma_info['base_schedule'] == 'beta_schedule':
+            for alpha, beta_span in itertools.product(alphas, beta_info['span_values']):
+                beta_expr = f"linspan({beta_info['start_expr']},{beta_span})"
+                param_id = f"a{alpha}_b{beta_expr}_gf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'beta_expr': beta_expr,
+                    'gamma_based_on': 'beta'
+                })
+
+        # Handle gamma as linspan with beta linked_only (factor from hyperparam table)
+        elif gamma_info['type'] == 'linspan' and beta_info['type'] == 'linked_only' and beta_info['base_schedule'] == 'gamma_schedule':
+            for alpha, gamma_span in itertools.product(alphas, gamma_info['span_values']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{gamma_span})"
+                param_id = f"a{alpha}_g{gamma_expr}_bf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'gamma_expr': gamma_expr,
+                    'beta_based_on': 'gamma'
+                })
+
+        # Handle beta as linspan with gamma prototype_only (factor from hyperparam table)
+        elif beta_info['type'] == 'linspan' and gamma_info['type'] == 'prototype_only':
+            for alpha, beta_span in itertools.product(alphas, beta_info['span_values']):
+                beta_expr = f"linspan({beta_info['start_expr']},{beta_span})"
+                param_id = f"a{alpha}_b{beta_expr}_gpf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'beta_expr': beta_expr,
+                    'gamma_prototype': gamma_info['prototype'],
+                    'gamma_is_prototype': True
+                })
+
+        # Handle gamma as linspan with beta prototype_only (factor from hyperparam table)
+        elif gamma_info['type'] == 'linspan' and beta_info['type'] == 'prototype_only':
+            for alpha, gamma_span in itertools.product(alphas, gamma_info['span_values']):
+                gamma_expr = f"linspan({gamma_info['start_expr']},{gamma_span})"
+                param_id = f"a{alpha}_g{gamma_expr}_bpf_TBD"
+                param_sets.append({
+                    'id': param_id,
+                    'alpha': alpha,
+                    'gamma_expr': gamma_expr,
+                    'beta_prototype': beta_info['prototype'],
+                    'beta_is_prototype': True
+                })
+
         else:
             raise ValueError("Invalid schedule linkage configuration")
 
@@ -1051,8 +1408,18 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv=No
                 'gamma_is_prototype': True
             })
 
+        # Handle gamma as linspan
+        elif gamma_info['type'] == 'linspan':
+            for span in gamma_info['span_values']:
+                gamma_expr = f"linspan({gamma_info['start_expr']},{span})"
+                param_id = f"g{gamma_expr}"
+                param_sets.append({
+                    'id': param_id,
+                    'gamma_expr': gamma_expr
+                })
+
         else:
-            raise ValueError("FIXED_AMPLITUDE model only supports direct, prototype, or prototype_only gamma_schedule specification")
+            raise ValueError("FIXED_AMPLITUDE model only supports direct, prototype, prototype_only, or linspan gamma_schedule specification")
 
     elif model_type == ModelType.CIM:
         # Expand all parameter ranges for CIM model using get_param for proper precedence
@@ -1168,9 +1535,36 @@ def generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv=No
                         'beta_prototype': beta_info['prototype'],
                         'beta_is_prototype': True
                     })
-        
+
+        # Handle beta as linspan
+        elif beta_info['type'] == 'linspan':
+            if use_scaled_B:
+                for alpha, B_num_vertices, zeta, span in itertools.product(
+                        alphas, B_num_vertices_values, zetas, beta_info['span_values']):
+                    beta_expr = f"linspan({beta_info['start_expr']},{span})"
+                    param_id = f"a{alpha}_Bnv{B_num_vertices}_z{zeta}_b{beta_expr}"
+                    param_sets.append({
+                        'id': param_id,
+                        'alpha': alpha,
+                        'B_num_vertices': B_num_vertices,
+                        'zeta': zeta,
+                        'beta_expr': beta_expr
+                    })
+            else:
+                for alpha, B, zeta, span in itertools.product(
+                        alphas, Bs, zetas, beta_info['span_values']):
+                    beta_expr = f"linspan({beta_info['start_expr']},{span})"
+                    param_id = f"a{alpha}_B{B}_z{zeta}_b{beta_expr}"
+                    param_sets.append({
+                        'id': param_id,
+                        'alpha': alpha,
+                        'B': B,
+                        'zeta': zeta,
+                        'beta_expr': beta_expr
+                    })
+
         else:
-            raise ValueError("CIM model only supports direct, prototype, or prototype_only beta_schedule specification")
+            raise ValueError("CIM model only supports direct, prototype, prototype_only, or linspan beta_schedule specification")
 
     else:
         raise ValueError(f"Unknown model type: {model_type}")

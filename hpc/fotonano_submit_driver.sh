@@ -1,9 +1,9 @@
 # submit_driver.sh
-#BSUB -J g05           # job name
+#BSUB -J g05_cim           # job name
 #BSUB -q fotonano                    # queue name
-#BSUB -n 254                     # total cores (max 128 for hpc, max 360 for fotonano)
-#BSUB -R "span[ptile=127]"       # max cores/node (max 20 for hpc)
-#BSUB -R "rusage[mem=2GB]"	# memory per core (2GB -> fast alloc)
+#BSUB -n 102                     # total cores (max 128 for hpc, max 360 for fotonano)
+#BSUB -R "span[ptile=32]"       # max cores/node (max 20 for hpc)
+#BSUB -R "rusage[mem=6GB]"	# memory per core (2GB -> fast alloc)
 #BSUB -W 120:00                  # max walltime (max 72 hours for hpc, max 120 hours for fotonano)
 #BSUB -u s194084@dtu.dk         # email address
 #BSUB -B                        # send email at start
@@ -15,4 +15,4 @@ module load python3/3.13.2
 module load mpi4py/4.0.2-python-3.13.2-openmpi-5.0.6
 source potts-env/bin/activate
 
-mpirun python3 run_potts_sweep.py --config configs/251213_g05.yaml
+mpirun python3 run_potts_sweep.py --config configs/251221_g05_cim.yaml

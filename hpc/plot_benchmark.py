@@ -29,7 +29,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.colors import LogNorm
-from matplotlib.ticker import FormatStrFormatter
+from matplotlib.ticker import FormatStrFormatter, PercentFormatter
 import argparse
 from pathlib import Path
 import os
@@ -66,15 +66,40 @@ def save_figure(filename_base, out_dir):
     plt.savefig(os.path.join(out_dir, filename), dpi=dpi)
     print(f"Saved plot to {os.path.join(out_dir, filename)}")
 
+def get_model_color(model, model_order, color_order=None):
+    """
+    Get the color for a given model from the palette.
+
+    Parameters:
+    - model: Model name
+    - model_order: List of models in visual order
+    - color_order: Optional list of models in color assignment order
+
+    Returns:
+    - Color from PALETTE
+    """
+    if color_order is not None and model in color_order:
+        color_idx = color_order.index(model)
+    elif model in model_order:
+        color_idx = model_order.index(model)
+    else:
+        # Fallback: use position 0
+        color_idx = 0
+
+    return PALETTE[color_idx % len(PALETTE)]
+
 def main():
     parser = argparse.ArgumentParser(description='Generate comparison plots from Potts model parameter sweep results')
     parser.add_argument('--plot_type', type=str, required=False, choices=['success_rate', 'optimality_gap'], help='Type of plot to generate')
     parser.add_argument('--results', type=str, required=True, help='Path to results.parquet file')
     parser.add_argument('--out_dir', type=str, default='plots', help='Output directory for plots')
     parser.add_argument('--model_order', type=str, default=None, help='Comma-separated list of models in desired order')
+    parser.add_argument('--color_order', type=str, default=None, help='Comma-separated list of models in desired color assignment order (independent of visual order)')
     parser.add_argument('--figure_mode', action='store_true', help='Output as PDF without titles (for publications)')
     parser.add_argument('--table', action='store_true', help='Generate CSV table with statistics for best hyperparameter combinations')
     parser.add_argument('--best_hyperparams', type=str, default=None, choices=['mean_gap', 'min_gap', 'success_rate'], help='Metric for selecting best hyperparameters: mean_gap (minimize mean), min_gap (minimize minimum), or success_rate (maximize success rate). Default depends on --plot_type.')
+    parser.add_argument('--graph_grouping', type=str, default='by_graph_size', choices=['per_graph', 'all_graphs', 'by_graph_size'], help='How to group graphs in plots: per_graph (one subplot per graph with scatter plot), all_graphs (one subplot averaging over all graphs with box plot), by_graph_size (subplots by graph size with box plots). Default: by_graph_size')
+    parser.add_argument('--plot_hyperparams', action='store_true', help='Generate hyperparameter sweep plots')
     args = parser.parse_args()
     
     # Set default best_hyperparams based on plot_type
@@ -88,7 +113,7 @@ def main():
     global FILE_EXT, ADD_TITLES
     if args.figure_mode:
         FILE_EXT = "pdf"
-        ADD_TITLES = True
+        ADD_TITLES = False
     
     # infer series name and adjust default output directory
     input_path = Path(args.results)
@@ -157,25 +182,29 @@ def main():
     raw_order = args.model_order.split(',') if args.model_order else None
     model_order = [alias_map.get(m, m) for m in raw_order] if raw_order else None
 
+    raw_color_order = args.color_order.split(',') if args.color_order else None
+    color_order = [alias_map.get(m, m) for m in raw_color_order] if raw_color_order else None
+
     # Generate plot based on plot_type argument
     if args.plot_type == 'success_rate':
         if 'reached_optimum_cut' in results.columns:
-            plot_max_success_rate_by_graph(results, args.out_dir, model_order)
+            plot_success_rate_with_grouping(results, args.out_dir, model_order, args.graph_grouping, args.best_hyperparams, color_order)
 
             # Also generate hyperparameter plots for success rate
-            plot_hyperparams(results, args.out_dir, model_order, args.best_hyperparams)
+            if args.plot_hyperparams:
+                plot_hyperparams(results, args.out_dir, model_order, args.best_hyperparams, color_order)
         else:
             print("Warning: Cannot create success rate plot - required columns not found")
-    
+
     else: # if args.plot_type == 'optimality_gap': or not specified
         if 'rel_cut_gap' in results.columns:
-            plot_rel_gap_distributions_by_graph(results, args.out_dir, model_order, args.best_hyperparams)
+            plot_rel_gap_distributions_by_graph(results, args.out_dir, model_order, args.best_hyperparams, color_order)
         else:
             print("Warning: Cannot create relative gap distribution plots - relative cut gap not found")
-        
+
         # Also generate hyperparameter plots for optimality gap
         if 'cut_gap' in results.columns:
-            plot_hyperparams(results, args.out_dir, model_order, args.best_hyperparams)
+            plot_hyperparams(results, args.out_dir, model_order, args.best_hyperparams, color_order)
         else:
             print("Warning: Cannot create hyperparameter sweep plots - cut gap not found")
 
@@ -282,15 +311,15 @@ def add_gamma_rate_over_th(data):
         data['gamma_rate/gamma_th'] = data['gamma_factor'] / data['T']
     return data
 
-def plot_hyperparams(results, out_dir, model_order=None, best_hyperparams_mode='mean_gap'):
+def plot_hyperparams(results, out_dir, model_order=None, best_hyperparams_mode='mean_gap', color_order=None):
     """
     Plot the mean relative optimality gap versus hyperparameters for each model.
-    
+
     For 1D hyperparameter sweeps: Line plot of gap vs parameter
     For 2D hyperparameter sweeps: Heatmap with parameters as axes
     For 3D+ hyperparameter sweeps: Skip plotting with a message
     For no hyperparameter sweep: Skip plotting with a message
-    
+
     Supports modes: 'mean_gap', 'min_gap', 'success_rate'
     """
     # Try to import seaborn for better heatmaps
@@ -423,7 +452,7 @@ def plot_hyperparams(results, out_dir, model_order=None, best_hyperparams_mode='
             # For success rate, don't use log norm
             if best_hyperparams_mode == 'success_rate':
                 norm = None
-                cbar_label = 'Success rate (%)'
+                cbar_label = 'Success Rate (SR)'
             else:
                 norm = None
                 if pd.notna(global_min) and global_min < global_max:
@@ -473,87 +502,303 @@ def identify_swept_hyperparameters(model_data, model=None):
     
     return swept_params
 
-def plot_max_success_rate_by_graph(results, out_dir, model_order=None):
-    """Plot max success rate for each model versus graph, ordered by number of spins and success rate"""
-    # Group by graph, model, and param_id to calculate success rate
-    success_rates = results.groupby(['graph', 'model', 'param_id'])['reached_optimum_cut'].mean().reset_index()
-    
-    # Find max success rate for each graph-model combination
-    max_success_rates = success_rates.groupby(['graph', 'model'])['reached_optimum_cut'].max().reset_index()
-    max_success_rates.rename(columns={'reached_optimum_cut': 'success_rate'}, inplace=True)
-    
-    # Add num_spins information by merging with results
-    graph_spins = results[['graph', 'num_spins']].drop_duplicates()
-    max_success_rates = max_success_rates.merge(graph_spins, on='graph')
-    
-    # Get all models
-    models = model_order if model_order else sorted(max_success_rates['model'].unique())
-    
-    # Get unique spin counts
-    spin_counts = sorted(graph_spins['num_spins'].unique())
-    
-    # Plot max success rate by number of spins for each model
-    plt.figure(figsize=(7, 3))
+def plot_success_rate_with_grouping(results, out_dir, model_order=None, graph_grouping='by_graph_size', best_hyperparams_mode='success_rate', color_order=None):
+    """
+    Plot success rates with different graph grouping strategies.
+
+    Parameters:
+    - results: DataFrame with simulation results
+    - out_dir: Output directory for plots
+    - model_order: List of model names in desired order (or None to auto-sort)
+    - graph_grouping: How to group graphs ('per_graph', 'all_graphs', 'by_graph_size')
+    - best_hyperparams_mode: Metric for selecting best hyperparameters
+    - color_order: Optional list of models in color assignment order
+    """
+    # Get best parameters for each graph-model combination
+    best_params = get_best_hyperparams(results, mode=best_hyperparams_mode)
+
+    # Filter results to only include best parameter combinations
+    filtered_results = pd.merge(
+        results,
+        best_params[['graph', 'model', 'param_id']],
+        on=['graph', 'model', 'param_id']
+    )
+
+    # Calculate success rates by aggregating over runs
+    success_rates = filtered_results.groupby(['graph', 'model', 'param_id'])['reached_optimum_cut'].mean().reset_index()
+    success_rates['success_rate'] = success_rates['reached_optimum_cut'] * 100  # Convert to percentage
+    success_rates = success_rates.drop(columns=['reached_optimum_cut'])
+
+    # Merge back to get additional columns (num_vertices, swept parameters, etc.)
+    success_rates = success_rates.merge(
+        filtered_results[['graph', 'model', 'param_id', 'num_vertices']].drop_duplicates(),
+        on=['graph', 'model', 'param_id']
+    )
+
+    # Determine model ordering if not provided (by mean success rate, descending)
+    if model_order is None:
+        model_performance = success_rates.groupby('model')['success_rate'].mean().sort_values(ascending=False)
+        model_order = model_performance.index.tolist()
+
+    # Branch based on grouping mode
+    if graph_grouping == 'per_graph':
+        _plot_success_rate_per_graph(success_rates, filtered_results, out_dir, model_order, color_order)
+    elif graph_grouping == 'all_graphs':
+        _plot_success_rate_all_graphs(success_rates, out_dir, model_order, color_order)
+    elif graph_grouping == 'by_graph_size':
+        _plot_success_rate_by_graph_size(success_rates, out_dir, model_order, color_order)
+    else:
+        print(f"Warning: Unknown graph_grouping mode '{graph_grouping}'")
+
+def _plot_success_rate_per_graph(success_rates, filtered_results, out_dir, model_order, color_order=None):
+    """
+    Plot success rates with one section per graph (scatter plot style).
+    Shows aggregated success rate per parameter value for each model.
+    """
+    # Check if there are swept parameters
+    graphs = sorted(success_rates['graph'].unique())
+    if not graphs:
+        print("Warning: No graphs found in filtered results")
+        return
+
+    # For the first graph, identify swept parameters
+    first_graph_data = filtered_results[filtered_results['graph'] == graphs[0]]
+    swept_params = identify_swept_hyperparameters(first_graph_data)
+
+    if len(swept_params) == 0:
+        print("Warning: No swept parameters found for 'per_graph' mode - falling back to bar chart")
+        # Could implement a bar chart fallback here
+        return
+    elif len(swept_params) > 1:
+        print(f"Warning: Multiple swept parameters found {swept_params} - using first one: {swept_params[0]}")
+
+    param_name = swept_params[0]
+
+    # Merge parameter values into success_rates
+    param_data = filtered_results[['graph', 'model', 'param_id', param_name]].drop_duplicates()
+    success_rates_with_param = success_rates.merge(param_data, on=['graph', 'model', 'param_id'])
+
+    # Get unique parameter values (globally across all graphs)
+    param_values = sorted(success_rates_with_param[param_name].unique())
+    num_param_values = len(param_values)
+    num_models = len(model_order)
+
+    # Calculate positions
+    positions_per_graph = num_param_values * num_models
+    graph_centers = []
+    separator_positions = []
+
+    # Prepare data structures
+    scatter_data = []  # List of (position, success_rate, model) tuples
+    position_to_param_value = {}
+
+    for g_idx, graph in enumerate(graphs):
+        start_pos = g_idx * positions_per_graph
+        graph_centers.append(start_pos + positions_per_graph/2 - 0.5)
+        if g_idx > 0:
+            separator_positions.append(start_pos - 0.5)
+
+        graph_data = success_rates_with_param[success_rates_with_param['graph'] == graph]
+
+        for p_idx, param_value in enumerate(param_values):
+            for m_idx, model in enumerate(model_order):
+                position = start_pos + (p_idx * num_models) + m_idx
+                position_to_param_value[position] = param_value
+
+                # Get success rate for this combination
+                point_data = graph_data[
+                    (graph_data['model'] == model) &
+                    (graph_data[param_name] == param_value)
+                ]
+
+                if not point_data.empty:
+                    sr = point_data['success_rate'].iloc[0]
+                    scatter_data.append((position, sr, model))
+
+    # Create plot
+    fig_width = min(12, 0.15 * len(graphs) * positions_per_graph + 2)
+    fig, ax = plt.subplots(figsize=(fig_width, 5))
+
+    # Plot scatter points
+    for position, sr, model in scatter_data:
+        ax.scatter(position, sr, color=get_model_color(model, model_order, color_order), s=50, alpha=0.7)
+
+    # Add vertical separators between graphs
+    for pos in separator_positions:
+        ax.axvline(x=pos, color='gray', linestyle='--', alpha=0.5)
+
+    # Add horizontal line at 100% (perfect success)
+    #ax.axhline(y=100, color='green', linestyle='-', linewidth=1, alpha=0.5)
+
+    # Set x-axis labels
+    ax.set_xticks(graph_centers)
+    ax.set_xticklabels([f"{g}" for g in graphs])
+    ax.set_xlabel('Graph')
+    ax.set_ylabel('Success Rate (SR)')
+    ax.set_ylim(-2,102)
+    ax.yaxis.set_major_formatter(PercentFormatter())
+    ax.grid(True, alpha=0.3)
+
+    # Add legend
+    legend_elements = [plt.scatter([], [], color=get_model_color(model, model_order, color_order), s=50, label=model)
+                      for model in model_order]
+    ax.legend(handles=legend_elements, loc='center left', bbox_to_anchor=(1.02, 0.5))
+
     if ADD_TITLES:
-        plt.title(f'{SERIES_NAME} | Max success rate')
-    
-    # Define bar positions
-    bar_positions = np.arange(len(spin_counts))
-    
-    # Calculate success rates by spin count and model
-    sr_by_spin_model = {}
-    model_order_by_spin = {}
-    
-    for spin_count in spin_counts:
-        # Calculate success rate for each model for this spin count
-        sr_by_model = {}
-        for model in models:
-            model_data = max_success_rates[(max_success_rates['model'] == model) & 
-                                          (max_success_rates['num_spins'] == spin_count)]
-            sr = model_data['success_rate'].mean() * 100 if not model_data.empty else 0
-            sr_by_model[model] = sr
-        
-        # Store success rates for this spin count
-        sr_by_spin_model[spin_count] = sr_by_model
-        
-        # Sort models by success rate (ascending order - shorter to taller)
-        model_order_by_spin[spin_count] = sorted(models, key=lambda m: sr_by_model[m])
-    
-    # Plot bars for each spin count with models ordered by height
-    width = 0.8 / len(models)
-    
-    for i, spin_count in enumerate(spin_counts):
-        ordered_models = model_order_by_spin[spin_count]
-        
-        for j, model in enumerate(ordered_models):
-            sr = sr_by_spin_model[spin_count][model]
-            offset = (j - (len(models) - 1) / 2) * width
-            
-            # Use a consistent color for each model across all spin counts
-            model_idx = models.index(model)
-            plt.bar(bar_positions[i] + offset, sr, width,
-                   color=PALETTE[model_idx % len(PALETTE)],
-                   label=model if i == 0 and j == 0 else "")
-    
-    # Create a proper legend with all models
-    handles = [plt.Rectangle((0,0),1,1, color=PALETTE[i % len(PALETTE)])
-               for i, _ in enumerate(models)]
-    plt.legend(handles, models)
-    
-    plt.xlabel('Number of Spins')
-    plt.ylabel('Success Rate (%)')
-    plt.xticks(bar_positions, spin_counts)
+        ax.set_title(f'{SERIES_NAME} | Success rate by graph (swept parameter: {param_name})')
+
     plt.tight_layout()
-    save_figure('max_success_rate', out_dir)
+    save_figure('success_rate_per_graph', out_dir)
     plt.close()
 
-def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None, best_hyperparams_mode='mean_gap'):
+def _plot_success_rate_all_graphs(success_rates, out_dir, model_order, color_order=None):
+    """
+    Plot success rates with all graphs grouped together (box plot).
+    """
+    # Prepare data for box plot
+    boxplot_data = []
+
+    for model in model_order:
+        model_data = success_rates[success_rates['model'] == model]
+        boxplot_data.append(model_data['success_rate'].tolist())
+
+    # Create plot
+    fig, ax = plt.subplots(figsize=(max(6, len(model_order) * 0.8), 5))
+
+    # Create box plot
+    bp = ax.boxplot(boxplot_data, tick_labels=model_order, patch_artist=True,
+                   widths=0.6, medianprops={'color': 'black'})
+
+    # Color boxes
+    for i, box in enumerate(bp['boxes']):
+        model = model_order[i]
+        box.set_facecolor(get_model_color(model, model_order, color_order))
+
+    # Add horizontal reference lines at 100% and 0%
+    ax.axhline(y=100, color='gray', linestyle='-', linewidth=1, alpha=0.7)
+    ax.axhline(y=0, color='gray', linestyle='-', linewidth=1, alpha=0.7)
+
+    ax.set_ylabel('Success Rate (SR)')
+    ax.set_ylim(-2,102)
+    ax.yaxis.set_major_formatter(PercentFormatter())
+    ax.grid(True, alpha=0.3, axis='y')
+    plt.xticks(rotation=45, ha='right')
+
+    if ADD_TITLES:
+        ax.set_title(f'{SERIES_NAME} | Success rate distribution (all graphs)')
+
+    plt.tight_layout()
+    save_figure('success_rate_all_graphs', out_dir)
+    plt.close()
+
+def _plot_success_rate_by_graph_size(success_rates, out_dir, model_order, color_order=None):
+    """
+    Plot success rates grouped by graph size (box plot style).
+    Similar visual style to plot_rel_gap_distributions_by_graph.
+    """
+    # Get unique graph sizes
+    sizes = sorted(success_rates['num_vertices'].unique())
+    num_models = len(model_order)
+
+    # Calculate positions
+    positions_per_size = num_models
+    size_centers = []
+    separator_positions = []
+
+    # Prepare data structures
+    boxplot_data = {}
+    position_model_map = {}
+
+    for s_idx, size in enumerate(sizes):
+        start_pos = s_idx * positions_per_size
+        size_centers.append(start_pos + positions_per_size/2 - 0.5)
+        if s_idx > 0:
+            separator_positions.append(start_pos - 0.5)
+
+        size_data = success_rates[success_rates['num_vertices'] == size]
+
+        for m_idx, model in enumerate(model_order):
+            position = start_pos + m_idx
+            model_data = size_data[size_data['model'] == model]
+
+            if not model_data.empty:
+                boxplot_data[position] = model_data['success_rate'].tolist()
+            else:
+                boxplot_data[position] = []
+
+            position_model_map[position] = model
+
+    # Sort positions and filter out empty ones
+    sorted_positions = sorted(boxplot_data.keys())
+    all_data = [boxplot_data[pos] for pos in sorted_positions]
+    mask = [len(data) > 0 for data in all_data]
+    valid_positions = [pos for i, pos in enumerate(sorted_positions) if mask[i]]
+    valid_data = [data for data in all_data if len(data) > 0]
+
+    # Create plot
+    fig_width = min(10, 0.4 * len(sizes) * num_models + 2)
+    fig, ax = plt.subplots(figsize=(fig_width, 5))
+
+    # Create box plots
+    bp = ax.boxplot(valid_data, positions=valid_positions, patch_artist=True,
+                   widths=0.7, medianprops={'color': 'black'})
+
+    # Color boxes
+    for i, box in enumerate(bp['boxes']):
+        model = position_model_map[valid_positions[i]]
+        box.set_facecolor(get_model_color(model, model_order, color_order))
+
+    # Enhance median lines for collapsed boxes
+    y_min, y_max = ax.get_ylim()
+    collapse_threshold = (y_max - y_min) * 0.01
+
+    for i, box in enumerate(bp['boxes']):
+        box_extent = box.get_path().get_extents()
+        box_height = box_extent.height
+        if box_height < collapse_threshold:
+            model = position_model_map[valid_positions[i]]
+            median_line = bp['medians'][i]
+            median_line.set_linewidth(4)
+            median_line.set_color(get_model_color(model, model_order, color_order))
+
+    # Add vertical separators between size groups
+    for pos in separator_positions:
+        ax.axvline(x=pos, color='gray', linestyle='--', alpha=0.7)
+
+    # Add horizontal reference lines at 100% and 0%
+    ax.axhline(y=100, color='gray', linestyle='-', linewidth=1, alpha=0.7)
+    ax.axhline(y=0, color='gray', linestyle='-', linewidth=1, alpha=0.7)
+
+    # Set x-axis labels as numbers only
+    ax.set_xticks(size_centers)
+    ax.set_xticklabels([f"{size}" for size in sizes])
+    ax.set_xlabel('Number of vertices in graph')
+    ax.set_ylabel('Success Rate (SR)')
+    ax.set_ylim(-2,102)
+    ax.yaxis.set_major_formatter(PercentFormatter())
+    ax.grid(True, alpha=0.3, axis='y')
+
+    # Add legend
+    legend_elements = [plt.Rectangle((0,0), 1, 1, facecolor=get_model_color(model, model_order, color_order),
+                                    edgecolor='black') for model in model_order]
+
+    ax.legend(legend_elements, model_order,
+             loc='center left', bbox_to_anchor=(1.02, 0.5))
+
+    if ADD_TITLES:
+        ax.set_title(f'{SERIES_NAME} | Success rate by graph size')
+
+    plt.tight_layout()
+    save_figure('success_rate_by_graph_size', out_dir)
+    plt.close()
+
+def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None, best_hyperparams_mode='mean_gap', color_order=None):
     """
     Create boxplots showing relative optimality gap distributions by graph and model.
-    
+
     For each graph-model combination, only the best hyperparameter set is used
     (the one with smallest mean relative optimality gap).
-    
+
     If there is a consistent large gap between model performances, a broken y-axis is used.
     """
     # Get best parameters for each graph-model combination (minimize cut gap)
@@ -592,7 +837,7 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None, best
 
     
     # Get unique graphs and sort them alphanumerically
-    graphs_df = filtered_results[['graph', 'num_spins']].drop_duplicates()
+    graphs_df = filtered_results[['graph', 'num_vertices']].drop_duplicates()
     graphs = sorted(graphs_df['graph'].unique())  # Sort alphanumerically
     
     # Calculate the total number of positions needed
@@ -789,13 +1034,25 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None, best
             widths=0.7,
             medianprops={'color': 'black'}
         )
-        
+
         # Color each box according to its model
         for i, box in enumerate(bp['boxes']):
             model = position_model_map[valid_positions[i]]
-            model_idx = model_order.index(model)
-            box.set_facecolor(PALETTE[model_idx % len(PALETTE)])
-        
+            box.set_facecolor(get_model_color(model, model_order, color_order))
+
+        # Enhance median lines for collapsed boxes
+        y_min, y_max = current_ax.get_ylim()
+        collapse_threshold = (y_max - y_min) * 0.01
+
+        for i, box in enumerate(bp['boxes']):
+            box_extent = box.get_path().get_extents()
+            box_height = box_extent.height
+            if box_height < collapse_threshold:
+                model = position_model_map[valid_positions[i]]
+                median_line = bp['medians'][i]
+                median_line.set_linewidth(4)
+                median_line.set_color(get_model_color(model, model_order, color_order))
+
         # Add vertical separators between graphs
         for pos in separator_positions:
             current_ax.axvline(x=pos, color='gray', linestyle='--', alpha=0.7)
@@ -815,9 +1072,9 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None, best
         title_ax.set_title(f'{SERIES_NAME} | Avg. rel. optimality gap distribution by graph (best hyperparams = {best_hyperparams_mode})')
     
     # Add legend for models
-    legend_elements = [plt.Rectangle((0,0), 1, 1, facecolor=PALETTE[i % len(PALETTE)], 
-                                    edgecolor='black') for i, _ in enumerate(model_order)]
-    
+    legend_elements = [plt.Rectangle((0,0), 1, 1, facecolor=get_model_color(model, model_order, color_order),
+                                    edgecolor='black') for model in model_order]
+
     # Add optimum line to legend
     opt_handle = Line2D([0], [0], color='green', linestyle='-', label='Optimum (0%)')
     legend_elements.append(opt_handle)
@@ -872,7 +1129,7 @@ def plot_1d_hyperparam(data, param, model, ax, graph_name, is_leftmost=True, is_
         grouped = data.groupby(param)['reached_optimum_cut'].mean().reset_index()
         grouped['reached_optimum_cut'] = grouped['reached_optimum_cut'] * 100  # Convert to percentage
         metric_col = 'reached_optimum_cut'
-        y_label = 'Success rate (%)'
+        y_label = 'Success Rate (SR)'
         find_best = 'max'  # Higher is better for success rate
     elif mode == 'mean_gap':
         grouped = data.groupby(param)['rel_cut_gap'].mean().reset_index()
@@ -1066,7 +1323,7 @@ def plot_2d_hyperparam(data, param1, param2, model, ax, graph_name, has_seaborn,
     else:
         # Use matplotlib's imshow for the heatmap
         im = ax.imshow(pivot.values, cmap='viridis', aspect='auto', origin='lower')
-        cbar_label = 'Success rate (%)' if mode == 'success_rate' else 'Mean relative optimality gap (%)'
+        cbar_label = 'Success Rate (SR)' if mode == 'success_rate' else 'Mean relative optimality gap (%)'
         ax.figure.colorbar(im, ax=ax, label=cbar_label)
         
         # Set formatted tick labels

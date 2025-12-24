@@ -28,26 +28,21 @@ models:
     gamma_schedule: # Gamma schedule as prototype multiplied by swept factor
       prototype: "lin(0,1)"
       #factor: fetched from table
- 
-  QPDC:
-    T: 50 #[1, 10, 50, 100, 1000] # Default: 50
-    dt: 1e-3 # [1e-1,1e-2,1e-3,1e-4] # Default: 1e-3
-    poly_order: ["2*num_states - 1"] 
-    beta_schedule: ["const(1/(1+num_edges/num_vertices))"] # Will be evaluated for each graph
-    gamma_schedule:
-      prototype: "lin(0,gamma_th)" # gamma_th = (256/27)**(1/4)
-      #factor: fetched from table
       
   FIXED_AMPLITUDE:
     T: 1000 #[10, 100, 1000, 5000, 10000] # Default: 1000
     dt: 1e-3 # [1e-1,1e-2,1e-3,1e-4] # Default: 1e-3
-    gamma_schedule: ["lin(0,10.0)"]
+    gamma_schedule:
+      start: 0
+      span: [1e-1, 1e0, 1e1, 1e2] # Default 1e1
   
   POLYNOMIAL:
     T: 1000 #[10, 100, 1000, 5000, 10000] # Default: 1000
     dt: 1e-3 # [1e-1,1e-2,1e-3,1e-4] # Default: 1e-3
     #poly_order: fetched from table
-    beta_schedule: ["lin(1/mu_max, 1/mu_max + 2)"]  # Linear ramp starting at threshold 1/mu_max
+    beta_schedule:
+      start: "1/mu_max"
+      span: [0.1, 1, 2, 10] # Default: 2
     gamma_schedule: # Gamma defined as a factor times beta
       based_on: "beta_schedule"
       #factor: fetched from table
@@ -56,7 +51,9 @@ models:
     T: 2000 #[10, 100, 1000, 2000, 10000] # Default: 2000
     dt: 1e-3 # [1e-1,1e-2,1e-3,1e-4] # Default: 1e-3
     #alpha: fetched from table
-    beta_schedule: ["lin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)"]
+    beta_schedule: #["lin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)"]
+      start: "(1-alpha)/mu_max"
+      span: [1, 10, 20, 100] # Default: 20
     gamma_schedule:
       based_on: "beta_schedule"
       #factor: fetched from table
@@ -65,6 +62,8 @@ models:
     T: 1000 #[10, 100, 1000, 5000, 10000] # Default: 1000
     dt: 1e-2 # [1e-1,1e-2,1e-3,1e-4] # Default: 1e-2
     alpha: [-50]
-    beta_schedule: ["lin(0,0.01)"]
+    beta_schedule: #["lin(0,0.01)"]
+      start: 0
+      span: [1e-4, 1e-3, 1e-2, 1e-1, 1e0] # Default 1e-2
     #B_num_vertices: fetched from table
     #zeta: fetched from table

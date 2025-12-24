@@ -4,7 +4,7 @@ graph_path: "graphs/gset/G1-5/"  # Directory, file, or multiple directories/file
 out_dir: "results/"  # Directory to save results
 
 # Wall time estimation
-assumed_time_per_step_us: 450 # Assumed time between steps in microseconds
+assumed_time_per_step_us: 300 # Assumed time between steps in microseconds
 
 # Hyperparam table CSV contains optimized hyperparameters for each model-graph combination 
 # If specified, this table will be used for parameters not specified in config.

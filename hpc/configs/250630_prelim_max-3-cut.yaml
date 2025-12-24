@@ -57,6 +57,8 @@ models:
       factor: "0:0.5:8"
       
   CIM:
+    T: 1000
+    dt: 1e-2
     alpha: [-50]
     beta_schedule: ["lin(0,0.01)"]
     B_num_vertices: "100:10:200"  # B = B_num_vertices / num_vertices

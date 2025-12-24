@@ -187,7 +187,7 @@ def run_cim(T, dt, num_vertices, num_states,
             J, H,
             return_continuous_states = True,
             return_discrete_states = False,
-
+            return_energy = False,
             return_cut_value = False,
             return_best_only=False,
             return_last_only=False):
