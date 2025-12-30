@@ -22,7 +22,7 @@ plots/
 results_local/
 results/schedule_verification_*
 trash/
-logs/
+#logs/
 
 # You can also use patterns
 #*.log

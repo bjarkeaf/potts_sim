@@ -4,9 +4,7 @@ graph_path: "graphs/g05/"  # Directory, file, or multiple directories/files
 out_dir: "results/"  # Directory to save results
 
 # Wall time estimation
-assumed_time_per_step_us: 5 # Assumed time between steps in microseconds
-
-hyperparam_table: "../best_hyperparams/251222_g05.csv"
+assumed_time_per_step_us: 25 # Assumed time between steps in microseconds
 
 # Global simulation parameters (can be overridden per model)
 T: 100         # Total simulation time
@@ -17,7 +15,7 @@ noise_factor: 1e-4  # Noise scaling
 # Parameter sweeps for each model type
 models:  
   NEC:
-    T: [1, 10, 50, 100, 500, 1000, 2000, 5000, 10000] # Default: 5e3 
+    T: 5e3 # larger T and dt helps wrt. gain term vs. other terms, same as original report
     dt: 1e-2
     alpha_rate: [1e-2]
     r_target: "0:0.25:4"
@@ -27,7 +25,7 @@ models:
       factor: "1:1:25"
       
   QPDC:
-    T: [1, 10, 50, 100, 500, 1000, 2000, 5000, 10000] # Default: 50
+    T: 50 # would be 17 for original report
     dt: 1e-3
     poly_order: ["2*num_states - 1"] 
     beta_schedule: ["const(1/(1+num_edges/num_vertices))"] # Will be evaluated for each graph
@@ -36,12 +34,12 @@ models:
       factor: "0:5:100" # Matlab style: start:step:end, would be 15 for original report
       
   FIXED_AMPLITUDE:
-    T: [1, 10, 50, 100, 50, 1000, 2000, 5000, 10000] # Default: 1000
+    T: 1000
     dt: 1e-3
     gamma_schedule: ["lin(0,10.0)"]
 
   POLYNOMIAL:
-    T: [1, 10, 50, 100, 500, 1000, 2000, 5000, 10000] # Default: 2000
+    T: 1000
     dt: 1e-3
     poly_order: "3:1:10"
     beta_schedule: ["lin(1/mu_max, 1/mu_max + 2)"]  # Linear ramp starting at threshold 1/mu_max
@@ -59,9 +57,9 @@ models:
       factor: "0:0.5:8"
 
   CIM:
-    T: [1, 10, 50, 100, 500, 1000, 2000, 5000, 10000] # Default: 1000
+    T: 1000
     dt: 1e-2
     alpha: [-50]
-    beta_schedule: ["lin(0,0.01)"]
-    B_num_vertices: "2:2:50"  # B/A = B_num_vertices / num_vertices
+    beta_schedule: ["lin(0,0.001)"]
+    B_num_vertices: "2:2:60"  # B/A = B_num_vertices / num_vertices
     zeta: "0.1:0.05:1.0"

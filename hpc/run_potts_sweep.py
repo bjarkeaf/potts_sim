@@ -230,23 +230,44 @@ def load_hyperparams_from_csv(csv_path):
     # Build the hyperparam table
     hyperparam_table = {}
 
+    # Mapping from pretty-print names (used in CSV/results) to backend enum names
+    # Also includes backend names for robustness (CSV may use either format)
+    pretty_to_backend = {
+        # Pretty names
+        'Polynomial PM': 'POLYNOMIAL',
+        'q-PDC': 'QPDC',
+        'q-SHIL': 'FIXED_AMPLITUDE',
+        'Sigmoid PM': 'SIGMOID',
+        'Sigmoid IM': 'CIM',
+        # Backend names (identity mapping)
+        'NEC': 'NEC',
+        'POLYNOMIAL': 'POLYNOMIAL',
+        'QPDC': 'QPDC',
+        'FIXED_AMPLITUDE': 'FIXED_AMPLITUDE',
+        'SIGMOID': 'SIGMOID',
+        'CIM': 'CIM',
+    }
+
     for _, row in df.iterrows():
-        model = row['Model']
+        model_pretty = row['Model']
         graph = row['Graph']
         param_id = row['param_id']
 
+        # Convert pretty-print name to backend name
+        model_backend = pretty_to_backend.get(model_pretty, model_pretty)
+
         # Map model name to ModelType enum
         try:
-            model_type = ModelType[model]
+            model_type = ModelType[model_backend]
         except KeyError:
-            print(f"Warning: Unknown model type '{model}' in CSV, skipping")
+            print(f"Warning: Unknown model type '{model_pretty}' (backend: '{model_backend}') in CSV, skipping")
             continue
 
         # Parse the param_id to extract hyperparameters
         params = parse_param_id(param_id, model_type)
 
-        # Store in the table
-        hyperparam_table[(model, graph)] = params
+        # Store in the table using backend name (matches YAML config model names)
+        hyperparam_table[(model_backend, graph)] = params
 
     print(f"Loaded hyperparameters for {len(hyperparam_table)} model-graph combinations from {csv_path}")
 

@@ -4,6 +4,11 @@ Plot convergence of figure of merit vs swept parameter for Potts machine simulat
 
 Usage:
     python plot_convergence.py --data <path> --conv_type <type> [--fom <metric>] [--graph_grouping <mode>] [--output_dir <path>] [--add_fits]
+
+Where conv_type can be:
+    - simulation_time: Sweep of total simulation time T
+    - time_step: Sweep of time step dt
+    - annealing: Sweep of annealing parameters (auto-detected per model)
 """
 
 import pandas as pd
@@ -32,7 +37,7 @@ def parse_args():
         '--conv_type',
         type=str,
         required=True,
-        choices=['simulation_time', 'time_step'],
+        choices=['simulation_time', 'time_step', 'annealing'],
         help='Parameter that is swept (x-axis)'
     )
     parser.add_argument(
@@ -116,26 +121,100 @@ def get_graph_sizes(df: pd.DataFrame) -> Dict[str, int]:
         return {}
 
 
-def get_conv_param_column(conv_type: str) -> str:
-    """Map convergence type to column name."""
-    mapping = {
-        'simulation_time': 'T',
-        'time_step': 'dt'
-    }
-    return mapping[conv_type]
+def parse_schedule_span(schedule_str: str) -> float:
+    """
+    Extract the span value from a schedule string like 'linspan(0,0.01)'.
+    Returns the second number (the end value).
+    """
+    import re
+    # Match patterns like 'linspan(start,end)' or 'lin(start,end)'
+    match = re.search(r'lin(?:span)?\s*\(\s*[^,]+,\s*([^)]+)\s*\)', str(schedule_str))
+    if match:
+        return float(match.group(1))
+    # If it's already a number, return it
+    try:
+        return float(schedule_str)
+    except (ValueError, TypeError):
+        raise ValueError(f"Could not parse schedule span from: {schedule_str}")
 
 
-def get_axis_labels(conv_type: str, fom: str) -> Tuple[str, str]:
+def get_conv_param_column(conv_type: str, model_df: pd.DataFrame = None, model: str = None) -> str:
+    """
+    Map convergence type to column name.
+
+    For 'annealing' type, auto-detects which annealing parameter is swept based on the model.
+    """
+    if conv_type in ['simulation_time', 'time_step']:
+        mapping = {
+            'simulation_time': 'T',
+            'time_step': 'dt'
+        }
+        return mapping[conv_type]
+
+    elif conv_type == 'annealing':
+        # Auto-detect which annealing parameter is being swept for this model
+        if model_df is None:
+            raise ValueError("model_df required for annealing convergence type")
+
+        # Define potential annealing parameters for each model
+        # Order matters: first match is used
+        annealing_params_by_model = {
+            'NEC': ['alpha_rate'],
+            'FIXED_AMPLITUDE': ['gamma_schedule', 'gamma_span'],
+            'POLYNOMIAL': ['beta_schedule', 'beta_span'],
+            'SIGMOID': ['beta_schedule', 'beta_span'],
+            'CIM': ['beta_schedule', 'beta_span'],
+        }
+
+        # Get candidate parameters for this model
+        candidates = annealing_params_by_model.get(model, [])
+
+        # Check which candidate has multiple unique values (is being swept)
+        for param in candidates:
+            if param in model_df.columns:
+                unique_vals = model_df[param].nunique()
+                if unique_vals > 1:
+                    return param
+
+        # Fallback: search all columns for any with multiple values
+        # that contain keywords like 'span', 'rate', 'schedule', 'factor'
+        annealing_keywords = ['span', 'rate', 'alpha', 'beta', 'gamma', 'factor', 'schedule']
+        for col in model_df.columns:
+            if any(kw in col.lower() for kw in annealing_keywords):
+                if model_df[col].nunique() > 1:
+                    return col
+
+        raise ValueError(f"Could not detect swept annealing parameter for model {model}")
+
+    else:
+        raise ValueError(f"Unknown convergence type: {conv_type}")
+
+
+def get_axis_labels(conv_type: str, fom: str, param_name: str = None) -> Tuple[str, str]:
     """Get x and y axis labels."""
-    x_labels = {
-        'simulation_time': 'Simulation time, $T$',
-        'time_step': r'Time step, $\mathit{dt}$'
-    }
+    if conv_type == 'annealing':
+        # Use parameter-specific label if available
+        param_labels = {
+            'alpha_rate': r'Annealing rate, $\alpha_{\mathrm{rate}}$',
+            'beta_span': r'Schedule span, $\beta_{\mathrm{span}}$',
+            'gamma_span': r'Schedule span, $\gamma_{\mathrm{span}}$',
+            'beta_schedule': r'Schedule span, $\beta_{\mathrm{span}}$',
+            'gamma_schedule': r'Schedule span, $\gamma_{\mathrm{span}}$',
+            'gamma_factor': r'Gamma factor, $f_\gamma$',
+        }
+        x_label = param_labels.get(param_name, 'Annealing parameter')
+    else:
+        x_labels = {
+            'simulation_time': 'Simulation time, $T$',
+            'time_step': r'Time step, $\mathit{dt}$'
+        }
+        x_label = x_labels[conv_type]
+
     y_labels = {
         'mean_gap': 'Relative optimality gap (%)',
         'success_rate': 'Success rate (%)'
     }
-    return x_labels[conv_type], y_labels[fom]
+    return x_label, y_labels[fom]
 
 
 def calculate_ylim_from_whiskers(boxplot_dict: dict, padding_factor: float = 0.05) -> Tuple[float, float]:
@@ -385,16 +464,39 @@ def create_convergence_plot(
     model_df['rel_gap'] = calculate_relative_gap(model_df)
 
     # Get convergence parameter column and values
-    conv_col = get_conv_param_column(conv_type)
-    conv_values = sorted(model_df[conv_col].unique())
+    conv_col = get_conv_param_column(conv_type, model_df=model_df, model=model)
+
+    # Check if column contains schedule strings that need parsing
+    sample_val = model_df[conv_col].iloc[0]
+    is_schedule_string = isinstance(sample_val, str) and 'lin' in sample_val
+
+    if is_schedule_string:
+        # Parse schedule strings to extract numeric span values
+        model_df['_conv_numeric'] = model_df[conv_col].apply(parse_schedule_span)
+        # Get unique pairs of (original, numeric) for mapping
+        unique_pairs = model_df[[conv_col, '_conv_numeric']].drop_duplicates().sort_values('_conv_numeric')
+        conv_values_map = dict(zip(unique_pairs['_conv_numeric'], unique_pairs[conv_col]))
+        conv_values = sorted(conv_values_map.keys())  # Sorted numeric values
+    else:
+        # Use values directly
+        conv_values = sorted(model_df[conv_col].unique())
+        conv_values_map = {v: v for v in conv_values}
 
     print(f"Processing {model} model...")
-    print(f"  Swept parameter: {conv_col} in {conv_values}")
+    print(f"  Swept parameter: {conv_col} in {[conv_values_map[v] for v in conv_values]}")
 
     # Validate sweep
     if len(conv_values) < 2:
         print(f"  WARNING: Only {len(conv_values)} unique value(s) for {conv_col}. Skipping.")
         return
+
+    # Determine if log scale should be used (decide once, use everywhere)
+    # Use log scale if spacing varies significantly (indicates log-spaced data)
+    if len(conv_values) > 1:
+        spacings = np.diff(sorted(conv_values))
+        use_log_scale = spacings.min() > 0 and spacings.max() / spacings.min() >= 10
+    else:
+        use_log_scale = False
 
     # Get graph sizes if needed
     graph_sizes = get_graph_sizes(model_df)
@@ -434,7 +536,7 @@ def create_convergence_plot(
     axes = axes.flatten()
 
     # Get axis labels
-    xlabel, ylabel = get_axis_labels(conv_type, fom)
+    xlabel, ylabel = get_axis_labels(conv_type, fom, param_name=conv_col)
 
     # Plot each subplot
     for idx, (key, title) in enumerate(zip(subplot_keys, subplot_titles)):
@@ -464,21 +566,25 @@ def create_convergence_plot(
             plot_data = []
             positions = []
             for conv_val in conv_values:
-                conv_df = subplot_df[subplot_df[conv_col] == conv_val]
+                # Filter by original value or numeric value
+                if is_schedule_string:
+                    orig_val = conv_values_map[conv_val]
+                    conv_df = subplot_df[subplot_df[conv_col] == orig_val]
+                else:
+                    conv_df = subplot_df[subplot_df[conv_col] == conv_val]
                 if len(conv_df) > 0:
                     plot_data.append(conv_df['rel_gap'].values)
-                    positions.append(conv_val)
+                    positions.append(conv_val)  # Use numeric value for position
 
             if plot_data:
                 # Calculate appropriate widths based on axis scaling
-                if conv_type == 'simulation_time' and len(positions) > 1:
-                    pos_array = np.array(positions)
-                    if pos_array.max() / pos_array.min() > 100:
+                if len(positions) > 1:
+                    if use_log_scale:
                         # Log scale: width proportional to position
                         widths = [p * 0.4 for p in positions]
                     else:
                         # Linear scale: fixed width
-                        widths = np.diff(pos_array).min() * 0.6
+                        widths = np.diff(np.array(positions)).min() * 0.6
                 else:
                     widths = 0.2
 
@@ -500,8 +606,7 @@ def create_convergence_plot(
                     q3_array = np.array(q3_values)
 
                     # Create smooth T range for plotting fits
-                    if conv_type == 'simulation_time' and T_array.max() / T_array.min() > 100:
-                        # Log scale
+                    if use_log_scale:
                         T_smooth = np.logspace(np.log10(T_array.min()), np.log10(T_array.max()), 200)
                     else:
                         T_smooth = np.linspace(T_array.min(), T_array.max(), 200)
@@ -545,11 +650,16 @@ def create_convergence_plot(
                 success_rates = []
                 positions = []
                 for conv_val in conv_values:
-                    conv_df = subplot_df[subplot_df[conv_col] == conv_val]
+                    # Filter by original value or numeric value
+                    if is_schedule_string:
+                        orig_val = conv_values_map[conv_val]
+                        conv_df = subplot_df[subplot_df[conv_col] == orig_val]
+                    else:
+                        conv_df = subplot_df[subplot_df[conv_col] == conv_val]
                     if len(conv_df) > 0:
                         sr = calculate_success_rate(conv_df)
                         success_rates.append(sr)
-                        positions.append(conv_val)
+                        positions.append(conv_val)  # Use numeric value for position
 
                 if positions:
                     ax.plot(positions, success_rates, 'o-', linewidth=2, markersize=6, label='Success rate')
@@ -562,7 +672,7 @@ def create_convergence_plot(
                         sr_array = np.array(success_rates)
 
                         # Create smooth T range for plotting fit
-                        if conv_type == 'simulation_time' and T_array.max() / T_array.min() > 100:
+                        if use_log_scale:
                             T_smooth = np.logspace(np.log10(T_array.min()), np.log10(T_array.max()), 200)
                         else:
                             T_smooth = np.linspace(T_array.min(), T_array.max(), 200)
@@ -582,7 +692,12 @@ def create_convergence_plot(
                 plot_data = []
                 positions = []
                 for conv_val in conv_values:
-                    conv_df = subplot_df[subplot_df[conv_col] == conv_val]
+                    # Filter by original value or numeric value
+                    if is_schedule_string:
+                        orig_val = conv_values_map[conv_val]
+                        conv_df = subplot_df[subplot_df[conv_col] == orig_val]
+                    else:
+                        conv_df = subplot_df[subplot_df[conv_col] == conv_val]
                     if len(conv_df) > 0:
                         # Calculate success rate for each graph at this conv_val
                         graph_success_rates = []
@@ -591,18 +706,17 @@ def create_convergence_plot(
                             sr = calculate_success_rate(graph_df)
                             graph_success_rates.append(sr)
                         plot_data.append(graph_success_rates)
-                        positions.append(conv_val)
+                        positions.append(conv_val)  # Use numeric value for position
 
                 if plot_data:
                     # Calculate appropriate widths based on axis scaling
-                    if conv_type == 'simulation_time' and len(positions) > 1:
-                        pos_array = np.array(positions)
-                        if pos_array.max() / pos_array.min() > 100:
+                    if len(positions) > 1:
+                        if use_log_scale:
                             # Log scale: width proportional to position
                             widths = [p * 0.4 for p in positions]
                         else:
                             # Linear scale: fixed width
-                            widths = np.diff(pos_array).min() * 0.6
+                            widths = np.diff(np.array(positions)).min() * 0.6
                     else:
                         widths = 0.2
 
@@ -624,8 +738,7 @@ def create_convergence_plot(
                         q3_array = np.array(q3_values)
 
                         # Create smooth T range for plotting fits
-                        if conv_type == 'simulation_time' and T_array.max() / T_array.min() > 100:
-                            # Log scale
+                        if use_log_scale:
                             T_smooth = np.logspace(np.log10(T_array.min()), np.log10(T_array.max()), 200)
                         else:
                             T_smooth = np.linspace(T_array.min(), T_array.max(), 200)
@@ -671,10 +784,8 @@ def create_convergence_plot(
         ax.set_title(title)
         ax.grid(True, alpha=0.3, linestyle='--')
 
-        # Log scale for x-axis if simulation time spans orders of magnitude
-        if conv_type == 'simulation_time' and len(conv_values) > 0:
-            if max(conv_values) / min(conv_values) > 100:
-                ax.set_xscale('log')
+        if use_log_scale:
+            ax.set_xscale('log')
 
     # Hide unused subplots
     for idx in range(len(subplot_keys), len(axes)):
@@ -682,7 +793,23 @@ def create_convergence_plot(
 
     # Add main title
     fom_name = 'Mean Relative Gap' if fom == 'mean_gap' else 'Success Rate'
-    conv_name = 'Simulation Time T' if conv_type == 'simulation_time' else 'Time Step dt'
+    if conv_type == 'simulation_time':
+        conv_name = 'Simulation Time T'
+    elif conv_type == 'time_step':
+        conv_name = 'Time Step dt'
+    elif conv_type == 'annealing':
+        # Use the detected parameter name for title
+        param_name_map = {
+            'alpha_rate': 'Annealing Rate',
+            'beta_span': 'Beta Schedule Span',
+            'gamma_span': 'Gamma Schedule Span',
+            'beta_schedule': 'Beta Schedule Span',
+            'gamma_schedule': 'Gamma Schedule Span',
+            'gamma_factor': 'Gamma Factor',
+        }
+        conv_name = param_name_map.get(conv_col, 'Annealing Parameter')
+    else:
+        conv_name = conv_col
     fig.suptitle(f'{model} Model: {fom_name} vs {conv_name}', fontsize=14, y=0.995)
 
     plt.tight_layout()

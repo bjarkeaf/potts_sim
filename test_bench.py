@@ -236,8 +236,8 @@ if __name__ == "__main__":
     # Load a coupling graph
     #file_path = "graphs/band/band50_3_antiferro.col"
     #file_path = "graphs/gset/G26.col"
-    #file_path = "graphs/g05/g05_50.0.col"
-    file_path = "graphs/gset/G1.col"
+    file_path = "graphs/g05/g05_50.0.col"
+    #file_path = "graphs/gset/G1.col"
     num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max = parse_graph(file_path)
     opt_cut = opt_cut_dict.get(num_states, 0)
     
@@ -341,11 +341,11 @@ if __name__ == "__main__":
     num_steps = int(np.floor(T / dt))  # number of time steps
 
     # CIM specific parameters
-    zeta = 0.7       # empirical rescaling factor
-    B_num_vertices = 225  # B/A/num_    vertices ratio for soft constraints 
+    zeta = 0.6       # empirical rescaling factor
+    B_num_vertices = 20  # B/A/num_    vertices ratio for soft constraints 
     B = B_num_vertices / num_vertices  # B value for CIM model
     alpha = -50      # parameter for tanh nonlinearity
-    beta_schedule = np.linspace(0, 0.02, num_steps)  # time-dependent annealing schedule
+    beta_schedule = np.linspace(0, 0.005, num_steps)  # time-dependent annealing schedule
 
     # Execute the CIM model
     res_dict["CIM"] = execute_model("CIM", run_cim_from_graph, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed,
