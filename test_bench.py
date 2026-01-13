@@ -354,4 +354,6 @@ if __name__ == "__main__":
         B, zeta
     )
 
-# %%
+# %% Generate figures
+
+# This is done in figures/dynamics_figure.py, not here!

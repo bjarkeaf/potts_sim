@@ -34,7 +34,7 @@ models:
     dt: 1e-3 # [1e-1,1e-2,1e-3,1e-4] # Default: 1e-3
     gamma_schedule:
       start: 0
-      span: [1e-1, 1e0, 1e1, 1e2] # Default 1e1
+      span: [1e-1, 1e0, 1e1, 1e2] # Default: 1e1
   
   POLYNOMIAL:
     T: 1000 #[10, 100, 1000, 5000, 10000] # Default: 1000
@@ -64,6 +64,6 @@ models:
     alpha: [-50]
     beta_schedule: #["lin(0,0.01)"]
       start: 0
-      span: [1e-4, 1e-3, 1e-2, 1e-1, 1e0] # Default 1e-2
+      span: [1e-4, 1e-3, 1e-2, 1e-1, 1e0] # Default: 1e-2
     #B_num_vertices: fetched from table
     #zeta: fetched from table

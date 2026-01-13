@@ -3,7 +3,7 @@
 Plot convergence of figure of merit vs swept parameter for Potts machine simulations.
 
 Usage:
-    python plot_convergence.py --data <path> --conv_type <type> [--fom <metric>] [--graph_grouping <mode>] [--output_dir <path>] [--add_fits]
+    python plot_convergence.py --data <path> --conv_type <type> [--fom <metric>] [--graph_grouping <mode>] [--output_dir <path>] [--add_fits] [--figure_mode] [--simple_filenames]
 
 Where conv_type can be:
     - simulation_time: Sweep of total simulation time T
@@ -20,6 +20,141 @@ from typing import Dict, List, Tuple, Optional
 import sys
 from scipy.optimize import curve_fit
 import warnings
+import re
+import yaml
+
+# Styling for default value highlighting
+# Figure caption should mention: "Default" indicates the parameter value used to generate main results
+DEFAULT_VALUE_COLOR = 'navy'
+DEFAULT_VALUE_LABEL = 'Default'
+
+# Model name aliases for pretty-printing (with italicized q in q-PDC and q-SHIL)
+MODEL_ALIAS_MAP = {
+    'NEC': 'NEC',
+    'QPDC': r'$q$-PDC',
+    'POLYNOMIAL': 'Polynomial PM',
+    'SIGMOID': 'Sigmoid PM',
+    'FIXED_AMPLITUDE': r'$q$-SHIL',
+    'CIM': 'Sigmoid IM',
+}
+
+
+def resolve_config_path(parquet_path: str) -> Optional[Path]:
+    """
+    Resolve the config file path from a parquet results file.
+
+    Uses the naming convention: results_<basename>.parquet -> run_info_<basename>.yaml -> config_file
+
+    Returns:
+        Path to the config file, or None if not found
+    """
+    parquet_path = Path(parquet_path)
+    results_dir = parquet_path.parent
+
+    # Extract basename: results_<basename>.parquet -> <basename>
+    filename = parquet_path.stem
+    if filename.startswith('results_'):
+        basename = filename[8:]  # len('results_') = 8
+    else:
+        basename = filename
+
+    # Look for run_info file
+    run_info_path = results_dir / f'run_info_{basename}.yaml'
+    if not run_info_path.exists():
+        return None
+
+    # Read config_file field from run_info
+    try:
+        with open(run_info_path, 'r') as f:
+            run_info = yaml.safe_load(f)
+        config_file = run_info.get('config_file')
+        if config_file:
+            # Config path is relative to hpc/ directory
+            config_path = results_dir.parent / config_file
+            if config_path.exists():
+                return config_path
+    except Exception:
+        pass
+
+    return None
+
+
+def extract_default_values(config_path: Path, conv_type: str) -> Dict[str, float]:
+    """
+    Extract default values from YAML config comments for the swept parameter.
+
+    Parses comments like "# Default: 1e-2" or "# Default 1e1" after parameter lines.
+
+    Args:
+        config_path: Path to the YAML config file
+        conv_type: Convergence type ('simulation_time', 'time_step', 'annealing')
+
+    Returns:
+        Dict mapping model name to default value (as float)
+    """
+    defaults = {}
+
+    try:
+        with open(config_path, 'r') as f:
+            content = f.read()
+    except Exception:
+        return defaults
+
+    # Determine which parameter to look for based on conv_type
+    if conv_type == 'simulation_time':
+        param_pattern = r'^\s*T:\s*\[.*?\]\s*#.*?Default:?\s*([\d.eE+-]+)'
+    elif conv_type == 'time_step':
+        param_pattern = r'^\s*dt:\s*\[.*?\]\s*#.*?Default:?\s*([\d.eE+-]+)'
+    elif conv_type == 'annealing':
+        # For annealing, we need to look for different parameters per model
+        # Pattern matches: alpha_rate, span, etc. with a list and Default comment
+        param_pattern = r'^\s*(?:alpha_rate|span):\s*\[.*?\]\s*#.*?Default:?\s*([\d.eE+-]+)'
+    else:
+        return defaults
+
+    # Parse the config to find model sections and their default values
+    lines = content.split('\n')
+    current_model = None
+    in_models_section = False
+
+    for line in lines:
+        # Check if we're entering the models section
+        if line.strip() == 'models:':
+            in_models_section = True
+            continue
+
+        if not in_models_section:
+            continue
+
+        # Check for model name (e.g., "  NEC:", "  POLYNOMIAL:")
+        model_match = re.match(r'^  ([A-Z_]+):', line)
+        if model_match:
+            current_model = model_match.group(1)
+            continue
+
+        if current_model is None:
+            continue
+
+        # Look for the parameter with default value
+        if conv_type == 'simulation_time':
+            # Match: T: [list] # ... Default: value
+            match = re.search(r'^\s*T:\s*\[.*?\].*#.*?Default:?\s*([\d.eE+-]+)', line)
+        elif conv_type == 'time_step':
+            # Match: dt: [list] # ... Default: value
+            match = re.search(r'^\s*dt:\s*\[.*?\].*#.*?Default:?\s*([\d.eE+-]+)', line)
+        elif conv_type == 'annealing':
+            # Match: alpha_rate: [list] # Default: value OR span: [list] # Default: value
+            match = re.search(r'^\s*(?:alpha_rate|span):\s*\[.*?\].*#.*?Default:?\s*([\d.eE+-]+)', line)
+        else:
+            match = None
+
+        if match:
+            try:
+                defaults[current_model] = float(match.group(1))
+            except ValueError:
+                pass
+
+    return defaults
 
 
 def parse_args():
@@ -69,6 +204,21 @@ def parse_args():
         '--cut_outliers',
         action='store_true',
         help='Set y-axis limits based on non-outlier data only, preventing extreme outliers from compressing the main data'
+    )
+    parser.add_argument(
+        '--figure_mode',
+        action='store_true',
+        help='Output publication-ready figures: removes top title and saves as PDF'
+    )
+    parser.add_argument(
+        '--simple_filenames',
+        action='store_true',
+        help='Use simple filenames (e.g., CIM.pdf) instead of descriptive ones'
+    )
+    parser.add_argument(
+        '--overlay_graphs',
+        action='store_true',
+        help='Overlay graphs with different colors in same subplot; use model subplots instead of separate files'
     )
     return parser.parse_args()
 
@@ -262,6 +412,16 @@ def exponential_decay(T, a, b, c):
     return a * np.exp(-b * T) + c
 
 
+def power_law_decay(dt, a, beta, c):
+    """Power-law decay model for dt convergence: gap(dt) = a * dt^beta + c"""
+    return a * np.power(dt, beta) + c
+
+
+def power_law_saturation(dt, SR_max, a, beta):
+    """Power-law saturation model for dt convergence: SR(dt) = SR_max - a * dt^beta"""
+    return SR_max - a * np.power(dt, beta)
+
+
 def exponential_saturation(T, a, k):
     """Exponential saturation model: SR(T) = a * (1 - exp(-k * T))"""
     return a * (1 - np.exp(-k * T))
@@ -334,8 +494,8 @@ def format_fit_label(curve_name: str, params: np.ndarray, model: str = 'decay') 
 
     Args:
         curve_name: Name of the curve (e.g., 'Mean', 'Q1', 'Q3', 'Fit')
-        params: Fitted parameters [a, b, c] for decay or [a, k] for saturation
-        model: 'decay' for exponential decay or 'saturation' for exponential saturation
+        params: Fitted parameters depending on model type
+        model: 'decay', 'saturation', 'power_decay', or 'power_saturation'
 
     Returns:
         Formatted label string with LaTeX math
@@ -348,8 +508,30 @@ def format_fit_label(curve_name: str, params: np.ndarray, model: str = 'decay') 
         a_str = format_scientific_latex(a, sig_figs=3)
         k_str = format_scientific_latex(k, sig_figs=3)
 
-        # Create label with upright exp()
-        label = f"{curve_name}: ${a_str}(1-\\mathrm{{exp}}(-{k_str}T))$"
+        # Create label with e^{...}
+        label = f"{curve_name}: ${a_str}(1-e^{{-{k_str}T}})$"
+        return label
+
+    elif model == 'power_decay':
+        # Power-law decay: a * dt^beta + c
+        a, beta, c = params
+
+        a_str = format_scientific_latex(a, sig_figs=3)
+        beta_str = format_with_sig_figs(beta, sig_figs=2)
+        c_str = format_scientific_latex(c, sig_figs=3)
+
+        label = f"{curve_name}: ${a_str} \\cdot dt^{{{beta_str}}} + {c_str}$"
+        return label
+
+    elif model == 'power_saturation':
+        # Power-law saturation: SR_max - a * dt^beta
+        SR_max, a, beta = params
+
+        SR_max_str = format_with_sig_figs(SR_max, sig_figs=3)
+        a_str = format_scientific_latex(a, sig_figs=3)
+        beta_str = format_with_sig_figs(beta, sig_figs=2)
+
+        label = f"{curve_name}: ${SR_max_str} - {a_str} \\cdot dt^{{{beta_str}}}$"
         return label
 
     else:
@@ -361,8 +543,8 @@ def format_fit_label(curve_name: str, params: np.ndarray, model: str = 'decay') 
         b_str = format_scientific_latex(b, sig_figs=3)
         c_str = format_scientific_latex(c, sig_figs=3)
 
-        # Create label with upright exp()
-        label = f"{curve_name}: ${a_str}\\mathrm{{exp}}(-{b_str}T) + {c_str}$"
+        # Create label with e^{...}
+        label = f"{curve_name}: ${a_str}e^{{-{b_str}T}} + {c_str}$"
         return label
 
 
@@ -445,6 +627,70 @@ def fit_exponential_saturation(T_values: np.ndarray, y_values: np.ndarray) -> Op
         return None
 
 
+def fit_power_law_decay(dt_values: np.ndarray, y_values: np.ndarray) -> Optional[np.ndarray]:
+    """
+    Fit power-law decay curve to gap vs dt data.
+
+    Args:
+        dt_values: Array of time step values
+        y_values: Array of gap values (mean, Q1, or Q3)
+
+    Returns:
+        Fitted parameters [a, beta, c] or None if fitting fails
+    """
+    if len(dt_values) < 3:
+        return None
+
+    # Initial parameter guesses
+    a_init = np.max(y_values) - np.min(y_values)
+    beta_init = 1.0  # Start with linear (weak convergence)
+    c_init = np.min(y_values)
+    p0 = [a_init, beta_init, c_init]
+
+    # Bounds: a > 0, beta > 0 (expect positive exponent), c >= 0
+    bounds = ([0, 0, 0], [np.inf, 2.0, np.inf])
+
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            popt, _ = curve_fit(power_law_decay, dt_values, y_values, p0=p0, bounds=bounds, maxfev=5000)
+        return popt
+    except Exception:
+        return None
+
+
+def fit_power_law_saturation(dt_values: np.ndarray, y_values: np.ndarray) -> Optional[np.ndarray]:
+    """
+    Fit power-law saturation curve to success rate vs dt data.
+
+    Args:
+        dt_values: Array of time step values
+        y_values: Array of success rate values (mean, Q1, or Q3)
+
+    Returns:
+        Fitted parameters [SR_max, a, beta] or None if fitting fails
+    """
+    if len(dt_values) < 3:
+        return None
+
+    # Initial parameter guesses
+    SR_max_init = min(np.max(y_values) * 1.1, 100)  # Cap at 100%
+    a_init = SR_max_init - np.min(y_values)
+    beta_init = 1.0
+    p0 = [SR_max_init, a_init, beta_init]
+
+    # Bounds: SR_max in [0, 100], a > 0, beta > 0
+    bounds = ([0, 0, 0], [100, np.inf, 2.0])
+
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            popt, _ = curve_fit(power_law_saturation, dt_values, y_values, p0=p0, bounds=bounds, maxfev=5000)
+        return popt
+    except Exception:
+        return None
+
+
 def create_convergence_plot(
     df: pd.DataFrame,
     conv_type: str,
@@ -453,9 +699,17 @@ def create_convergence_plot(
     model: str,
     output_dir: Path,
     add_fits: bool = False,
-    cut_outliers: bool = False
+    cut_outliers: bool = False,
+    figure_mode: bool = False,
+    default_value: Optional[float] = None,
+    simple_filenames: bool = False
 ):
-    """Create and save convergence plot for a specific model."""
+    """Create and save convergence plot for a specific model.
+
+    Args:
+        default_value: If provided, highlight this value on the x-axis with a star marker
+        simple_filenames: If True, use simple filenames (e.g., CIM.pdf) instead of descriptive ones
+    """
 
     # Filter data for this model
     model_df = df[df['model_type'] == model].copy()
@@ -482,6 +736,10 @@ def create_convergence_plot(
         conv_values = sorted(model_df[conv_col].unique())
         conv_values_map = {v: v for v in conv_values}
 
+    # Determine if log scale should be used (parameter spans 2+ orders of magnitude)
+    use_log_scale = (len(conv_values) > 0 and min(conv_values) > 0 and
+                     max(conv_values) / min(conv_values) >= 100)
+
     print(f"Processing {model} model...")
     print(f"  Swept parameter: {conv_col} in {[conv_values_map[v] for v in conv_values]}")
 
@@ -489,14 +747,6 @@ def create_convergence_plot(
     if len(conv_values) < 2:
         print(f"  WARNING: Only {len(conv_values)} unique value(s) for {conv_col}. Skipping.")
         return
-
-    # Determine if log scale should be used (decide once, use everywhere)
-    # Use log scale if spacing varies significantly (indicates log-spaced data)
-    if len(conv_values) > 1:
-        spacings = np.diff(sorted(conv_values))
-        use_log_scale = spacings.min() > 0 and spacings.max() / spacings.min() >= 10
-    else:
-        use_log_scale = False
 
     # Get graph sizes if needed
     graph_sizes = get_graph_sizes(model_df)
@@ -529,10 +779,10 @@ def create_convergence_plot(
 
     # Create figure with subplots
     n_subplots = len(subplot_keys)
-    ncols = min(3, n_subplots)
+    ncols = min(2, n_subplots)
     nrows = (n_subplots + ncols - 1) // ncols
 
-    fig, axes = plt.subplots(nrows, ncols, figsize=(5*ncols, 4*nrows), squeeze=False)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(3.6*ncols, 2.16*nrows), squeeze=False, sharey=True)
     axes = axes.flatten()
 
     # Get axis labels
@@ -580,10 +830,8 @@ def create_convergence_plot(
                 # Calculate appropriate widths based on axis scaling
                 if len(positions) > 1:
                     if use_log_scale:
-                        # Log scale: width proportional to position
                         widths = [p * 0.4 for p in positions]
                     else:
-                        # Linear scale: fixed width
                         widths = np.diff(np.array(positions)).min() * 0.6
                 else:
                     widths = 0.2
@@ -593,46 +841,71 @@ def create_convergence_plot(
                 means = [np.mean(d) for d in plot_data]
                 ax.plot(positions, means, 'D', color='red', markersize=4, label='Mean', zorder=10)
 
-                # Add exponential decay fits if requested
+                # Highlight default value with vertical dashed line
+                if default_value is not None:
+                    matches = [i for i, p in enumerate(positions) if np.isclose(p, default_value, rtol=1e-6)]
+                    if matches:
+                        default_idx = matches[0]
+                        ax.axvline(x=positions[default_idx], color=DEFAULT_VALUE_COLOR, linestyle='--',
+                                   linewidth=1.5, alpha=0.7, label=DEFAULT_VALUE_LABEL, zorder=5)
+
+                # Add fits if requested
                 if add_fits and len(positions) >= 3:
                     # Extract quartiles from boxplot data
                     q1_values = [np.percentile(d, 25) for d in plot_data]
                     q3_values = [np.percentile(d, 75) for d in plot_data]
 
                     # Convert positions to numpy array
-                    T_array = np.array(positions)
+                    x_array = np.array(positions)
                     mean_array = np.array(means)
                     q1_array = np.array(q1_values)
                     q3_array = np.array(q3_values)
 
-                    # Create smooth T range for plotting fits
+                    # Create smooth range for plotting fits
                     if use_log_scale:
-                        T_smooth = np.logspace(np.log10(T_array.min()), np.log10(T_array.max()), 200)
+                        x_smooth = np.logspace(np.log10(x_array.min()), np.log10(x_array.max()), 200)
                     else:
-                        T_smooth = np.linspace(T_array.min(), T_array.max(), 200)
+                        x_smooth = np.linspace(x_array.min(), x_array.max(), 200)
 
-                    # Fit and plot three curves with individual labels
+                    # Use power-law for time_step, exponential decay otherwise
+                    if conv_type == 'time_step':
+                        # Power-law fits for dt convergence
+                        params_mean = fit_power_law_decay(x_array, mean_array)
+                        if params_mean is not None:
+                            fit_mean = power_law_decay(x_smooth, *params_mean)
+                            label_mean = format_fit_label('Fit', params_mean, model='power_decay')
+                            ax.plot(x_smooth, fit_mean, '-', color='darkgray', linewidth=1.5, alpha=0.8, label=label_mean, zorder=5)
 
-                    # Fit mean
-                    params_mean = fit_exponential_decay(T_array, mean_array)
-                    if params_mean is not None:
-                        fit_mean = exponential_decay(T_smooth, *params_mean)
-                        label_mean = format_fit_label('Mean', params_mean, model='decay')
-                        ax.plot(T_smooth, fit_mean, '-', color='darkgray', linewidth=1.5, alpha=0.8, label=label_mean, zorder=5)
+                        # params_q1 = fit_power_law_decay(x_array, q1_array)
+                        # if params_q1 is not None:
+                        #     fit_q1 = power_law_decay(x_smooth, *params_q1)
+                        #     label_q1 = format_fit_label('Q1', params_q1, model='power_decay')
+                        #     ax.plot(x_smooth, fit_q1, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q1, zorder=5)
 
-                    # Fit Q1 (25th percentile)
-                    params_q1 = fit_exponential_decay(T_array, q1_array)
-                    if params_q1 is not None:
-                        fit_q1 = exponential_decay(T_smooth, *params_q1)
-                        label_q1 = format_fit_label('Q1', params_q1, model='decay')
-                        ax.plot(T_smooth, fit_q1, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q1, zorder=5)
+                        # params_q3 = fit_power_law_decay(x_array, q3_array)
+                        # if params_q3 is not None:
+                        #     fit_q3 = power_law_decay(x_smooth, *params_q3)
+                        #     label_q3 = format_fit_label('Q3', params_q3, model='power_decay')
+                        #     ax.plot(x_smooth, fit_q3, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q3, zorder=5)
+                    else:
+                        # Exponential decay fits for simulation_time and annealing
+                        params_mean = fit_exponential_decay(x_array, mean_array)
+                        if params_mean is not None:
+                            fit_mean = exponential_decay(x_smooth, *params_mean)
+                            label_mean = format_fit_label('Fit', params_mean, model='decay')
+                            ax.plot(x_smooth, fit_mean, '-', color='darkgray', linewidth=1.5, alpha=0.8, label=label_mean, zorder=5)
 
-                    # Fit Q3 (75th percentile)
-                    params_q3 = fit_exponential_decay(T_array, q3_array)
-                    if params_q3 is not None:
-                        fit_q3 = exponential_decay(T_smooth, *params_q3)
-                        label_q3 = format_fit_label('Q3', params_q3, model='decay')
-                        ax.plot(T_smooth, fit_q3, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q3, zorder=5)
+                        # params_q1 = fit_exponential_decay(x_array, q1_array)
+                        # if params_q1 is not None:
+                        #     fit_q1 = exponential_decay(x_smooth, *params_q1)
+                        #     label_q1 = format_fit_label('Q1', params_q1, model='decay')
+                        #     ax.plot(x_smooth, fit_q1, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q1, zorder=5)
+
+                        # params_q3 = fit_exponential_decay(x_array, q3_array)
+                        # if params_q3 is not None:
+                        #     fit_q3 = exponential_decay(x_smooth, *params_q3)
+                        #     label_q3 = format_fit_label('Q3', params_q3, model='decay')
+                        #     ax.plot(x_smooth, fit_q3, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q3, zorder=5)
 
                 ax.legend()
 
@@ -666,25 +939,42 @@ def create_convergence_plot(
                     # For per_graph line plots, always use full range
                     ax.set_ylim(0, 105)
 
-                    # Add exponential saturation fit if requested
-                    if add_fits and len(positions) >= 2:
-                        T_array = np.array(positions)
+                    # Highlight default value with vertical dashed line
+                    if default_value is not None:
+                        matches = [i for i, p in enumerate(positions) if np.isclose(p, default_value, rtol=1e-6)]
+                        if matches:
+                            default_idx = matches[0]
+                            ax.axvline(x=positions[default_idx], color=DEFAULT_VALUE_COLOR, linestyle='--',
+                                       linewidth=1.5, alpha=0.7, label=DEFAULT_VALUE_LABEL, zorder=5)
+
+                    # Add fit if requested
+                    min_points = 3 if conv_type == 'time_step' else 2
+                    if add_fits and len(positions) >= min_points:
+                        x_array = np.array(positions)
                         sr_array = np.array(success_rates)
 
-                        # Create smooth T range for plotting fit
+                        # Create smooth range for plotting fit
                         if use_log_scale:
-                            T_smooth = np.logspace(np.log10(T_array.min()), np.log10(T_array.max()), 200)
+                            x_smooth = np.logspace(np.log10(x_array.min()), np.log10(x_array.max()), 200)
                         else:
-                            T_smooth = np.linspace(T_array.min(), T_array.max(), 200)
+                            x_smooth = np.linspace(x_array.min(), x_array.max(), 200)
 
-                        # Fit exponential saturation to success rate
-                        params_sr = fit_exponential_saturation(T_array, sr_array)
-                        if params_sr is not None:
-                            fit_sr = exponential_saturation(T_smooth, *params_sr)
-                            # Clip to valid success rate range [0, 100]
-                            fit_sr = np.clip(fit_sr, 0, 100)
-                            label_fit = format_fit_label('Fit', params_sr, model='saturation')
-                            ax.plot(T_smooth, fit_sr, '-', color='darkgray', linewidth=1.5, alpha=0.8, label=label_fit, zorder=5)
+                        if conv_type == 'time_step':
+                            # Power-law saturation for dt convergence
+                            params_sr = fit_power_law_saturation(x_array, sr_array)
+                            if params_sr is not None:
+                                fit_sr = power_law_saturation(x_smooth, *params_sr)
+                                fit_sr = np.clip(fit_sr, 0, 100)
+                                label_fit = format_fit_label('Fit', params_sr, model='power_saturation')
+                                ax.plot(x_smooth, fit_sr, '-', color='darkgray', linewidth=1.5, alpha=0.8, label=label_fit, zorder=5)
+                        else:
+                            # Exponential saturation for simulation_time and annealing
+                            params_sr = fit_exponential_saturation(x_array, sr_array)
+                            if params_sr is not None:
+                                fit_sr = exponential_saturation(x_smooth, *params_sr)
+                                fit_sr = np.clip(fit_sr, 0, 100)
+                                label_fit = format_fit_label('Fit', params_sr, model='saturation')
+                                ax.plot(x_smooth, fit_sr, '-', color='darkgray', linewidth=1.5, alpha=0.8, label=label_fit, zorder=5)
 
                     ax.legend()
             else:
@@ -712,10 +1002,8 @@ def create_convergence_plot(
                     # Calculate appropriate widths based on axis scaling
                     if len(positions) > 1:
                         if use_log_scale:
-                            # Log scale: width proportional to position
                             widths = [p * 0.4 for p in positions]
                         else:
-                            # Linear scale: fixed width
                             widths = np.diff(np.array(positions)).min() * 0.6
                     else:
                         widths = 0.2
@@ -725,65 +1013,95 @@ def create_convergence_plot(
                     means = [np.mean(d) for d in plot_data]
                     ax.plot(positions, means, 'D', color='red', markersize=4, label='Mean', zorder=10)
 
-                    # Add exponential saturation fits if requested
-                    if add_fits and len(positions) >= 2:
+                    # Highlight default value with vertical dashed line
+                    if default_value is not None:
+                        matches = [i for i, p in enumerate(positions) if np.isclose(p, default_value, rtol=1e-6)]
+                        if matches:
+                            default_idx = matches[0]
+                            ax.axvline(x=positions[default_idx], color=DEFAULT_VALUE_COLOR, linestyle='--',
+                                       linewidth=1.5, alpha=0.7, label=DEFAULT_VALUE_LABEL, zorder=5)
+
+                    # Add fits if requested
+                    min_points = 3 if conv_type == 'time_step' else 2
+                    if add_fits and len(positions) >= min_points:
                         # Extract quartiles from boxplot data
                         q1_values = [np.percentile(d, 25) for d in plot_data]
                         q3_values = [np.percentile(d, 75) for d in plot_data]
 
                         # Convert positions to numpy array
-                        T_array = np.array(positions)
+                        x_array = np.array(positions)
                         mean_array = np.array(means)
                         q1_array = np.array(q1_values)
                         q3_array = np.array(q3_values)
 
-                        # Create smooth T range for plotting fits
+                        # Create smooth range for plotting fits
                         if use_log_scale:
-                            T_smooth = np.logspace(np.log10(T_array.min()), np.log10(T_array.max()), 200)
+                            x_smooth = np.logspace(np.log10(x_array.min()), np.log10(x_array.max()), 200)
                         else:
-                            T_smooth = np.linspace(T_array.min(), T_array.max(), 200)
+                            x_smooth = np.linspace(x_array.min(), x_array.max(), 200)
 
-                        # Fit and plot three curves with individual labels
+                        if conv_type == 'time_step':
+                            # Power-law saturation fits for dt convergence
+                            params_mean = fit_power_law_saturation(x_array, mean_array)
+                            if params_mean is not None:
+                                fit_mean = power_law_saturation(x_smooth, *params_mean)
+                                fit_mean = np.clip(fit_mean, 0, 100)
+                                label_mean = format_fit_label('Fit', params_mean, model='power_saturation')
+                                ax.plot(x_smooth, fit_mean, '-', color='darkgray', linewidth=1.5, alpha=0.8, label=label_mean, zorder=5)
 
-                        # Fit mean
-                        params_mean = fit_exponential_saturation(T_array, mean_array)
-                        if params_mean is not None:
-                            fit_mean = exponential_saturation(T_smooth, *params_mean)
-                            fit_mean = np.clip(fit_mean, 0, 100)  # Clip to valid success rate range
-                            label_mean = format_fit_label('Mean', params_mean, model='saturation')
-                            ax.plot(T_smooth, fit_mean, '-', color='darkgray', linewidth=1.5, alpha=0.8, label=label_mean, zorder=5)
+                            # params_q1 = fit_power_law_saturation(x_array, q1_array)
+                            # if params_q1 is not None:
+                            #     fit_q1 = power_law_saturation(x_smooth, *params_q1)
+                            #     fit_q1 = np.clip(fit_q1, 0, 100)
+                            #     label_q1 = format_fit_label('Q1', params_q1, model='power_saturation')
+                            #     ax.plot(x_smooth, fit_q1, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q1, zorder=5)
 
-                        # Fit Q1 (25th percentile)
-                        params_q1 = fit_exponential_saturation(T_array, q1_array)
-                        if params_q1 is not None:
-                            fit_q1 = exponential_saturation(T_smooth, *params_q1)
-                            fit_q1 = np.clip(fit_q1, 0, 100)
-                            label_q1 = format_fit_label('Q1', params_q1, model='saturation')
-                            ax.plot(T_smooth, fit_q1, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q1, zorder=5)
+                            # params_q3 = fit_power_law_saturation(x_array, q3_array)
+                            # if params_q3 is not None:
+                            #     fit_q3 = power_law_saturation(x_smooth, *params_q3)
+                            #     fit_q3 = np.clip(fit_q3, 0, 100)
+                            #     label_q3 = format_fit_label('Q3', params_q3, model='power_saturation')
+                            #     ax.plot(x_smooth, fit_q3, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q3, zorder=5)
+                        else:
+                            # Exponential saturation fits for simulation_time and annealing
+                            params_mean = fit_exponential_saturation(x_array, mean_array)
+                            if params_mean is not None:
+                                fit_mean = exponential_saturation(x_smooth, *params_mean)
+                                fit_mean = np.clip(fit_mean, 0, 100)
+                                label_mean = format_fit_label('Fit', params_mean, model='saturation')
+                                ax.plot(x_smooth, fit_mean, '-', color='darkgray', linewidth=1.5, alpha=0.8, label=label_mean, zorder=5)
 
-                        # Fit Q3 (75th percentile)
-                        params_q3 = fit_exponential_saturation(T_array, q3_array)
-                        if params_q3 is not None:
-                            fit_q3 = exponential_saturation(T_smooth, *params_q3)
-                            fit_q3 = np.clip(fit_q3, 0, 100)
-                            label_q3 = format_fit_label('Q3', params_q3, model='saturation')
-                            ax.plot(T_smooth, fit_q3, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q3, zorder=5)
+                            # params_q1 = fit_exponential_saturation(x_array, q1_array)
+                            # if params_q1 is not None:
+                            #     fit_q1 = exponential_saturation(x_smooth, *params_q1)
+                            #     fit_q1 = np.clip(fit_q1, 0, 100)
+                            #     label_q1 = format_fit_label('Q1', params_q1, model='saturation')
+                            #     ax.plot(x_smooth, fit_q1, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q1, zorder=5)
+
+                            # params_q3 = fit_exponential_saturation(x_array, q3_array)
+                            # if params_q3 is not None:
+                            #     fit_q3 = exponential_saturation(x_smooth, *params_q3)
+                            #     fit_q3 = np.clip(fit_q3, 0, 100)
+                            #     label_q3 = format_fit_label('Q3', params_q3, model='saturation')
+                            #     ax.plot(x_smooth, fit_q3, '--', color='darkgray', linewidth=1.5, alpha=0.8, label=label_q3, zorder=5)
 
                     ax.legend()
 
-                    # Apply outlier-based y-limits if requested
-                    if cut_outliers:
-                        _, ymax = calculate_ylim_from_whiskers(bp)
-                        # Ensure we stay within valid success rate range, always start at 0
-                        ymax = min(ymax, 105)
-                        ax.set_ylim(0, ymax)
+                    # For success_rate, always use 0-100% range
+                    ax.set_ylim(0, 105)
 
         # Styling
         ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
         ax.set_title(title)
         ax.grid(True, alpha=0.3, linestyle='--')
 
+        # Only show y-axis label on left panels
+        if idx % ncols == 0:
+            ax.set_ylabel(ylabel)
+        else:
+            ax.set_ylabel('')
+
+        # Log scale for x-axis if parameter spans orders of magnitude
         if use_log_scale:
             ax.set_xscale('log')
 
@@ -791,37 +1109,298 @@ def create_convergence_plot(
     for idx in range(len(subplot_keys), len(axes)):
         axes[idx].axis('off')
 
-    # Add main title
-    fom_name = 'Mean Relative Gap' if fom == 'mean_gap' else 'Success Rate'
-    if conv_type == 'simulation_time':
-        conv_name = 'Simulation Time T'
-    elif conv_type == 'time_step':
-        conv_name = 'Time Step dt'
-    elif conv_type == 'annealing':
-        # Use the detected parameter name for title
-        param_name_map = {
-            'alpha_rate': 'Annealing Rate',
-            'beta_span': 'Beta Schedule Span',
-            'gamma_span': 'Gamma Schedule Span',
-            'beta_schedule': 'Beta Schedule Span',
-            'gamma_schedule': 'Gamma Schedule Span',
-            'gamma_factor': 'Gamma Factor',
-        }
-        conv_name = param_name_map.get(conv_col, 'Annealing Parameter')
-    else:
-        conv_name = conv_col
-    fig.suptitle(f'{model} Model: {fom_name} vs {conv_name}', fontsize=14, y=0.995)
+    # Add main title (skip in figure_mode for publication-ready output)
+    if not figure_mode:
+        fom_name = 'Mean Relative Gap' if fom == 'mean_gap' else 'Success Rate'
+        if conv_type == 'simulation_time':
+            conv_name = 'Simulation Time T'
+        elif conv_type == 'time_step':
+            conv_name = 'Time Step dt'
+        elif conv_type == 'annealing':
+            # Use the detected parameter name for title
+            param_name_map = {
+                'alpha_rate': 'Annealing Rate',
+                'beta_span': 'Beta Schedule Span',
+                'gamma_span': 'Gamma Schedule Span',
+                'beta_schedule': 'Beta Schedule Span',
+                'gamma_schedule': 'Gamma Schedule Span',
+                'gamma_factor': 'Gamma Factor',
+            }
+            conv_name = param_name_map.get(conv_col, 'Annealing Parameter')
+        else:
+            conv_name = conv_col
+        fig.suptitle(f'{model} Model: {fom_name} vs {conv_name}', fontsize=14, y=0.995)
 
     plt.tight_layout()
 
     # Save figure
-    suffix = '_cut_outliers' if cut_outliers else ''
-    filename = f'convergence_{conv_type}_{fom}_{model}_{grouping}{suffix}.png'
+    ext = 'pdf' if figure_mode else 'png'
+    if simple_filenames:
+        filename = f'{model}.{ext}'
+    else:
+        suffix = '_cut_outliers' if cut_outliers else ''
+        filename = f'convergence_{conv_type}_{fom}_{model}_{grouping}{suffix}.{ext}'
     output_path = output_dir / filename
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
 
     print(f"  Generated plot: {output_path}")
+
+
+def create_overlay_plot(
+    df: pd.DataFrame,
+    conv_type: str,
+    fom: str,
+    grouping: str,
+    output_dir: Path,
+    add_fits: bool = False,
+    cut_outliers: bool = False,
+    figure_mode: bool = False,
+    default_values: Optional[Dict[str, float]] = None,
+    simple_filenames: bool = False
+):
+    """Create convergence plot with model subplots and overlaid graph series.
+
+    Args:
+        df: DataFrame with all results
+        conv_type: Type of convergence ('simulation_time', 'time_step', 'annealing')
+        fom: Figure of merit ('mean_gap' or 'success_rate')
+        grouping: How to group data into series ('per_graph', 'by_graph_size', 'all_graphs')
+        output_dir: Directory to save plots
+        add_fits: Whether to add fit curves
+        cut_outliers: Whether to limit y-axis based on non-outlier data
+        figure_mode: Whether to produce publication-ready output (PDF, no title)
+        default_values: Dict mapping model name to default parameter value
+        simple_filenames: Use simple filenames
+    """
+    if default_values is None:
+        default_values = {}
+
+    # Calculate relative gap
+    df = df.copy()
+    df['rel_gap'] = calculate_relative_gap(df)
+
+    # Get unique models
+    models = sorted(df['model_type'].unique())
+    print(f"Creating overlay plot with {len(models)} model subplots...")
+
+    # Create figure with model subplots
+    n_models = len(models)
+    ncols = min(2, n_models)
+    nrows = (n_models + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4.32*ncols, 2.88*nrows), squeeze=False)
+    axes = axes.flatten()
+
+    # Determine series based on grouping
+    graph_sizes = get_graph_sizes(df)
+
+    if grouping == 'per_graph':
+        graphs = sorted(df['graph_path'].unique())
+        series_keys = graphs
+        series_labels = [Path(g).stem if '/' in g or '.' in g else g for g in graphs]
+    elif grouping == 'by_graph_size':
+        if graph_sizes:
+            sizes = sorted(set(graph_sizes.values()))
+            series_keys = sizes
+            series_labels = [f"{s} vertices" for s in sizes]
+        else:
+            print("  WARNING: Graph sizes not available. Falling back to per_graph.")
+            graphs = sorted(df['graph_path'].unique())
+            series_keys = graphs
+            series_labels = [Path(g).stem if '/' in g or '.' in g else g for g in graphs]
+            grouping = 'per_graph'
+    else:  # all_graphs
+        series_keys = ['all']
+        series_labels = ['All graphs']
+
+    # Color palette for series
+    colors = plt.cm.tab10.colors[:len(series_keys)]
+
+    # Plot each model subplot
+    for model_idx, model in enumerate(models):
+        ax = axes[model_idx]
+        model_df = df[df['model_type'] == model]
+
+        # Get convergence parameter for this model
+        try:
+            conv_col = get_conv_param_column(conv_type, model_df=model_df, model=model)
+        except ValueError as e:
+            print(f"  Skipping {model}: {e}")
+            ax.text(0.5, 0.5, f'No data for {model}', ha='center', va='center', transform=ax.transAxes)
+            ax.set_title(MODEL_ALIAS_MAP.get(model, model))
+            continue
+
+        # Parse schedule strings if needed
+        sample_val = model_df[conv_col].iloc[0]
+        is_schedule_string = isinstance(sample_val, str) and 'lin' in sample_val
+
+        if is_schedule_string:
+            model_df = model_df.copy()
+            model_df['_conv_numeric'] = model_df[conv_col].apply(parse_schedule_span)
+            conv_values = sorted(model_df['_conv_numeric'].unique())
+        else:
+            conv_values = sorted(model_df[conv_col].unique())
+
+        if len(conv_values) < 2:
+            ax.text(0.5, 0.5, f'Insufficient data', ha='center', va='center', transform=ax.transAxes)
+            ax.set_title(MODEL_ALIAS_MAP.get(model, model))
+            continue
+
+        # Determine log scale
+        use_log_scale = (min(conv_values) > 0 and max(conv_values) / min(conv_values) >= 100)
+
+        # Get axis labels
+        xlabel, ylabel = get_axis_labels(conv_type, fom, param_name=conv_col)
+
+        # Plot each series
+        legend_handles = []
+        legend_labels = []
+
+        for series_idx, (series_key, series_label, color) in enumerate(zip(series_keys, series_labels, colors)):
+            # Filter data for this series
+            if grouping == 'per_graph':
+                series_df = model_df[model_df['graph_path'] == series_key]
+            elif grouping == 'by_graph_size':
+                graphs_in_size = [g for g, s in graph_sizes.items() if s == series_key]
+                series_df = model_df[model_df['graph_path'].isin(graphs_in_size)]
+            else:  # all_graphs
+                series_df = model_df
+
+            if len(series_df) == 0:
+                continue
+
+            # Compute statistics per conv_value
+            positions = []
+            means = []
+            stds = []
+
+            for conv_val in conv_values:
+                if is_schedule_string:
+                    val_df = series_df[series_df['_conv_numeric'] == conv_val]
+                else:
+                    val_df = series_df[series_df[conv_col] == conv_val]
+
+                if len(val_df) == 0:
+                    continue
+
+                positions.append(conv_val)
+
+                if fom == 'mean_gap':
+                    means.append(val_df['rel_gap'].mean())
+                    stds.append(val_df['rel_gap'].std())
+                else:  # success_rate
+                    sr = calculate_success_rate(val_df)
+                    means.append(sr)
+                    # For success rate, compute std across runs
+                    n_runs = len(val_df)
+                    # Bernoulli std: sqrt(p*(1-p)/n) scaled to percentage
+                    p = sr / 100
+                    stds.append(np.sqrt(p * (1 - p) / n_runs) * 100 if n_runs > 0 else 0)
+
+            if len(positions) == 0:
+                continue
+
+            positions = np.array(positions)
+            means = np.array(means)
+            stds = np.array(stds)
+
+            # Plot mean with error bars (connect with lines if no fits, scatter only if fits)
+            fmt = 'o' if add_fits else 'o-'
+            line = ax.errorbar(positions, means, yerr=stds, fmt=fmt, color=color,
+                               capsize=3, capthick=1, markersize=5, linewidth=1.5)
+            legend_handles.append(line)
+            legend_labels.append(series_label)
+
+            # Add fit if requested
+            if add_fits and len(positions) >= 3:
+                if use_log_scale:
+                    x_smooth = np.logspace(np.log10(positions.min()), np.log10(positions.max()), 200)
+                else:
+                    x_smooth = np.linspace(positions.min(), positions.max(), 200)
+
+                if fom == 'mean_gap':
+                    if conv_type == 'time_step':
+                        params = fit_power_law_decay(positions, means)
+                        if params is not None:
+                            fit_y = power_law_decay(x_smooth, *params)
+                            ax.plot(x_smooth, fit_y, '-', color=color, linewidth=1, alpha=0.5)
+                    else:
+                        params = fit_exponential_decay(positions, means)
+                        if params is not None:
+                            fit_y = exponential_decay(x_smooth, *params)
+                            ax.plot(x_smooth, fit_y, '-', color=color, linewidth=1, alpha=0.5)
+                else:  # success_rate
+                    if conv_type == 'time_step':
+                        params = fit_power_law_saturation(positions, means)
+                        if params is not None:
+                            fit_y = np.clip(power_law_saturation(x_smooth, *params), 0, 100)
+                            ax.plot(x_smooth, fit_y, '-', color=color, linewidth=1, alpha=0.5)
+                    else:
+                        params = fit_exponential_saturation(positions, means)
+                        if params is not None:
+                            fit_y = np.clip(exponential_saturation(x_smooth, *params), 0, 100)
+                            ax.plot(x_smooth, fit_y, '-', color=color, linewidth=1, alpha=0.5)
+
+        # Add default value line if available
+        default_value = default_values.get(model)
+        if default_value is not None:
+            vline = ax.axvline(x=default_value, color=DEFAULT_VALUE_COLOR, linestyle='--',
+                               linewidth=1.5, alpha=0.7, zorder=5)
+            legend_handles.append(vline)
+            legend_labels.append(DEFAULT_VALUE_LABEL)
+
+        # Configure axes
+        ax.set_xlabel(xlabel)
+        ax.set_title(MODEL_ALIAS_MAP.get(model, model))
+        ax.grid(True, alpha=0.3, linestyle='--')
+
+        if model_idx % ncols == 0:
+            ax.set_ylabel(ylabel)
+
+        if use_log_scale:
+            ax.set_xscale('log')
+
+        # Set y-limits
+        if fom == 'mean_gap':
+            ax.set_ylim(bottom=0)
+        else:  # success_rate
+            ax.set_ylim(0, 105)
+
+        # Add legend
+        if legend_handles:
+            ax.legend(legend_handles, legend_labels, loc='best', fontsize='small')
+
+    # Hide unused subplots
+    for idx in range(len(models), len(axes)):
+        axes[idx].axis('off')
+
+    # Add main title (skip in figure_mode)
+    if not figure_mode:
+        fom_name = 'Mean Relative Gap' if fom == 'mean_gap' else 'Success Rate'
+        if conv_type == 'simulation_time':
+            conv_name = 'Simulation Time T'
+        elif conv_type == 'time_step':
+            conv_name = 'Time Step dt'
+        elif conv_type == 'annealing':
+            conv_name = 'Annealing Parameter'
+        else:
+            conv_name = conv_type
+        fig.suptitle(f'{fom_name} vs {conv_name} (Overlay)', fontsize=14, y=0.995)
+
+    plt.tight_layout()
+
+    # Save figure
+    ext = 'pdf' if figure_mode else 'png'
+    if simple_filenames:
+        filename = f'{conv_type}.{ext}'
+    else:
+        suffix = '_cut_outliers' if cut_outliers else ''
+        filename = f'convergence_{conv_type}_{fom}_overlay_{grouping}{suffix}.{ext}'
+    output_path = output_dir / filename
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
+
+    print(f"Generated overlay plot: {output_path}")
 
 
 def main():
@@ -848,28 +1427,64 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
     print(f"Output directory: {output_dir}")
 
+    # Resolve config and extract default values
+    config_path = resolve_config_path(args.data)
+    default_values = {}
+    if config_path:
+        print(f"Config file: {config_path}")
+        default_values = extract_default_values(config_path, args.conv_type)
+        if default_values:
+            print(f"Default values: {default_values}")
+    else:
+        print("Config file: not found (default highlighting disabled)")
+
     # Get unique models
     models = sorted(df['model_type'].unique())
 
-    # Create plots for each model
-    plot_count = 0
-    for model in models:
+    if args.overlay_graphs:
+        # Create single overlay plot with model subplots
         try:
-            create_convergence_plot(
+            create_overlay_plot(
                 df=df,
                 conv_type=args.conv_type,
                 fom=args.fom,
                 grouping=args.graph_grouping,
-                model=model,
                 output_dir=output_dir,
                 add_fits=args.add_fits,
-                cut_outliers=args.cut_outliers
+                cut_outliers=args.cut_outliers,
+                figure_mode=args.figure_mode,
+                default_values=default_values,
+                simple_filenames=args.simple_filenames
             )
-            plot_count += 1
+            plot_count = 1
         except Exception as e:
-            print(f"  ERROR processing {model}: {e}")
+            print(f"ERROR creating overlay plot: {e}")
             import traceback
             traceback.print_exc()
+            plot_count = 0
+    else:
+        # Create plots for each model
+        plot_count = 0
+        for model in models:
+            try:
+                create_convergence_plot(
+                    df=df,
+                    conv_type=args.conv_type,
+                    fom=args.fom,
+                    grouping=args.graph_grouping,
+                    model=model,
+                    output_dir=output_dir,
+                    add_fits=args.add_fits,
+                    cut_outliers=args.cut_outliers,
+                    figure_mode=args.figure_mode,
+                    default_value=default_values.get(model),
+                    simple_filenames=args.simple_filenames
+                )
+                plot_count += 1
+            except Exception as e:
+                print(f"  ERROR processing {model}: {e}")
+                import traceback
+                traceback.print_exc()
 
     print(f"\nDone. Generated {plot_count} plots.")
 

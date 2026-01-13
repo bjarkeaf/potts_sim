@@ -22,7 +22,7 @@ models:
     T: 5000 #[1, 10, 50, 100, 500, 1000, 2000, 5000, 10000] # Default: 5e3 
     dt: 1e-2 #[1e-1,1e-2,1e-3,1e-4] # Default: 1e-2
     poly_order: [4]
-    alpha_rate: [1e-0, 1e-1, 1e-2, 1e-3, 1e-4] # Default [1e-2]
+    alpha_rate: [1e-0, 1e-1, 1e-2, 1e-3, 1e-4] # Default: 1e-2
     #r_target: fetched from table
     initial_alpha: "-mu_max"  # Will be evaluated for each graph
     gamma_schedule: # Gamma schedule as prototype multiplied by swept factor
@@ -34,7 +34,7 @@ models:
     dt: 1e-3 #[1e-1,1e-2,1e-3,1e-4] # Default: 1e-3
     gamma_schedule: #["lin(0,10.0)"]
       start: 0
-      span: [1e-1, 1e0, 1e1, 1e2] # Default 1e1
+      span: [1e-1, 1e0, 1e1, 1e2] # Default: 1e1
     
   POLYNOMIAL:
     T: 1000 #[1, 10, 50, 100, 500, 1000, 2000, 5000, 10000] # Default: 1000
@@ -65,6 +65,6 @@ models:
     alpha: [-50]
     beta_schedule: #["lin(0,0.01)"]
       start: 0
-      span: [1e-4, 1e-3, 1e-2, 1e-1, 1e0] # Default 1e-2
+      span: [1e-4, 1e-3, 1e-2, 1e-1, 1e0] # Default: 1e-2
     #B_num_vertices: fetched from table
     #zeta: fetched from table

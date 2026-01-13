@@ -299,20 +299,28 @@ for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
     ax.text(-0.2, 1.10, f"({letter}1)", transform=ax.transAxes,
             fontsize=12, fontweight="bold")
     ax.set_title(display_name, pad=10)
-    
+
     # Get model results
     model_res = res_dict[model_key]
-    cont_states = model_res["continuous_states"]
-    
-    # Downsample if needed
+    cont_states_full = model_res["continuous_states"]
+
+    # Create full time array and extract inset data before downsampling
+    T = model_res["dt"] * model_res["num_steps"]
+    t_full = np.linspace(0, T, cont_states_full.shape[0])
+    inset_tmax = 3
+    inset_mask = t_full <= inset_tmax
+    t_inset_full = t_full[inset_mask]
+    cont_states_inset = cont_states_full[inset_mask]
+
+    # Downsample for main plot if needed
+    cont_states = cont_states_full
     if cont_states.shape[0] > 1000:
         idxs = np.linspace(0, cont_states.shape[0] - 1, 1000, dtype=int)
         cont_states = cont_states[idxs]
-    
-    # Create time array
-    T = model_res["dt"] * model_res["num_steps"]
+
+    # Create time array for main plot
     t = np.linspace(0, T, cont_states.shape[0])
-    
+
     # For q-SHIL (Fixed-Amplitude), plot phase
     if model_key == "Fixed-Amplitude":
         if np.iscomplexobj(cont_states):
@@ -341,7 +349,25 @@ for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
         else:
             for i in range(min(max_num_spins, cont_states.shape[1])):
                 ax.plot(t, cont_states[:, i], lw=1)
-    
+
+        # Add inset showing t=0 to inset_tmax (full resolution)
+        from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+        ax_inset = inset_axes(ax, width="35%", height="45%", loc='upper right',
+                              bbox_to_anchor=(0, 0, 0.99, 0.82), bbox_transform=ax.transAxes)
+        if np.iscomplexobj(cont_states_inset):
+            amp_inset = np.abs(cont_states_inset)
+            for i in range(min(max_num_spins, amp_inset.shape[1])):
+                ax_inset.plot(t_inset_full, amp_inset[:, i], lw=0.5)
+        else:
+            for i in range(min(max_num_spins, cont_states_inset.shape[1])):
+                ax_inset.plot(t_inset_full, cont_states_inset[:, i], lw=0.5)
+        inset_yrange = np.max(np.abs(amp_inset)) * 1.1 if np.iscomplexobj(cont_states_inset) else np.max(np.abs(cont_states_inset)) * 1.1
+        ax_inset.set_xlim(0, inset_tmax)
+        ax_inset.set_xticks([0, inset_tmax])
+        ax_inset.set_ylim(-inset_yrange, inset_yrange)
+        ax_inset.tick_params(axis='both', which='both', labelsize=7, pad=-3)
+        ax_inset.set_xlabel("Time", fontsize=7, labelpad=-2)
+
     ax.set_ylabel(ylabel)
     ax.tick_params(axis='both', which='both', direction='out',
                   bottom=True, top=False, left=True, right=False,
