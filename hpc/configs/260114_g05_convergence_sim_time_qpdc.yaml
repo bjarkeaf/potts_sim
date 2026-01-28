@@ -1,0 +1,27 @@
+# General configuration
+num_runs: 100  # Number of different seeds to run per parameter set
+graph_path: "graphs/g05/"  # Directory, file, or multiple directories/files
+out_dir: "results/"  # Directory to save results
+
+# Wall time estimation
+assumed_time_per_step_us: 10 # Assumed time between steps in microseconds
+
+hyperparam_table: "../best_hyperparams/260113_g05.csv"
+
+# Global simulation parameters (can be overridden per model)
+T: 100         # Total simulation time
+dt: 1e-2       # Time step
+num_states: 3  # Number of Potts states
+noise_factor: 1e-4  # Noise scaling
+
+# Parameter sweeps for each model type
+models:      
+  QPDC:
+    T: [10, 100, 1000, 5000, 10000] # Default: 1000
+    dt: 1e-3 #[1e-1,1e-2,1e-3,1e-4] # Default: 1e-3
+    poly_order: ["2*num_states - 1"] 
+    beta_schedule: ["const(1/(1+num_edges/num_vertices))"] # Will be evaluated for each graph
+    gamma_schedule:
+      prototype: "lin(0,gamma_th)" # gamma_th = (256/27)**(1/4)
+      #factor: "0:5:100" # Matlab style: start:step:end, would be 15 for original report
+      

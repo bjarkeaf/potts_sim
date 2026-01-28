@@ -101,25 +101,38 @@ def safe_eval(expr, env):
     return eval(expr, {"__builtins__": {}}, eval_env)
 
 def parse_range(token):
-    """Parse MATLAB-style range notation (start:step:stop) into a list of values"""
+    """Parse MATLAB-style range notation (start:step:stop) into a list of values.
+    Supports expressions using constants like gamma_th, e.g. '0:0.04:2*gamma_th'"""
+    constants_env = {
+        'gamma_th': (256/27)**(1/4),
+        'np': np
+    }
+
+    def eval_part(part):
+        part = part.strip()
+        try:
+            return float(part)
+        except ValueError:
+            return safe_eval(part, constants_env)
+
     if ':' in token:
         parts = token.split(':')
         if len(parts) == 2:
             # start:stop format
-            start, stop = map(float, parts)
+            start, stop = eval_part(parts[0]), eval_part(parts[1])
             step = 1.0
         elif len(parts) == 3:
             # start:step:stop format
-            start, step, stop = map(float, parts)
+            start, step, stop = eval_part(parts[0]), eval_part(parts[1]), eval_part(parts[2])
         else:
             raise ValueError(f"Invalid range format: {token}")
-        
+
         # Calculate number of points (inclusive of start and end)
         n = int(round((stop - start) / step)) + 1
         return [start + i * step for i in range(n)]
     else:
         # Single value
-        return [float(token)]
+        return [eval_part(token)]
 
 def compile_schedule(expr):
     """Return a lambda(num_steps, env) that builds the schedule when called"""
@@ -644,7 +657,7 @@ def expand_param_values(param_values, is_schedule=False):
             if isinstance(val, str):
                 if ':' in val:
                     expanded.extend(parse_range(val))
-                elif any(token in val for token in ['mu_max', 'alpha', 'num_vertices', 'num_edges', 'num_states']):
+                elif any(token in val for token in ['mu_max', 'alpha', 'num_vertices', 'num_edges', 'num_states', 'gamma_th', 'T', 'dt']):
                     # This is an expression to be evaluated later with environment variables
                     expanded.append(val)  # Keep as string
                 else:
@@ -1674,7 +1687,9 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
         'num_vertices': num_vertices,
         'num_edges': num_edges,
         'num_states': num_states,
-        'gamma_th': (256/27)**(1/4)  # Add gamma_th constant
+        'gamma_th': (256/27)**(1/4),
+        'T': T,
+        'dt': dt
     }
     
     # Add model-specific parameters to environment
@@ -1686,7 +1701,13 @@ def run_task(graph, model_type, param_set, seed, T, dt, num_states, noise_factor
     # Evaluate poly_order if it's an expression
     if 'poly_order' in param_set and isinstance(param_set['poly_order'], str):
         param_set['poly_order'] = int(safe_eval(param_set['poly_order'], env))
-    
+
+    # Evaluate factor expressions if they're strings
+    if 'gamma_factor' in param_set and isinstance(param_set['gamma_factor'], str):
+        param_set['gamma_factor'] = safe_eval(param_set['gamma_factor'], env)
+    if 'beta_factor' in param_set and isinstance(param_set['beta_factor'], str):
+        param_set['beta_factor'] = safe_eval(param_set['beta_factor'], env)
+
     # Evaluate schedules based on model type requirements
     if model_type == ModelType.POLYNOMIAL or model_type == ModelType.QPDC:
         # For POLYNOMIAL model

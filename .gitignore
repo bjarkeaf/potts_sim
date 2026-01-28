@@ -74,3 +74,4 @@ hpc/logs/*
 
 # LLM related
 CLAUDE.md
+plans/

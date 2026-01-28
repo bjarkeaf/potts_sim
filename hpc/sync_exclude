@@ -23,7 +23,8 @@ plots/
 results_local/
 results/schedule_verification_*
 trash/
-#logs/
+logs/
+#*submit_driver.sh
 
 # You can also use patterns
 #*.log
