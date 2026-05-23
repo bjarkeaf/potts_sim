@@ -2,7 +2,7 @@
 
 Research code for the paper **"Comparative Study of Potts Machine Dynamics and Performance for Max-k-Cut"**.
 
-The repository implements and benchmarks five analog Potts machine (PM) models -- NEC, q-PDC, q-SHIL, Polynomial PM, Sigmoid PM -- and one reference Ising machine (Reference IM) for solving Max-3-Cut and Max-4-Cut combinatorial optimization problems on the G-set benchmark graphs. Simulations use an Euler-Maruyama ODE solver implemented in C++ (via pybind11) and are parallelised with MPI for large-scale parameter sweeps on HPC clusters.
+The repository implements and benchmarks five analog Potts machine (PM) models (NEC, q-PDC, q-SHIL, Polynomial PM, Sigmoid PM) and one reference Ising machine (Reference IM) for solving Max-3-Cut and Max-4-Cut combinatorial optimization problems on the G-set benchmark graphs. Simulations use an Euler-Maruyama ODE solver implemented in C++ (via pybind11) and are parallelised with MPI for large-scale parameter sweeps on HPC clusters.
 
 ## Paper
 
@@ -122,4 +122,4 @@ If you use this code, please cite:
 
 ## License
 
-MIT -- see `LICENSE`.
+MIT. See `LICENSE`.
