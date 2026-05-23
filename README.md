@@ -6,7 +6,7 @@ The repository implements and benchmarks five analog Potts machine (PM) models -
 
 ## Paper
 
-> Bjarke Almer Frederiksen, "Comparative Study of Potts Machine Dynamics and Performance for Max-k-Cut", 2026. See `readme.pdf`.
+> Bjarke Almer Frederiksen, Robbe De Prins, Peter Bienstman, "Comparative Study of Potts Machine Dynamics and Performance for Max-k-Cut", arXiv:2605.06425 (2026). https://doi.org/10.48550/arXiv.2605.06425
 
 ## Requirements
 
@@ -109,10 +109,14 @@ See `hpc/configs/0_local_test.yaml` for a minimal working example.
 If you use this code, please cite:
 
 ```bibtex
-@article{frederiksen2026potts,
-  title   = {Comparative Study of Potts Machine Dynamics and Performance for Max-k-Cut},
-  author  = {Frederiksen, Bjarke Almer},
-  year    = {2026},
+@misc{frederiksen2026potts,
+  title         = {Comparative Study of Potts Machine Dynamics and Performance for Max-k-Cut},
+  author        = {Frederiksen, Bjarke Almer and De Prins, Robbe and Bienstman, Peter},
+  year          = {2026},
+  eprint        = {2605.06425},
+  archivePrefix = {arXiv},
+  primaryClass  = {cond-mat.stat-mech},
+  doi           = {10.48550/arXiv.2605.06425},
 }
 ```
 
