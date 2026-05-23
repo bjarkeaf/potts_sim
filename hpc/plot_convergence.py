@@ -35,7 +35,7 @@ MODEL_ALIAS_MAP = {
     'POLYNOMIAL': 'Polynomial PM',
     'SIGMOID': 'Sigmoid PM',
     'FIXED_AMPLITUDE': r'$q$-SHIL',
-    'CIM': 'Sigmoid IM',
+    'CIM': 'Reference IM',
 }
 
 
@@ -219,6 +219,14 @@ def parse_args():
         '--overlay_graphs',
         action='store_true',
         help='Overlay graphs with different colors in same subplot; use model subplots instead of separate files'
+    )
+    parser.add_argument(
+        '--exclude_models',
+        type=str,
+        nargs='+',
+        default=[],
+        metavar='MODEL',
+        help='Model names to exclude from plots (e.g., QPDC)'
     )
     return parser.parse_args()
 
@@ -1440,6 +1448,9 @@ def main():
 
     # Get unique models
     models = sorted(df['model_type'].unique())
+    if args.exclude_models:
+        models = [m for m in models if m not in args.exclude_models]
+        df = df[df['model_type'].isin(models)]
 
     if args.overlay_graphs:
         # Create single overlay plot with model subplots

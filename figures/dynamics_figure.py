@@ -288,7 +288,7 @@ for idx, (model_key, display_name, letter) in enumerate(zip(models, display_name
 # Bottom models: 2 wide columns, 2 rows (main and cut)
 bottom_models = [
     ("Fixed-Amplitude", r'$q$-SHIL', "e", "Spin phases"),
-    ("CIM", "Sigmoid IM", "f", "Spin amplitudes")
+    ("CIM", "Reference IM", "f", "Spin amplitudes")
 ]
 
 for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
@@ -340,7 +340,7 @@ for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
         ax.set_yticks(theta_values)
         ax.set_yticklabels(theta_labels)
     
-    # For Sigmoid Ising machine (CIM), plot amplitude
+    # For Reference Ising machine (CIM), plot amplitude
     else:
         if np.iscomplexobj(cont_states):
             amp = np.abs(cont_states)
@@ -477,7 +477,7 @@ for model_key, title in top_figures:
 
 bottom_figures = [
     ("Fixed-Amplitude", r"$q$-SHIL", True),
-    ("CIM", "Sigmoid IM", False)
+    ("CIM", "Reference IM", False)
 ]
 
 for model_key, title, is_phase_plot in bottom_figures:

@@ -147,7 +147,7 @@ def main():
         'NEC':             'NEC',
         'SIGMOID':         'Sigmoid PM',
         'FIXED_AMPLITUDE': 'q-SHIL',
-        'CIM':              'Sigmoid IM'
+        'CIM':              'Reference IM'
     }
     results['model'] = results['model'].replace(alias_map)
     
@@ -303,12 +303,66 @@ def plot_relative_optimality_gap(results, out_dir, model_order=None, best_hyperp
 
 def add_gamma_rate_over_th(data):
     """
-    For QPDC model, add gamma_rate/gamma_th column which is gamma_factor/T
+    For QPDC model, add gamma_rate/gamma_th column.
+    This is the normalized rate of gamma increase: ε_γ / γ_th
+
+    With γ = γ₀ + ε_γ·t and gamma = factor × prototype:
+    - For linspan(start, span): ε_γ = factor × span / T
+    - So ε_γ/γ_th = factor × span / (T × γ_th)
+
     Returns a modified copy of the dataframe
     """
-    if 'gamma_factor' in data.columns and 'T' in data.columns:
-        data = data.copy()
-        data['gamma_rate/gamma_th'] = data['gamma_factor'] / data['T']
+    gamma_th = (256/27)**(1/4)
+
+    if 'gamma_factor' not in data.columns or 'T' not in data.columns:
+        return data
+
+    data = data.copy()
+
+    # Check if gamma_prototype column exists to determine the span
+    if 'gamma_prototype' in data.columns:
+        def compute_normalized_rate(row):
+            prototype = row.get('gamma_prototype', '')
+            factor = row['gamma_factor']
+            T = row['T']
+
+            if pd.isna(prototype) or prototype == '':
+                # Default: assume lin(0,1) equivalent, span=1
+                span = 1.0
+            elif 'linspan(' in str(prototype):
+                # Parse linspan(start, span) - extract span value
+                match = re.search(r'linspan\s*\(\s*[^,]+\s*,\s*([^)]+)\s*\)', str(prototype))
+                if match:
+                    span_expr = match.group(1).strip()
+                    # Evaluate span expression (may contain T)
+                    try:
+                        span = eval(span_expr, {'T': T, 'np': np})
+                    except:
+                        span = 1.0
+                else:
+                    span = 1.0
+            elif 'lin(' in str(prototype):
+                # Parse lin(start, end) - span = end - start
+                match = re.search(r'lin\s*\(\s*([^,]+)\s*,\s*([^)]+)\s*\)', str(prototype))
+                if match:
+                    try:
+                        start = float(match.group(1).strip())
+                        end = float(match.group(2).strip())
+                        span = end - start
+                    except:
+                        span = 1.0
+                else:
+                    span = 1.0
+            else:
+                span = 1.0
+
+            return factor * span / (T * gamma_th)
+
+        data['gamma_rate/gamma_th'] = data.apply(compute_normalized_rate, axis=1)
+    else:
+        # Fallback: assume standard lin(0,1) prototype where span=1
+        data['gamma_rate/gamma_th'] = data['gamma_factor'] / (data['T'] * gamma_th)
+
     return data
 
 def plot_hyperparams(results, out_dir, model_order=None, best_hyperparams_mode='mean_gap', color_order=None):
@@ -960,16 +1014,19 @@ def plot_rel_gap_distributions_by_graph(results, out_dir, model_order=None, best
 
         # Add diagonal lines to indicate breaks
         d = .015
+        h_ref = max(height_ratios)
         for i in range(len(axes)-1):
             ax_top = axes[i]
             ax_bottom = axes[i+1]
-            ratio = height_ratios[i+1] / height_ratios[i]
+            # Scale d_y inversely with panel height for consistent physical size
+            d_y_top = d * h_ref / height_ratios[i]
+            d_y_bottom = d * h_ref / height_ratios[i+1]
             kwargs = dict(transform=ax_top.transAxes, color='k', clip_on=False)
-            ax_top.plot((-d, +d), (-d*ratio, +d*ratio), **kwargs)
-            ax_top.plot((1 - d, 1 + d), (-d*ratio, +d*ratio), **kwargs)
+            ax_top.plot((-d, +d), (-d_y_top, +d_y_top), **kwargs)
+            ax_top.plot((1 - d, 1 + d), (-d_y_top, +d_y_top), **kwargs)
             kwargs.update(transform=ax_bottom.transAxes)
-            ax_bottom.plot((-d, +d), (1 - d, 1 + d), **kwargs)
-            ax_bottom.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
+            ax_bottom.plot((-d, +d), (1 - d_y_bottom, 1 + d_y_bottom), **kwargs)
+            ax_bottom.plot((1 - d, 1 + d), (1 - d_y_bottom, 1 + d_y_bottom), **kwargs)
     else:
         fig, ax = plt.subplots(figsize=(fig_width, fig_height))
         ax.tick_params(axis='y', which='both', left=True)

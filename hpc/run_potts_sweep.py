@@ -251,7 +251,7 @@ def load_hyperparams_from_csv(csv_path):
         'q-PDC': 'QPDC',
         'q-SHIL': 'FIXED_AMPLITUDE',
         'Sigmoid PM': 'SIGMOID',
-        'Sigmoid IM': 'CIM',
+        'Reference IM': 'CIM',
         # Backend names (identity mapping)
         'NEC': 'NEC',
         'POLYNOMIAL': 'POLYNOMIAL',

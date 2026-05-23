@@ -9,11 +9,11 @@ Polynomial PM,G2,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.55",poly_order=10.00,gam
 Polynomial PM,G3,"po8_blin(1/mu_max, 1/mu_max + 2)_gf0.75",poly_order=8.00,gamma_factor=0.75,3.55,3.52,3.12,0.20,0.00
 Polynomial PM,G4,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.2",poly_order=10.00,gamma_factor=0.20,3.57,3.56,3.21,0.17,0.00
 Polynomial PM,G5,"po9_blin(1/mu_max, 1/mu_max + 2)_gf0.55",poly_order=9.00,gamma_factor=0.55,3.63,3.62,3.16,0.19,0.00
-Sigmoid IM,G1,"a-50.0_Bnv220.0_z0.75_blin(0,0.02)",B_num_vertices=220.00,zeta=0.75,0.18,0.19,0.02,0.06,0.00
-Sigmoid IM,G2,"a-50.0_Bnv220.0_z0.75_blin(0,0.02)",B_num_vertices=220.00,zeta=0.75,0.19,0.20,0.04,0.06,0.00
-Sigmoid IM,G3,"a-50.0_Bnv220.0_z0.75_blin(0,0.02)",B_num_vertices=220.00,zeta=0.75,0.17,0.17,0.05,0.06,0.00
-Sigmoid IM,G4,"a-50.0_Bnv220.0_z0.75_blin(0,0.02)",B_num_vertices=220.00,zeta=0.75,0.18,0.18,0.05,0.05,0.00
-Sigmoid IM,G5,"a-50.0_Bnv220.0_z0.75_blin(0,0.02)",B_num_vertices=220.00,zeta=0.75,0.18,0.18,0.04,0.06,0.00
+Reference IM,G1,"a-50.0_Bnv220.0_z0.75_blin(0,0.02)",B_num_vertices=220.00,zeta=0.75,0.18,0.19,0.02,0.06,0.00
+Reference IM,G2,"a-50.0_Bnv220.0_z0.75_blin(0,0.02)",B_num_vertices=220.00,zeta=0.75,0.19,0.20,0.04,0.06,0.00
+Reference IM,G3,"a-50.0_Bnv220.0_z0.75_blin(0,0.02)",B_num_vertices=220.00,zeta=0.75,0.17,0.17,0.05,0.06,0.00
+Reference IM,G4,"a-50.0_Bnv220.0_z0.75_blin(0,0.02)",B_num_vertices=220.00,zeta=0.75,0.18,0.18,0.05,0.05,0.00
+Reference IM,G5,"a-50.0_Bnv220.0_z0.75_blin(0,0.02)",B_num_vertices=220.00,zeta=0.75,0.18,0.18,0.04,0.06,0.00
 Sigmoid PM,G1,"a-50.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.30000000000000004",gamma_factor=0.30,alpha=-50.00,3.49,3.49,3.49,0.00,0.00
 Sigmoid PM,G2,"a-50.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.1",gamma_factor=1.10,alpha=-50.00,3.43,3.43,3.43,0.00,0.00
 Sigmoid PM,G3,"a-30.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.0",gamma_factor=1.00,alpha=-30.00,3.28,3.28,3.28,0.03,0.00
