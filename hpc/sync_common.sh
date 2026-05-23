@@ -1,5 +1,11 @@
 #!/bin/bash
 # sync_common.sh - Shared functions for isync.sh and osync.sh
+#
+# Configuration (edit the variables below for your cluster):
+#   PASSFILE    -- path to a file containing your SSH password (used by sshpass)
+#   RSYNC_RSH   -- rsync remote shell command; adjust SSH key path as needed
+#   REMOTE_HOST -- SSH host alias (configure in ~/.ssh/config) or full hostname
+#   REMOTE_PATH -- absolute or ~ path to the project directory on the remote
 
 set -euo pipefail
 

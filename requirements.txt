@@ -1,0 +1,25 @@
+# Core numerical / data
+numpy
+pandas
+pyarrow
+scipy
+
+# Plotting
+matplotlib
+seaborn
+cycler
+
+# Configuration
+pyyaml
+
+# JIT compilation
+numba
+
+# C++ extension build (requires a C++ compiler)
+pybind11
+
+# MPI parallelisation (requires a system MPI installation, e.g. OpenMPI)
+# On HPC clusters this is typically provided via an environment module.
+# For local single-process runs mpi4py is optional -- the code falls back
+# gracefully when MPI is unavailable.
+mpi4py

@@ -74,4 +74,16 @@ hpc/logs/*
 
 # LLM related
 CLAUDE.md
+.claude/
 plans/
+
+# Historical/numbered HPC submit scripts (keep only submit_template.sh)
+hpc/submit_driver.sh
+hpc/hpc_submit_driver.sh
+hpc/fotonano_submit_driver.sh
+hpc/amd_submit_driver.sh
+hpc/2_*.sh
+hpc/3_*.sh
+hpc/4_*.sh
+hpc/5_*.sh
+hpc/6_*.sh
