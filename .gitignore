@@ -72,6 +72,9 @@ hpc/results/*
 hpc/logs/*
 !hpc/logs/.gitkeep
 
+# Paper PDF
+readme.pdf
+
 # LLM related
 CLAUDE.md
 .claude/

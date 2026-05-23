@@ -1,6 +1,6 @@
 # Potts Machine Simulator
 
-Research code for the paper **"Comparative Study of Potts Machine Dynamics and Performance for Max-k-Cut"** (`readme.pdf`).
+Research code for the paper **"Comparative Study of Potts Machine Dynamics and Performance for Max-k-Cut"**.
 
 The repository implements and benchmarks five analog Potts machine (PM) models -- NEC, q-PDC, q-SHIL, Polynomial PM, Sigmoid PM -- and one reference Ising machine (Reference IM) for solving Max-3-Cut and Max-4-Cut combinatorial optimization problems on the G-set benchmark graphs. Simulations use an Euler-Maruyama ODE solver implemented in C++ (via pybind11) and are parallelised with MPI for large-scale parameter sweeps on HPC clusters.
 
@@ -72,7 +72,6 @@ potts_sim/
 ├── build_potts_sim.py     # Builds the C++ extension via pybind11
 ├── potts_utils.py         # Graph parsing (DIMACS) and eigenvalue utilities
 ├── cim_sim.py             # Coherent Ising Machine simulator wrapper
-├── readme.pdf             # Associated paper
 ├── graphs/                # Input graphs in DIMACS .col format (G-set + g05)
 ├── figures/               # Publication figures and generation scripts
 └── hpc/
