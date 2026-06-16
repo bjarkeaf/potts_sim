@@ -10,19 +10,20 @@ The repository implements and benchmarks five analog Potts machine (PM) models (
 
 ## System Requirements
 
-**Operating system:** Linux or macOS. Tested on Linux (Arch, kernel 6.x) with Python 3.14 and GCC 14. macOS should work with Clang and Homebrew OpenMPI, but has not been formally tested.
+**Operating system:** Linux or macOS. Tested on Linux (Arch, kernel 7.x) with Python 3.14 and GCC 16. macOS should work with Clang and Homebrew OpenMPI, but has not been formally tested.
 
 **Software dependencies:**
 
 | Dependency | Version tested | Notes |
 |---|---|---|
 | Python | 3.14 | 3.10+ should work |
-| GCC or Clang | GCC 14 | Required to build the C++ extension |
+| GCC or Clang | GCC 16 | Required to build the C++ extension |
 | OpenMPI | 5.0.6 | Required for multi-process sweeps; optional for single-process runs |
 | pybind11 | 2.13+ | Installed via pip |
 | numpy | 2.x | |
 | pandas | 2.x | |
-| mpi4py | 4.0 | |
+| numba | 0.60+ | Required for the CIM model; installed via pip |
+| mpi4py | 4.0 | Optional for local single-process runs |
 
 Full Python dependency list is in `requirements.txt`. No special hardware is required.
 
@@ -37,6 +38,12 @@ python -m venv potts-env
 source potts-env/bin/activate
 ```
 
+Install system-level dependencies (required before pip):
+
+- **Linux (Debian/Ubuntu):** `sudo apt install gcc libopenmpi-dev python3-dev`
+- **Linux (Arch):** `sudo pacman -S gcc openmpi`
+- **macOS:** `brew install open-mpi`
+
 Install Python dependencies:
 
 ```bash
@@ -50,6 +57,12 @@ python build_potts_sim.py build_ext --inplace
 ```
 
 This produces `potts_sim.cpython-*.so` in the repo root, which is imported by the Python scripts. The build uses `-march=native`, so the compiled binary is CPU-specific and floating-point results may differ slightly across machines.
+
+Verify the build succeeded:
+
+```bash
+python -c "import potts_sim; print('OK')"
+```
 
 ## Demo
 
@@ -73,7 +86,13 @@ Saved combined results with 60 rows to results/results_0_local_test.parquet
 Finished sweep in 0:00:07
 ```
 
-The result is written to `results/results_0_local_test.parquet` relative to the repo root. The Parquet file contains one row per simulation run. Key columns include `cut_gap` (achieved cut minus optimal cut, closer to zero means better performance) and `energy_gap`. Expected run time on a standard desktop computer: under 30 seconds (single core).
+The result is written to `results/results_0_local_test.parquet` relative to the repo root. The Parquet file contains one row per simulation run. Key columns include `cut_gap` (achieved cut minus optimal cut; zero means the optimum was reached, negative means the solution fell short) and `energy_gap`. To inspect the output:
+
+```bash
+python -c "import pandas as pd; print(pd.read_parquet('results/results_0_local_test.parquet')[['model','graph','cut_gap']].to_string())"
+```
+
+Expected run time on a standard desktop computer: under 30 seconds (single core).
 
 ## Instructions for Use
 
@@ -179,7 +198,29 @@ e <src> <dst> <weight>
 ...
 ```
 
-Edges are 1-indexed. Set `graph_path` in your YAML config to a list of `.col` files. If the `Maximum eigenvalue` comment is absent, it is computed on the first run and written back into the graph file (requires write permission on the file).
+Edges are 1-indexed. If the `Maximum eigenvalue` comment is absent, it is computed on the first run and written back into the graph file (requires write permission on the file). If the `Optimum cut value` comment is absent, `cut_gap` and `energy_gap` will be null in the output.
+
+A minimal config to run on your own graph:
+
+```yaml
+num_runs: 10
+graph_path:
+  - "path/to/your_graph.col"
+out_dir: "results"
+T: 100.0
+dt: 1e-3
+num_states: 3
+noise_factor: 1e-4
+models:
+  POLYNOMIAL:
+    poly_order: [3]
+    beta_schedule: ["lin(1/mu_max, 1.0)"]
+    gamma_schedule:
+      based_on: "beta_schedule"
+      factor: "1:0.5:2"
+```
+
+Graph paths are relative to the working directory from which you run the script. Run from the repo root and use paths like `graphs/my_graph.col`.
 
 ## Reproducing Paper Results
 
@@ -195,18 +236,29 @@ The benchmark results in the paper were produced on the DTU Computing Center HPC
 
 All configs use paths relative to the `hpc/` directory. Run the following from inside `hpc/` (as `submit_template.sh` does).
 
+Before submitting, estimate the wall time:
+
+```bash
+cd hpc/
+python run_potts_sweep.py --config configs/260123_gset_max-3-cut.yaml --estimate_wall_time 72
+```
+
 **Benchmark workflow** (repeat for each config in the table above):
 
 ```bash
 cd hpc/
 
-# 1. Edit submit_template.sh with your email, core count, and config path, then submit
+# Option A: LSF cluster
+# Edit submit_template.sh with your email, core count, and config path, then submit
 bsub < submit_template.sh
 
-# 2. After completion, save best hyperparameters
+# Option B: local multi-core (slow for large configs)
+mpirun -n 8 python run_potts_sweep.py --config configs/260123_gset_max-3-cut.yaml
+
+# After completion, save best hyperparameters (writes best_hyperparams/results_260123_gset_max-3-cut_mean_gap.csv)
 python save_best_hyperparams.py results/results_260123_gset_max-3-cut.parquet
 
-# 3. Plot benchmark figures
+# Plot benchmark figures
 python plot_benchmark.py --results results/results_260123_gset_max-3-cut.parquet --figure_mode
 ```
 
