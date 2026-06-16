@@ -1,8 +1,0 @@
-assumed_time_per_step_us: 250
-config_file: configs/250606_G14-17.yaml
-estimated_runtime_seconds: 44850000.0
-git_revision: unknown
-num_graphs: 4
-num_ranks: 1
-num_tasks: 272800
-timestamp: '2025-06-12T14:57:02.908837'

@@ -1,25 +1,25 @@
 # Core numerical / data
-numpy
-pandas
-pyarrow
-scipy
+numpy>=2.0
+pandas>=2.0
+pyarrow>=16.0
+scipy>=1.13
 
 # Plotting
-matplotlib
-seaborn
-cycler
+matplotlib>=3.9
+seaborn>=0.13
+cycler>=0.12
 
 # Configuration
-pyyaml
+pyyaml>=6.0
 
 # JIT compilation
-numba
+numba>=0.60
 
 # C++ extension build (requires a C++ compiler)
-pybind11
+pybind11>=2.13
 
 # MPI parallelisation (requires a system MPI installation, e.g. OpenMPI)
 # On HPC clusters this is typically provided via an environment module.
 # For local single-process runs mpi4py is optional -- the code falls back
 # gracefully when MPI is unavailable.
-mpi4py
+mpi4py>=4.0

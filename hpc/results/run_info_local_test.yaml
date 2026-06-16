@@ -1,8 +1,0 @@
-assumed_time_per_step_us: 100
-config_file: configs/local_test.yaml
-estimated_runtime_seconds: 600.0
-git_revision: 56e3c360781fa0036488be77b453539afb0d4a9d
-num_graphs: 2
-num_ranks: 1
-num_tasks: 60
-timestamp: '2025-06-12T14:52:00.474854'

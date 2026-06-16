@@ -1,7 +1,7 @@
 num_runs: 10  # Small number of runs for quick testing
 graph_path:
-  - "graphs/band/band250_3_antiferro.col"
-  - "graphs/band/band200_3_antiferro.col"
+  - "graphs/g05/g05_10.0.col"
+  - "graphs/g05/g05_20.0.col"
 out_dir: "results"
 
 # Global simulation parameters

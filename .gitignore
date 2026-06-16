@@ -80,6 +80,26 @@ CLAUDE.md
 .claude/
 plans/
 
+# Development/iteration configs (keep only final 260123_*, 260128_*, and 0_* test configs)
+hpc/configs/2[0-9][0-9][0-9][0-9][0-9]_*.yaml
+!hpc/configs/260123_*.yaml
+!hpc/configs/260128_*.yaml
+hpc/configs/not_main_results/
+
+# Early-run result files
+hpc/results/*.parquet
+hpc/results/not_main_results/
+
+# Demo band graphs (not used in paper)
+graphs/band/
+
+# VS Code
+.vscode/
+
+# Unused source files
+rk4_potts_sim.cpp
+test_bench.py
+
 # Historical/numbered HPC submit scripts (keep only submit_template.sh)
 hpc/submit_driver.sh
 hpc/hpc_submit_driver.sh

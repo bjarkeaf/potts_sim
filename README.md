@@ -16,7 +16,7 @@ The repository implements and benchmarks five analog Potts machine (PM) models (
 
 | Dependency | Version tested | Notes |
 |---|---|---|
-| Python | 3.13 | 3.10+ should work |
+| Python | 3.14 | 3.10+ should work |
 | GCC or Clang | GCC 14 | Required to build the C++ extension |
 | OpenMPI | 5.0.6 | Required for multi-process sweeps; optional for single-process runs |
 | pybind11 | 2.13+ | Installed via pip |
@@ -30,6 +30,13 @@ Full Python dependency list is in `requirements.txt`. No special hardware is req
 
 ## Installation
 
+Create and activate a virtual environment:
+
+```bash
+python -m venv potts-env
+source potts-env/bin/activate  # on Windows: potts-env\Scripts\activate
+```
+
 Install Python dependencies:
 
 ```bash
@@ -42,11 +49,11 @@ Build the C++ simulation extension:
 python build_potts_sim.py build_ext --inplace
 ```
 
-This produces `potts_sim.cpython-*.so` in the repo root, which is imported by the Python scripts.
+This produces `potts_sim.cpython-*.so` in the repo root, which is imported by the Python scripts. The build uses `-march=native`, so the compiled binary is CPU-specific and floating-point results may differ slightly across machines.
 
 ## Demo
 
-The repository includes small benchmark graphs in `graphs/` (DIMACS `.col` format) for testing. The quickest demo uses the bundled band graphs (200 and 250 nodes) with the Polynomial PM model and 10 runs per parameter combination.
+The repository includes benchmark graphs in `graphs/` (DIMACS `.col` format). The quickest demo uses two small g05 graphs (10 and 20 nodes) with the Polynomial PM model and 10 runs per parameter combination.
 
 Run from the repo root:
 
@@ -54,19 +61,19 @@ Run from the repo root:
 python hpc/run_potts_sweep.py --config hpc/configs/0_local_test.yaml
 ```
 
-Expected output (printed to stdout):
+Expected output:
 
 ```
 Found 2 graph files
 Generated 60 tasks
 Rank 0: Processing 60 tasks
-Rank 0: Completed 1/60 tasks | Runtime: 0:00:01 | ETA: ...
+Rank 0: Completed 1/60 tasks | Runtime: 0:00:00 | ETA: 0:00:00 | ...
 ...
 Saved combined results with 60 rows to results/results_0_local_test.parquet
-Finished sweep in 0:01:35
+Finished sweep in 0:00:07
 ```
 
-The result is written to `hpc/results/results_0_local_test.parquet`. Expected run time on a standard desktop computer: approximately 2 minutes (single core).
+The result is written to `results/results_0_local_test.parquet` relative to the repo root. The Parquet file contains one row per simulation run with columns including `cut_gap` (deviation from the known optimum cut, lower is better) and `success_rate` (fraction of runs reaching the optimum). Expected run time on a standard desktop computer: under 30 seconds (single core).
 
 ## Quickstart
 
@@ -109,9 +116,10 @@ potts_sim/
 └── hpc/
     ├── run_potts_sweep.py     # Main entry point; MPI sweep runner
     ├── configs/               # YAML experiment configurations
+    ├── graphs/                # Mirror of graphs/ used by HPC configs (paths relative to hpc/)
     ├── best_hyperparams/      # Saved optimal hyperparameters per model/graph
     ├── submit_template.sh     # LSF job submission template
-    ├── merge_parquet.py       # Merges per-rank result files
+    ├── merge_parquet.py       # Merges result files from separate jobs
     ├── plot_benchmark.py      # Benchmark result visualisation
     ├── plot_convergence.py    # Convergence analysis plots
     ├── save_best_hyperparams.py
@@ -136,6 +144,33 @@ Key fields:
 
 See `hpc/configs/0_local_test.yaml` for a minimal working example.
 
+**Schedule expressions** control how parameters vary over simulation time:
+
+| Expression | Meaning |
+|---|---|
+| `lin(a, b)` | Linear ramp from `a` to `b` over the simulation |
+| `const(x)` | Constant value `x` |
+| `mu_max` | Maximum eigenvalue of the coupling matrix (read from the graph file or computed) |
+| `"start:step:end"` | MATLAB-style range, generates a sweep list (e.g. `"0:0.5:2"` → [0.0, 0.5, 1.0, 1.5, 2.0]) |
+
+A linked schedule (`based_on` + `factor`) makes one parameter track another multiplied by a factor — useful for keeping gamma proportional to beta.
+
+**Model names:** In YAML configs and result files, q-SHIL appears as `FIXED_AMPLITUDE`.
+
+## Using Your Own Graphs
+
+Graphs must be in DIMACS `.col` format:
+
+```
+c Maximum eigenvalue: 3.14       (optional, computed on the fly if absent)
+c Optimum cut value (max-3-cut): 42  (optional, needed for gap/success-rate metrics)
+p <vertices> <edges> <weight>
+e <src> <dst> <weight>
+...
+```
+
+Edges are 1-indexed. Set `graph_path` in your YAML config to a list of `.col` files. The eigenvalue is cached in the comment header after the first run and used in schedule expressions via `mu_max`.
+
 ## Reproducing Paper Results
 
 The benchmark results in the paper were produced on the DTU Computing Center HPC cluster (LSF scheduler) using the configurations in `hpc/configs/`. The final sweep configs are:
@@ -148,13 +183,36 @@ The benchmark results in the paper were produced on the DTU Computing Center HPC
 | Convergence (G-set) | `260128_gset_max-3-cut_convergence_*.yaml`, `260128_gset_max-4-cut_convergence_*.yaml` |
 | Convergence (g05) | `260128_g05_convergence_*.yaml` |
 
-Each config is self-contained and includes all model types, parameter sweeps, and graph paths. To reproduce a result:
+All configs use paths relative to the `hpc/` directory. Run the following from inside `hpc/` (as `submit_template.sh` does).
 
-1. Edit `hpc/submit_template.sh` with your cluster settings and the target config path.
-2. Submit: `bsub < submit_template.sh`
-3. After completion, merge per-rank results: `python hpc/merge_parquet.py`
-4. Save best hyperparameters: `python hpc/save_best_hyperparams.py`
-5. Plot: `python hpc/plot_benchmark.py`
+**Benchmark workflow** (repeat for each config in the table above):
+
+```bash
+cd hpc/
+
+# 1. Edit submit_template.sh with your email, core count, and config path, then submit
+bsub < submit_template.sh
+
+# 2. After completion, save best hyperparameters
+python save_best_hyperparams.py results/results_260123_gset_max-3-cut.parquet
+
+# 3. Plot benchmark figures
+python plot_benchmark.py --results results/results_260123_gset_max-3-cut.parquet --figure_mode
+```
+
+**Convergence workflow** (run after the benchmark sweep, as it uses the saved hyperparameters):
+
+```bash
+# Submit convergence sweep (edit submit_template.sh to point to a 260128_* config)
+bsub < submit_template.sh
+
+# Plot convergence figures
+python plot_convergence.py \
+    --data results/results_260128_gset_max-3-cut_convergence_sim_time.parquet \
+    --conv_type simulation_time
+```
+
+`merge_parquet.py` is only needed when combining results from separate jobs manually; the sweep auto-merges results on completion.
 
 Saved optimal hyperparameters used in the paper are provided in `hpc/best_hyperparams/` for reference.
 
