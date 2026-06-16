@@ -138,7 +138,7 @@ See `hpc/configs/0_local_test.yaml` for a minimal working example.
 
 ## Reproducing Paper Results
 
-The benchmark results in the paper were produced on a DTU HPC cluster (LSF scheduler) using the configurations in `hpc/configs/`. The final sweep configs are:
+The benchmark results in the paper were produced on the DTU Computing Center HPC cluster (LSF scheduler) using the configurations in `hpc/configs/`. The final sweep configs are:
 
 | Figure | Config file(s) |
 |---|---|
