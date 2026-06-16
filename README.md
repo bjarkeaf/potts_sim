@@ -10,7 +10,7 @@ The repository implements and benchmarks five analog Potts machine (PM) models (
 
 ## System Requirements
 
-**Operating system:** Linux or macOS. Tested on Linux (Arch, kernel 6.x) with Python 3.13 and GCC 14. macOS should work with Clang and Homebrew OpenMPI, but has not been formally tested.
+**Operating system:** Linux or macOS. Tested on Linux (Arch, kernel 6.x) with Python 3.14 and GCC 14. macOS should work with Clang and Homebrew OpenMPI, but has not been formally tested.
 
 **Software dependencies:**
 
@@ -34,7 +34,7 @@ Create and activate a virtual environment:
 
 ```bash
 python -m venv potts-env
-source potts-env/bin/activate  # on Windows: potts-env\Scripts\activate
+source potts-env/bin/activate
 ```
 
 Install Python dependencies:
@@ -73,7 +73,7 @@ Saved combined results with 60 rows to results/results_0_local_test.parquet
 Finished sweep in 0:00:07
 ```
 
-The result is written to `results/results_0_local_test.parquet` relative to the repo root. The Parquet file contains one row per simulation run with columns including `cut_gap` (deviation from the known optimum cut, lower is better) and `success_rate` (fraction of runs reaching the optimum). Expected run time on a standard desktop computer: under 30 seconds (single core).
+The result is written to `results/results_0_local_test.parquet` relative to the repo root. The Parquet file contains one row per simulation run. Key columns include `cut_gap` (achieved cut minus optimal cut, closer to zero means better performance) and `energy_gap`. Expected run time on a standard desktop computer: under 30 seconds (single core).
 
 ## Quickstart
 
@@ -149,6 +149,8 @@ See `hpc/configs/0_local_test.yaml` for a minimal working example.
 | Expression | Meaning |
 |---|---|
 | `lin(a, b)` | Linear ramp from `a` to `b` over the simulation |
+| `linspan(a, s)` | Linear ramp starting at `a` with total span `s` (i.e. ends at `a + s`) |
+| `exp(a, b)` | Exponential ramp from `a` to `b` over the simulation |
 | `const(x)` | Constant value `x` |
 | `mu_max` | Maximum eigenvalue of the coupling matrix (read from the graph file or computed) |
 | `"start:step:end"` | MATLAB-style range, generates a sweep list (e.g. `"0:0.5:2"` → [0.0, 0.5, 1.0, 1.5, 2.0]) |
@@ -163,13 +165,13 @@ Graphs must be in DIMACS `.col` format:
 
 ```
 c Maximum eigenvalue: 3.14       (optional, computed on the fly if absent)
-c Optimum cut value (max-3-cut): 42  (optional, needed for gap/success-rate metrics)
+c Optimum cut value (max-3-cut): 42  (optional, needed for gap metrics)
 p <vertices> <edges> <weight>
 e <src> <dst> <weight>
 ...
 ```
 
-Edges are 1-indexed. Set `graph_path` in your YAML config to a list of `.col` files. The eigenvalue is cached in the comment header after the first run and used in schedule expressions via `mu_max`.
+Edges are 1-indexed. Set `graph_path` in your YAML config to a list of `.col` files. If the `Maximum eigenvalue` comment is absent, it is computed on the first run and written back into the graph file (requires write permission on the file).
 
 ## Reproducing Paper Results
 

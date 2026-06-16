@@ -100,6 +100,16 @@ graphs/band/
 rk4_potts_sim.cpp
 test_bench.py
 
+# Duplicate source files shadowed in hpc/ (canonical copies are in repo root)
+hpc/cim_sim.py
+hpc/potts_utils.py
+hpc/build_potts_sim.py
+hpc/build_potts_sim.sh
+
+# Intermediate hyperparameter CSV backups and old runs
+hpc/best_hyperparams/*.bak
+hpc/best_hyperparams/old/
+
 # Historical/numbered HPC submit scripts (keep only submit_template.sh)
 hpc/submit_driver.sh
 hpc/hpc_submit_driver.sh
