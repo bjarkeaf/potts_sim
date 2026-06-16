@@ -136,6 +136,30 @@ Key fields:
 
 See `hpc/configs/0_local_test.yaml` for a minimal working example.
 
+## Reproducing Paper Results
+
+The benchmark results in the paper were produced on a DTU HPC cluster (LSF scheduler) using the configurations in `hpc/configs/`. The final sweep configs are:
+
+| Figure | Config file(s) |
+|---|---|
+| G-set Max-3-Cut benchmark | `260123_gset_max-3-cut.yaml` |
+| G-set Max-4-Cut benchmark | `260123_gset_max-4-cut.yaml` |
+| g05 benchmark | `260123_g05.yaml` |
+| Convergence (G-set) | `260128_gset_max-3-cut_convergence_*.yaml`, `260128_gset_max-4-cut_convergence_*.yaml` |
+| Convergence (g05) | `260128_g05_convergence_*.yaml` |
+
+Each config is self-contained and includes all model types, parameter sweeps, and graph paths. To reproduce a result:
+
+1. Edit `hpc/submit_template.sh` with your cluster settings and the target config path.
+2. Submit: `bsub < submit_template.sh`
+3. After completion, merge per-rank results: `python hpc/merge_parquet.py`
+4. Save best hyperparameters: `python hpc/save_best_hyperparams.py`
+5. Plot: `python hpc/plot_benchmark.py`
+
+Saved optimal hyperparameters used in the paper are provided in `hpc/best_hyperparams/` for reference.
+
+The full benchmark sweeps require a multi-core HPC cluster and take on the order of tens of CPU-hours per config. Single-node reproduction is possible but slow.
+
 ## Citation
 
 If you use this code, please cite:
