@@ -75,7 +75,15 @@ Finished sweep in 0:00:07
 
 The result is written to `results/results_0_local_test.parquet` relative to the repo root. The Parquet file contains one row per simulation run. Key columns include `cut_gap` (achieved cut minus optimal cut, closer to zero means better performance) and `energy_gap`. Expected run time on a standard desktop computer: under 30 seconds (single core).
 
-## Quickstart
+## Instructions for Use
+
+### Running on your own data
+
+Graphs must be in DIMACS `.col` format (see "Using Your Own Graphs" below). Create a YAML config pointing to your graph files, set `num_states` (3 for Max-3-Cut, 4 for Max-4-Cut), and run:
+
+```bash
+python hpc/run_potts_sweep.py --config hpc/configs/YOUR_CONFIG.yaml
+```
 
 ### Estimate wall time before a large sweep
 
