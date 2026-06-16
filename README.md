@@ -8,11 +8,27 @@ The repository implements and benchmarks five analog Potts machine (PM) models (
 
 > Bjarke Almer Frederiksen, Robbe De Prins, Peter Bienstman, "Comparative Study of Potts Machine Dynamics and Performance for Max-k-Cut", arXiv:2605.06425 (2026). https://doi.org/10.48550/arXiv.2605.06425
 
-## Requirements
+## System Requirements
 
-- Python 3.10+
-- A C++ compiler (GCC or Clang) for building the simulation extension
-- An MPI implementation (e.g. OpenMPI) for multi-process sweeps
+**Operating system:** Linux or macOS. Tested on Linux (Arch, kernel 6.x) with Python 3.13 and GCC 14. macOS should work with Clang and Homebrew OpenMPI, but has not been formally tested.
+
+**Software dependencies:**
+
+| Dependency | Version tested | Notes |
+|---|---|---|
+| Python | 3.13 | 3.10+ should work |
+| GCC or Clang | GCC 14 | Required to build the C++ extension |
+| OpenMPI | 5.0.6 | Required for multi-process sweeps; optional for single-process runs |
+| pybind11 | 2.13+ | Installed via pip |
+| numpy | 2.x | |
+| pandas | 2.x | |
+| mpi4py | 4.0 | |
+
+Full Python dependency list is in `requirements.txt`. No special hardware is required.
+
+**Typical install time:** 2 to 5 minutes (dominated by pip dependency installation).
+
+## Installation
 
 Install Python dependencies:
 
@@ -20,23 +36,39 @@ Install Python dependencies:
 pip install -r requirements.txt
 ```
 
-## Installation
-
 Build the C++ simulation extension:
 
 ```bash
-python build_potts_sim.py
+python build_potts_sim.py build_ext --inplace
 ```
 
-This produces `potts_sim.cpython-*.so` in the project root, which is imported by the Python scripts.
+This produces `potts_sim.cpython-*.so` in the repo root, which is imported by the Python scripts.
 
-## Quickstart
+## Demo
 
-### Local test (single process)
+The repository includes small benchmark graphs in `graphs/` (DIMACS `.col` format) for testing. The quickest demo uses the bundled band graphs (200 and 250 nodes) with the Polynomial PM model and 10 runs per parameter combination.
+
+Run from the repo root:
 
 ```bash
 python hpc/run_potts_sweep.py --config hpc/configs/0_local_test.yaml
 ```
+
+Expected output (printed to stdout):
+
+```
+Found 2 graph files
+Generated 60 tasks
+Rank 0: Processing 60 tasks
+Rank 0: Completed 1/60 tasks | Runtime: 0:00:01 | ETA: ...
+...
+Saved combined results with 60 rows to results/results_0_local_test.parquet
+Finished sweep in 0:01:35
+```
+
+The result is written to `hpc/results/results_0_local_test.parquet`. Expected run time on a standard desktop computer: approximately 2 minutes (single core).
+
+## Quickstart
 
 ### Estimate wall time before a large sweep
 
