@@ -93,6 +93,20 @@ The result is written to `results/results_0_local_test.parquet` relative to the 
 python -c "import pandas as pd; print(pd.read_parquet('results/results_0_local_test.parquet')[['model','graph','cut_gap']].to_string())"
 ```
 
+Expected output (60 rows, truncated):
+
+```
+        model     graph  cut_gap
+0  POLYNOMIAL  g05_10.0      0.0
+1  POLYNOMIAL  g05_10.0      0.0
+...
+50 POLYNOMIAL  g05_20.0     -1.0
+51 POLYNOMIAL  g05_20.0      0.0
+...
+```
+
+All-zero `cut_gap` values mean the optimum was reached on every run. A value of `-1.0` means the best cut found was one edge short of optimal, which is normal for stochastic solvers on harder instances.
+
 Expected run time on a standard desktop computer: under 30 seconds (single core).
 
 ## Instructions for Use
@@ -230,56 +244,79 @@ Graph paths are relative to the working directory from which you run the script.
 
 The benchmark results in the paper were produced on the DTU Computing Center HPC cluster (LSF scheduler) using the configurations in `configs/`. The final sweep configs are:
 
-| Figure | Config file(s) |
-|---|---|
-| G-set Max-3-Cut benchmark | `260123_gset_max-3-cut.yaml` |
-| G-set Max-4-Cut benchmark | `260123_gset_max-4-cut.yaml` |
-| g05 benchmark | `260123_g05.yaml` |
-| Convergence (G-set) | `260128_gset_max-3-cut_convergence_*.yaml`, `260128_gset_max-4-cut_convergence_*.yaml` |
-| Convergence (g05) | `260128_g05_convergence_*.yaml` |
+| Figure | Config file(s) | Plot script |
+|---|---|---|
+| Dynamics | — | `dynamics_figure.py` |
+| G-set Max-3-Cut benchmark | `260123_gset_max-3-cut.yaml` | `plot_benchmark.py` |
+| G-set Max-4-Cut benchmark | `260123_gset_max-4-cut.yaml` | `plot_benchmark.py` |
+| g05 benchmark | `260123_g05.yaml` | `plot_benchmark.py` |
+| Convergence (G-set) | `260128_gset_max-3-cut_convergence_*.yaml`, `260128_gset_max-4-cut_convergence_*.yaml` | `plot_convergence.py` |
+| Convergence (g05) | `260128_g05_convergence_*.yaml` | `plot_convergence.py` |
+
+`plot_benchmark.py` outputs a `rel_gap_distributions.pdf` (and per-model plots) to `plots/<results_name>/`.
 
 All commands run from the repo root.
 
-Before submitting, estimate the wall time:
+### Regenerating figures from pre-computed results
+
+Pre-computed result files are provided in `results/paper/`. To regenerate all figures without re-running the sweeps:
 
 ```bash
+# Dynamics figure (outputs to figures/)
+python dynamics_figure.py
+
+# Benchmark figures (outputs to plots/<result_name>/)
+python plot_benchmark.py --results results/paper/results_260123_gset_max-3-cut.parquet --figure_mode
+python plot_benchmark.py --results results/paper/results_260123_gset_max-4-cut.parquet --figure_mode
+python plot_benchmark.py --results results/paper/results_260123_g05.parquet --figure_mode
+
+# Convergence figures
+python plot_convergence.py --data results/paper/results_260128_gset_max-3-cut_convergence_sim_time.parquet --conv_type simulation_time --figure_mode
+python plot_convergence.py --data results/paper/results_260128_gset_max-3-cut_convergence_time_step.parquet --conv_type time_step --figure_mode
+python plot_convergence.py --data results/paper/results_260128_gset_max-4-cut_convergence_sim_time.parquet --conv_type simulation_time --figure_mode
+python plot_convergence.py --data results/paper/results_260128_gset_max-4-cut_convergence_time_step.parquet --conv_type time_step --figure_mode
+python plot_convergence.py --data results/paper/results_260128_g05_convergence_sim_time.parquet --conv_type simulation_time --figure_mode
+python plot_convergence.py --data results/paper/results_260128_g05_convergence_time_step.parquet --conv_type time_step --figure_mode
+```
+
+### Full reproduction of results
+
+The full benchmark sweeps require a multi-core HPC cluster and take on the order of tens of CPU-hours per config. Single-node reproduction is possible but slow. The convergence sweeps (step 3) depend on the hyperparameters saved in step 2.
+
+**Step 1: Run benchmark sweeps.** Repeat for each of the three configs:
+
+```bash
+# Estimate wall time first (72 = number of MPI ranks)
 python run_potts_sweep.py --config configs/260123_gset_max-3-cut.yaml --estimate_wall_time 72
-```
 
-**Benchmark workflow** (repeat for each config in the table above):
-
-```bash
-# Option A: LSF cluster
-# Edit submit_template.sh with your email, core count, and config path, then submit
+# Option A: LSF cluster — edit submit_template.sh with your email, core count, and config path
 bsub < submit_template.sh
 
-# Option B: local multi-core (slow for large configs)
+# Option B: local multi-core
 mpirun -n 8 python run_potts_sweep.py --config configs/260123_gset_max-3-cut.yaml
-
-# After completion, save best hyperparameters (writes best_hyperparams/260123_gset_max-3-cut_mean_gap.csv)
-python save_best_hyperparams.py results/results_260123_gset_max-3-cut.parquet
-
-# Plot benchmark figures
-python plot_benchmark.py --results results/results_260123_gset_max-3-cut.parquet --figure_mode
 ```
 
-**Convergence workflow** (run after the benchmark sweep, as it uses the saved hyperparameters):
+Configs: `260123_gset_max-3-cut.yaml`, `260123_gset_max-4-cut.yaml`, `260123_g05.yaml`.
+
+**Step 2: Save best hyperparameters** (required before running convergence sweeps):
 
 ```bash
-# Submit convergence sweep (edit submit_template.sh to point to a 260128_* config)
-bsub < submit_template.sh
-
-# Plot convergence figures
-python plot_convergence.py \
-    --data results/results_260128_gset_max-3-cut_convergence_sim_time.parquet \
-    --conv_type simulation_time
+python save_best_hyperparams.py results/results_260123_gset_max-3-cut.parquet
+python save_best_hyperparams.py results/results_260123_gset_max-4-cut.parquet
+python save_best_hyperparams.py results/results_260123_g05.parquet
 ```
+
+**Step 3: Run convergence sweeps.** Repeat for each config:
+
+```bash
+bsub < submit_template.sh  # point submit_template.sh at the convergence config
+```
+
+Configs: `260128_gset_max-3-cut_convergence_sim_time.yaml`, `260128_gset_max-3-cut_convergence_time_step.yaml`, `260128_gset_max-4-cut_convergence_sim_time.yaml`, `260128_gset_max-4-cut_convergence_time_step.yaml`, `260128_g05_convergence_sim_time.yaml`, `260128_g05_convergence_time_step.yaml`.
+
+**Step 4: Plot all figures** using the commands in the previous section, substituting `results/paper/` with your own `results/` paths.
 
 `merge_parquet.py` is only needed when combining results from separate jobs manually. The sweep auto-merges results on completion.
-
-Saved optimal hyperparameters used in the paper are provided in `best_hyperparams/` for reference.
-
-The full benchmark sweeps require a multi-core HPC cluster and take on the order of tens of CPU-hours per config. Single-node reproduction is possible but slow.
 
 ## Citation
 
