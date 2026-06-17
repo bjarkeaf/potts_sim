@@ -157,6 +157,7 @@ potts_sim/
 ├── plot_benchmark.py          # Benchmark result visualisation
 ├── plot_convergence.py        # Convergence analysis plots
 ├── dynamics_figure.py         # Generates dynamics figures, outputs to figures/
+├── reproduce_figures.sh       # Regenerates all paper figures from results/paper/
 ├── submit_template.sh         # LSF job submission template
 ├── graphs/                    # Input graphs in DIMACS .col format (G-set + g05)
 ├── figures/                   # Publication figures (PDF and PNG outputs)
@@ -259,22 +260,10 @@ All commands run from the repo root.
 Pre-computed result files are provided in `results/paper/`. To regenerate all figures without re-running the sweeps:
 
 ```bash
-# Dynamics figure (outputs to figures/)
-python dynamics_figure.py
-
-# Benchmark figures (outputs to plots/<result_name>/)
-python plot_benchmark.py --results results/paper/results_260123_gset_max-3-cut.parquet --figure_mode
-python plot_benchmark.py --results results/paper/results_260123_gset_max-4-cut.parquet --figure_mode
-python plot_benchmark.py --results results/paper/results_260123_g05.parquet --figure_mode
-
-# Convergence figures
-python plot_convergence.py --data results/paper/results_260128_gset_max-3-cut_convergence_sim_time.parquet --conv_type simulation_time --figure_mode
-python plot_convergence.py --data results/paper/results_260128_gset_max-3-cut_convergence_time_step.parquet --conv_type time_step --figure_mode
-python plot_convergence.py --data results/paper/results_260128_gset_max-4-cut_convergence_sim_time.parquet --conv_type simulation_time --figure_mode
-python plot_convergence.py --data results/paper/results_260128_gset_max-4-cut_convergence_time_step.parquet --conv_type time_step --figure_mode
-python plot_convergence.py --data results/paper/results_260128_g05_convergence_sim_time.parquet --conv_type simulation_time --figure_mode
-python plot_convergence.py --data results/paper/results_260128_g05_convergence_time_step.parquet --conv_type time_step --figure_mode
+bash reproduce_figures.sh
 ```
+
+This runs `dynamics_figure.py`, all `plot_benchmark.py` calls, and all `plot_convergence.py` calls. Outputs go to `figures/` and `plots/`.
 
 ### Full reproduction of results
 
