@@ -244,16 +244,14 @@ The benchmark results in the paper were produced on the DTU Computing Center HPC
 
 | Figure | Config file(s) | Plot script |
 |---|---|---|
-| Dynamics | — | `dynamics_figure.py` |
+| Dynamics | (no sweep) | `dynamics_figure.py` |
 | G-set Max-3-Cut benchmark | `260123_gset_max-3-cut.yaml` | `plot_benchmark.py` |
 | G-set Max-4-Cut benchmark | `260123_gset_max-4-cut.yaml` | `plot_benchmark.py` |
 | g05 benchmark | `260123_g05.yaml` | `plot_benchmark.py` |
 | Convergence (G-set) | `260128_gset_max-3-cut_convergence_*.yaml`, `260128_gset_max-4-cut_convergence_*.yaml` | `plot_convergence.py` |
 | Convergence (g05) | `260128_g05_convergence_*.yaml` | `plot_convergence.py` |
 
-`plot_benchmark.py` outputs a `rel_gap_distributions.pdf` (and per-model plots) to `plots/<results_name>/`.
-
-All commands run from the repo root.
+`plot_benchmark.py` outputs a `rel_gap_distributions.pdf` (and per-model plots) to `plots/<results_name>/`. All commands run from the repo root.
 
 ### Regenerating figures from pre-computed results
 
@@ -267,42 +265,7 @@ This runs `dynamics_figure.py`, all `plot_benchmark.py` calls, and all `plot_con
 
 ### Full reproduction of results
 
-The full benchmark sweeps require a multi-core HPC cluster and take on the order of tens of CPU-hours per config. Single-node reproduction is possible but slow. The convergence sweeps (step 3) depend on the hyperparameters saved in step 2.
-
-**Step 1: Run benchmark sweeps.** Repeat for each of the three configs:
-
-```bash
-# Estimate wall time first (72 = number of MPI ranks)
-python run_potts_sweep.py --config configs/260123_gset_max-3-cut.yaml --estimate_wall_time 72
-
-# Option A: LSF cluster — edit submit_template.sh with your email, core count, and config path
-bsub < submit_template.sh
-
-# Option B: local multi-core
-mpirun -n 8 python run_potts_sweep.py --config configs/260123_gset_max-3-cut.yaml
-```
-
-Configs: `260123_gset_max-3-cut.yaml`, `260123_gset_max-4-cut.yaml`, `260123_g05.yaml`.
-
-**Step 2: Save best hyperparameters** (required before running convergence sweeps):
-
-```bash
-python save_best_hyperparams.py results/results_260123_gset_max-3-cut.parquet
-python save_best_hyperparams.py results/results_260123_gset_max-4-cut.parquet
-python save_best_hyperparams.py results/results_260123_g05.parquet
-```
-
-**Step 3: Run convergence sweeps.** Repeat for each config:
-
-```bash
-bsub < submit_template.sh  # point submit_template.sh at the convergence config
-```
-
-Configs: `260128_gset_max-3-cut_convergence_sim_time.yaml`, `260128_gset_max-3-cut_convergence_time_step.yaml`, `260128_gset_max-4-cut_convergence_sim_time.yaml`, `260128_gset_max-4-cut_convergence_time_step.yaml`, `260128_g05_convergence_sim_time.yaml`, `260128_g05_convergence_time_step.yaml`.
-
-**Step 4: Plot all figures** using the commands in the previous section, substituting `results/paper/` with your own `results/` paths.
-
-`merge_parquet.py` is only needed when combining results from separate jobs manually. The sweep auto-merges results on completion.
+The full benchmark sweeps require a multi-core HPC cluster and take on the order of tens of CPU-hours per config. Run each `260123_*.yaml` config using `mpirun` (see the Multi-core and HPC section above). Once the benchmark sweeps are complete, run `save_best_hyperparams.py` on each result file before running the convergence configs (`260128_*.yaml`), as the convergence sweeps depend on the saved hyperparameters. After all sweeps complete, run `bash reproduce_figures.sh` with `results/paper/` replaced by your own `results/` paths. `merge_parquet.py` is only needed when combining results from separate jobs manually.
 
 ## Citation
 
