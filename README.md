@@ -19,6 +19,7 @@ The repository implements and benchmarks five analog Potts machine (PM) models (
 | Python | 3.14 | 3.10+ should work |
 | GCC or Clang | GCC 16 | Required to build the C++ extension |
 | OpenMPI | 5.0.6 | Required for multi-process sweeps; optional for single-process runs |
+| setuptools | 70+ | Installed via pip; required to build the C++ extension |
 | pybind11 | 2.13+ | Installed via pip |
 | numpy | 2.x | |
 | pandas | 2.x | |
@@ -71,7 +72,7 @@ The repository includes benchmark graphs in `graphs/` (DIMACS `.col` format). Th
 Run from the repo root:
 
 ```bash
-python hpc/run_potts_sweep.py --config hpc/configs/0_local_test.yaml
+python run_potts_sweep.py --config configs/0_local_test.yaml
 ```
 
 Expected output:
@@ -86,7 +87,7 @@ Saved combined results with 60 rows to results/results_0_local_test.parquet
 Finished sweep in 0:00:07
 ```
 
-The result is written to `results/results_0_local_test.parquet` relative to the repo root. The Parquet file contains one row per simulation run. Key columns include `cut_gap` (achieved cut minus optimal cut; zero means the optimum was reached, negative means the solution fell short) and `energy_gap`. To inspect the output:
+The result is written to `results/results_0_local_test.parquet` relative to the repo root. The Parquet file contains one row per simulation run. Key columns include `cut_gap` (achieved cut minus optimal cut: zero means the optimum was reached, negative means the solution fell short) and `energy_gap`. To inspect the output:
 
 ```bash
 python -c "import pandas as pd; print(pd.read_parquet('results/results_0_local_test.parquet')[['model','graph','cut_gap']].to_string())"
@@ -101,25 +102,24 @@ Expected run time on a standard desktop computer: under 30 seconds (single core)
 Graphs must be in DIMACS `.col` format (see "Using Your Own Graphs" below). Create a YAML config pointing to your graph files, set `num_states` (3 for Max-3-Cut, 4 for Max-4-Cut), and run:
 
 ```bash
-python hpc/run_potts_sweep.py --config hpc/configs/YOUR_CONFIG.yaml
+python run_potts_sweep.py --config configs/YOUR_CONFIG.yaml
 ```
 
 ### Estimate wall time before a large sweep
 
 ```bash
-python hpc/run_potts_sweep.py --config hpc/configs/YOUR_CONFIG.yaml --estimate_wall_time 72
+python run_potts_sweep.py --config configs/YOUR_CONFIG.yaml --estimate_wall_time 72
 ```
 
 ### Visualise parameter schedules
 
 ```bash
-python hpc/run_potts_sweep.py --config hpc/configs/YOUR_CONFIG.yaml --plot_schedules
+python run_potts_sweep.py --config configs/YOUR_CONFIG.yaml --plot_schedules
 ```
 
 ### HPC cluster (LSF)
 
 ```bash
-cd hpc/
 # Edit submit_template.sh: set your email, core count, walltime, and config path
 bsub < submit_template.sh
 
@@ -128,35 +128,33 @@ bstat
 tail -f logs/driver.<JOBID>.out
 ```
 
-Results are written as Parquet files to `hpc/results/` and can be merged with `merge_parquet.py`.
+Results are written as Parquet files to `results/` and can be merged with `merge_parquet.py`.
 
 ## Repository Structure
 
 ```
 potts_sim/
-├── potts_sim.cpp          # C++ simulation engine (Euler-Maruyama, all models)
-├── build_potts_sim.py     # Builds the C++ extension via pybind11
-├── potts_utils.py         # Graph parsing (DIMACS) and eigenvalue utilities
-├── cim_sim.py             # Coherent Ising Machine simulator wrapper
-├── graphs/                # Input graphs in DIMACS .col format (G-set + g05)
-├── figures/               # Publication figures and generation scripts
-└── hpc/
-    ├── run_potts_sweep.py     # Main entry point; MPI sweep runner
-    ├── configs/               # YAML experiment configurations
-    ├── graphs/                # Mirror of graphs/ used by HPC configs (paths relative to hpc/)
-    ├── best_hyperparams/      # Saved optimal hyperparameters per model/graph
-    ├── submit_template.sh     # LSF job submission template
-    ├── merge_parquet.py       # Merges result files from separate jobs
-    ├── plot_benchmark.py      # Benchmark result visualisation
-    ├── plot_convergence.py    # Convergence analysis plots
-    ├── save_best_hyperparams.py
-    ├── results/               # Output Parquet files (gitignored)
-    └── logs/                  # Job stdout/stderr logs (gitignored)
+├── potts_sim.cpp              # C++ simulation engine (Euler-Maruyama, all models)
+├── build_potts_sim.py         # Builds the C++ extension via pybind11
+├── potts_utils.py             # Graph parsing (DIMACS) and eigenvalue utilities
+├── cim_sim.py                 # Coherent Ising Machine simulator wrapper
+├── run_potts_sweep.py         # Main entry point; MPI sweep runner
+├── save_best_hyperparams.py   # Extracts best hyperparameters from a result file
+├── merge_parquet.py           # Merges result files from separate jobs
+├── plot_benchmark.py          # Benchmark result visualisation
+├── plot_convergence.py        # Convergence analysis plots
+├── submit_template.sh         # LSF job submission template
+├── graphs/                    # Input graphs in DIMACS .col format (G-set + g05)
+├── figures/                   # Publication figures and generation scripts
+├── configs/                   # YAML experiment configurations
+├── best_hyperparams/          # Saved optimal hyperparameters per model/graph
+├── results/                   # Output Parquet files (gitignored)
+└── logs/                      # Job stdout/stderr logs (gitignored)
 ```
 
 ## Configuration
 
-Experiments are defined in YAML files under `hpc/configs/`. The naming convention is `YYMMDD_<graph_set>_<model>.yaml`.
+Experiments are defined in YAML files under `configs/`. The naming convention is `YYMMDD_<graph_set>_<model>.yaml`.
 
 Key fields:
 
@@ -169,7 +167,7 @@ Key fields:
 | `noise_factor` | Stochastic noise amplitude |
 | `models` | Per-model parameter sweeps (supports ranges like `"0:0.5:2"` and schedule expressions like `"lin(1/mu_max, 1.0)"`) |
 
-See `hpc/configs/0_local_test.yaml` for a minimal working example.
+See `configs/0_local_test.yaml` for a minimal working example.
 
 **Schedule expressions** control how parameters vary over simulation time:
 
@@ -182,7 +180,7 @@ See `hpc/configs/0_local_test.yaml` for a minimal working example.
 | `mu_max` | Maximum eigenvalue of the coupling matrix (read from the graph file or computed) |
 | `"start:step:end"` | MATLAB-style range, generates a sweep list (e.g. `"0:0.5:2"` → [0.0, 0.5, 1.0, 1.5, 2.0]) |
 
-A linked schedule (`based_on` + `factor`) makes one parameter track another multiplied by a factor — useful for keeping gamma proportional to beta.
+A linked schedule (`based_on` + `factor`) makes one parameter track another multiplied by a factor, which is useful for keeping gamma proportional to beta.
 
 **Model names:** In YAML configs and result files, q-SHIL appears as `FIXED_AMPLITUDE`.
 
@@ -224,7 +222,7 @@ Graph paths are relative to the working directory from which you run the script.
 
 ## Reproducing Paper Results
 
-The benchmark results in the paper were produced on the DTU Computing Center HPC cluster (LSF scheduler) using the configurations in `hpc/configs/`. The final sweep configs are:
+The benchmark results in the paper were produced on the DTU Computing Center HPC cluster (LSF scheduler) using the configurations in `configs/`. The final sweep configs are:
 
 | Figure | Config file(s) |
 |---|---|
@@ -234,20 +232,17 @@ The benchmark results in the paper were produced on the DTU Computing Center HPC
 | Convergence (G-set) | `260128_gset_max-3-cut_convergence_*.yaml`, `260128_gset_max-4-cut_convergence_*.yaml` |
 | Convergence (g05) | `260128_g05_convergence_*.yaml` |
 
-All configs use paths relative to the `hpc/` directory. Run the following from inside `hpc/` (as `submit_template.sh` does).
+All commands run from the repo root.
 
 Before submitting, estimate the wall time:
 
 ```bash
-cd hpc/
 python run_potts_sweep.py --config configs/260123_gset_max-3-cut.yaml --estimate_wall_time 72
 ```
 
 **Benchmark workflow** (repeat for each config in the table above):
 
 ```bash
-cd hpc/
-
 # Option A: LSF cluster
 # Edit submit_template.sh with your email, core count, and config path, then submit
 bsub < submit_template.sh
@@ -255,7 +250,7 @@ bsub < submit_template.sh
 # Option B: local multi-core (slow for large configs)
 mpirun -n 8 python run_potts_sweep.py --config configs/260123_gset_max-3-cut.yaml
 
-# After completion, save best hyperparameters (writes best_hyperparams/results_260123_gset_max-3-cut_mean_gap.csv)
+# After completion, save best hyperparameters (writes best_hyperparams/260123_gset_max-3-cut_mean_gap.csv)
 python save_best_hyperparams.py results/results_260123_gset_max-3-cut.parquet
 
 # Plot benchmark figures
@@ -274,9 +269,9 @@ python plot_convergence.py \
     --conv_type simulation_time
 ```
 
-`merge_parquet.py` is only needed when combining results from separate jobs manually; the sweep auto-merges results on completion.
+`merge_parquet.py` is only needed when combining results from separate jobs manually. The sweep auto-merges results on completion.
 
-Saved optimal hyperparameters used in the paper are provided in `hpc/best_hyperparams/` for reference.
+Saved optimal hyperparameters used in the paper are provided in `best_hyperparams/` for reference.
 
 The full benchmark sweeps require a multi-core HPC cluster and take on the order of tens of CPU-hours per config. Single-node reproduction is possible but slow.
 

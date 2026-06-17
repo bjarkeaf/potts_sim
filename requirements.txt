@@ -15,7 +15,8 @@ pyyaml>=6.0
 # JIT compilation
 numba>=0.60
 
-# C++ extension build (requires a C++ compiler)
+# C++ extension build (requires a C++ compiler and setuptools)
+setuptools>=70.0
 pybind11>=2.13
 
 # MPI parallelisation (requires a system MPI installation, e.g. OpenMPI)

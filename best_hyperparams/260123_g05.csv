@@ -1,0 +1,361 @@
+Model,Graph,param_id,Hyperparameter 1,Hyperparameter 2,Mean rel. gap (%),Median rel. gap (%),Min rel. gap (%),Std rel. gap (%),Success rate (%)
+Reference IM,g05_10.0,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_10.1,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_10.2,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_10.3,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_10.4,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_10.5,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_10.6,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_10.7,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_10.8,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_10.9,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_20.0,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_20.1,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_20.2,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_20.3,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_20.4,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_20.5,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_20.6,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_20.7,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_20.8,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_20.9,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_30.0,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_30.1,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_30.2,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_30.3,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_30.4,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_30.5,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_30.6,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_30.7,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_30.8,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_30.9,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_40.0,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_40.1,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_40.2,"a-50.0_Bnv10.0_z0.35_blin(0,0.005)",B_num_vertices=10.00,zeta=0.35,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_40.3,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_40.4,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_40.5,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_40.6,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_40.7,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_40.8,"a-50.0_Bnv10.0_z0.25_blin(0,0.005)",B_num_vertices=10.00,zeta=0.25,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_40.9,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_5.0,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_5.1,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_5.2,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_5.3,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_5.4,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_5.5,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_5.6,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_5.7,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_5.8,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_5.9,"a-50.0_Bnv10.0_z0.15000000000000002_blin(0,0.005)",B_num_vertices=10.00,zeta=0.15,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_50.0,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_50.1,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_50.2,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_50.3,"a-50.0_Bnv10.0_z0.35_blin(0,0.005)",B_num_vertices=10.00,zeta=0.35,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_50.4,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_50.5,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_50.6,"a-50.0_Bnv10.0_z0.45000000000000007_blin(0,0.005)",B_num_vertices=10.00,zeta=0.45,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_50.7,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_50.8,"a-50.0_Bnv10.0_z0.45000000000000007_blin(0,0.005)",B_num_vertices=10.00,zeta=0.45,0.00,0.00,0.00,0.00,100.00
+Reference IM,g05_50.9,"a-50.0_Bnv10.0_z0.30000000000000004_blin(0,0.005)",B_num_vertices=10.00,zeta=0.30,0.00,0.00,0.00,0.00,100.00
+NEC,g05_10.0,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_10.1,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_10.2,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_10.3,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_10.4,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_10.5,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_10.6,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_10.7,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_10.8,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_10.9,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_20.0,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_20.1,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_20.2,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_20.3,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_20.4,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_20.5,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_20.6,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_20.7,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_20.8,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_20.9,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_30.0,ar1.00e-02_rt0.25_ia-mu_max_gpf11.0,gamma_factor=11.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_30.1,ar1.00e-02_rt0.25_ia-mu_max_gpf2.0,gamma_factor=2.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_30.2,ar1.00e-02_rt0.25_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_30.3,ar1.00e-02_rt0.25_ia-mu_max_gpf10.0,gamma_factor=10.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_30.4,ar1.00e-02_rt0.25_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_30.5,ar1.00e-02_rt0.75_ia-mu_max_gpf13.0,gamma_factor=13.00,r_target=0.75,0.09,0.00,0.00,0.21,84.00
+NEC,g05_30.6,ar1.00e-02_rt0.25_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_30.7,ar1.00e-02_rt0.25_ia-mu_max_gpf2.0,gamma_factor=2.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_30.8,ar1.00e-02_rt0.25_ia-mu_max_gpf10.0,gamma_factor=10.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_30.9,ar1.00e-02_rt0.5_ia-mu_max_gpf19.0,gamma_factor=19.00,r_target=0.50,0.00,0.00,0.00,0.00,100.00
+NEC,g05_40.0,ar1.00e-02_rt0.5_ia-mu_max_gpf21.0,gamma_factor=21.00,r_target=0.50,0.00,0.00,0.00,0.00,100.00
+NEC,g05_40.1,ar1.00e-02_rt0.25_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_40.2,ar1.00e-02_rt0.5_ia-mu_max_gpf21.0,gamma_factor=21.00,r_target=0.50,0.00,0.00,0.00,0.00,100.00
+NEC,g05_40.3,ar1.00e-02_rt0.75_ia-mu_max_gpf11.0,gamma_factor=11.00,r_target=0.75,0.00,0.00,0.00,0.00,100.00
+NEC,g05_40.4,ar1.00e-02_rt0.25_ia-mu_max_gpf16.0,gamma_factor=16.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_40.5,ar1.00e-02_rt0.25_ia-mu_max_gpf10.0,gamma_factor=10.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_40.6,ar1.00e-02_rt0.25_ia-mu_max_gpf18.0,gamma_factor=18.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_40.7,ar1.00e-02_rt0.25_ia-mu_max_gpf10.0,gamma_factor=10.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_40.8,ar1.00e-02_rt0.25_ia-mu_max_gpf5.0,gamma_factor=5.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_40.9,ar1.00e-02_rt0.25_ia-mu_max_gpf2.0,gamma_factor=2.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_5.0,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_5.1,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_5.2,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_5.3,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_5.4,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_5.5,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_5.6,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_5.7,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_5.8,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_5.9,ar1.00e-02_rt0.0_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.00,0.00,0.00,0.00,0.00,100.00
+NEC,g05_50.0,ar1.00e-02_rt0.25_ia-mu_max_gpf24.0,gamma_factor=24.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_50.1,ar1.00e-02_rt0.5_ia-mu_max_gpf22.0,gamma_factor=22.00,r_target=0.50,0.00,0.00,0.00,0.00,100.00
+NEC,g05_50.2,ar1.00e-02_rt0.25_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_50.3,ar1.00e-02_rt0.5_ia-mu_max_gpf21.0,gamma_factor=21.00,r_target=0.50,0.00,0.00,0.00,0.00,100.00
+NEC,g05_50.4,ar1.00e-02_rt0.5_ia-mu_max_gpf13.0,gamma_factor=13.00,r_target=0.50,0.00,0.00,0.00,0.00,100.00
+NEC,g05_50.5,ar1.00e-02_rt0.5_ia-mu_max_gpf20.0,gamma_factor=20.00,r_target=0.50,0.00,0.00,0.00,0.00,100.00
+NEC,g05_50.6,ar1.00e-02_rt0.25_ia-mu_max_gpf25.0,gamma_factor=25.00,r_target=0.25,0.00,0.00,0.00,0.00,100.00
+NEC,g05_50.7,ar1.00e-02_rt0.5_ia-mu_max_gpf1.0,gamma_factor=1.00,r_target=0.50,0.00,0.00,0.00,0.00,100.00
+NEC,g05_50.8,ar1.00e-02_rt0.75_ia-mu_max_gpf22.0,gamma_factor=22.00,r_target=0.75,0.00,0.00,0.00,0.00,100.00
+NEC,g05_50.9,ar1.00e-02_rt0.5_ia-mu_max_gpf19.0,gamma_factor=19.00,r_target=0.50,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_10.0,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_10.1,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.5",gamma_factor=1.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_10.2,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_10.3,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.5",gamma_factor=0.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_10.4,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_10.5,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.5",gamma_factor=0.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_10.6,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.5",gamma_factor=0.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_10.7,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.5",gamma_factor=0.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_10.8,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_10.9,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.5",gamma_factor=0.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_20.0,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.5",gamma_factor=0.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_20.1,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.5",gamma_factor=0.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_20.2,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf2.0",gamma_factor=2.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_20.3,"a-20.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.5",gamma_factor=1.50,alpha=-20.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_20.4,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.0",gamma_factor=1.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_20.5,"a-30.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-30.00,0.88,1.20,0.00,0.70,34.00
+Sigmoid PM,g05_20.6,"a-50.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf4.5",gamma_factor=4.50,alpha=-50.00,0.17,0.00,0.00,0.42,86.00
+Sigmoid PM,g05_20.7,"a-50.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.5",gamma_factor=1.50,alpha=-50.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_20.8,"a-30.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-30.00,0.57,0.00,0.00,0.71,58.00
+Sigmoid PM,g05_20.9,"a-40.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.5",gamma_factor=1.50,alpha=-40.00,0.61,0.00,0.00,0.78,58.00
+Sigmoid PM,g05_30.0,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.5",gamma_factor=1.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_30.1,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf2.5",gamma_factor=2.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_30.2,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.5",gamma_factor=0.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_30.3,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.5",gamma_factor=0.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_30.4,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf2.0",gamma_factor=2.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_30.5,"a-30.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf2.5",gamma_factor=2.50,alpha=-30.00,0.56,0.56,0.00,0.06,1.00
+Sigmoid PM,g05_30.6,"a-40.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf2.0",gamma_factor=2.00,alpha=-40.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_30.7,"a0.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.5",gamma_factor=0.50,alpha=0.00,0.74,1.11,0.00,0.70,28.00
+Sigmoid PM,g05_30.8,"a-50.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf4.5",gamma_factor=4.50,alpha=-50.00,1.06,1.11,0.00,0.23,3.00
+Sigmoid PM,g05_30.9,"a-30.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf7.5",gamma_factor=7.50,alpha=-30.00,1.08,1.12,0.00,0.16,1.00
+Sigmoid PM,g05_40.0,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,1.79,1.87,0.62,0.67,0.00
+Sigmoid PM,g05_40.1,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf2.0",gamma_factor=2.00,alpha=-10.00,0.35,0.33,0.00,0.25,13.00
+Sigmoid PM,g05_40.2,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf4.0",gamma_factor=4.00,alpha=-10.00,0.81,0.98,0.00,0.20,2.00
+Sigmoid PM,g05_40.3,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf7.0",gamma_factor=7.00,alpha=-10.00,0.94,0.95,0.00,0.45,15.00
+Sigmoid PM,g05_40.4,"a-50.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf2.0",gamma_factor=2.00,alpha=-50.00,0.01,0.00,0.00,0.05,97.00
+Sigmoid PM,g05_40.5,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.0",gamma_factor=1.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_40.6,"a0.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.0",gamma_factor=1.00,alpha=0.00,1.09,0.98,0.00,0.79,13.00
+Sigmoid PM,g05_40.7,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.5",gamma_factor=1.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_40.8,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.5",gamma_factor=1.50,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_40.9,"a-40.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf3.0",gamma_factor=3.00,alpha=-40.00,0.36,0.00,0.00,0.61,73.00
+Sigmoid PM,g05_5.0,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_5.1,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_5.2,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_5.3,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_5.4,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_5.5,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_5.6,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_5.7,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_5.8,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_5.9,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_50.0,"a0.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf2.5",gamma_factor=2.50,alpha=0.00,1.11,0.91,0.00,0.70,1.00
+Sigmoid PM,g05_50.1,"a-30.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf3.5",gamma_factor=3.50,alpha=-30.00,0.59,0.73,0.00,0.35,24.00
+Sigmoid PM,g05_50.2,"a0.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.5",gamma_factor=1.50,alpha=0.00,0.38,0.20,0.00,0.42,12.00
+Sigmoid PM,g05_50.3,"a-40.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf7.5",gamma_factor=7.50,alpha=-40.00,0.08,0.00,0.00,0.16,81.00
+Sigmoid PM,g05_50.4,"a-20.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf2.5",gamma_factor=2.50,alpha=-20.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_50.5,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,2.67,3.21,0.40,1.31,0.00
+Sigmoid PM,g05_50.6,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf0.0",gamma_factor=0.00,alpha=-10.00,2.20,1.87,1.04,0.76,0.00
+Sigmoid PM,g05_50.7,"a-50.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf3.5",gamma_factor=3.50,alpha=-50.00,0.00,0.00,0.00,0.00,100.00
+Sigmoid PM,g05_50.8,"a0.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.5",gamma_factor=1.50,alpha=0.00,1.20,1.20,0.00,0.41,1.00
+Sigmoid PM,g05_50.9,"a-10.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf5.5",gamma_factor=5.50,alpha=-10.00,0.60,0.59,0.00,0.24,6.00
+Polynomial PM,g05_10.0,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_10.1,"po10_blin(1/mu_max, 1/mu_max + 2)_gf1.5",poly_order=10.00,gamma_factor=1.50,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_10.2,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.5",poly_order=10.00,gamma_factor=0.50,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_10.3,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.5",poly_order=10.00,gamma_factor=0.50,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_10.4,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.5",poly_order=10.00,gamma_factor=0.50,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_10.5,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.5",poly_order=10.00,gamma_factor=0.50,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_10.6,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.5",poly_order=10.00,gamma_factor=0.50,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_10.7,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.5",poly_order=10.00,gamma_factor=0.50,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_10.8,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_10.9,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.5",poly_order=10.00,gamma_factor=0.50,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_20.0,"po10_blin(1/mu_max, 1/mu_max + 2)_gf1.0",poly_order=10.00,gamma_factor=1.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_20.1,"po10_blin(1/mu_max, 1/mu_max + 2)_gf2.0",poly_order=10.00,gamma_factor=2.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_20.2,"po3_blin(1/mu_max, 1/mu_max + 2)_gf1.0",poly_order=3.00,gamma_factor=1.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_20.3,"po3_blin(1/mu_max, 1/mu_max + 2)_gf2.0",poly_order=3.00,gamma_factor=2.00,1.30,1.22,0.00,1.03,31.00
+Polynomial PM,g05_20.4,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.5",poly_order=10.00,gamma_factor=0.50,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_20.5,"po3_blin(1/mu_max, 1/mu_max + 2)_gf2.5",poly_order=3.00,gamma_factor=2.50,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_20.6,"po8_blin(1/mu_max, 1/mu_max + 2)_gf2.5",poly_order=8.00,gamma_factor=2.50,1.05,1.20,0.00,0.41,13.00
+Polynomial PM,g05_20.7,"po3_blin(1/mu_max, 1/mu_max + 2)_gf3.5",poly_order=3.00,gamma_factor=3.50,0.66,0.00,0.00,0.86,58.00
+Polynomial PM,g05_20.8,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,1.18,1.27,0.00,1.25,42.00
+Polynomial PM,g05_20.9,"po9_blin(1/mu_max, 1/mu_max + 2)_gf6.5",poly_order=9.00,gamma_factor=6.50,1.06,1.22,0.00,0.94,36.00
+Polynomial PM,g05_30.0,"po3_blin(1/mu_max, 1/mu_max + 2)_gf2.0",poly_order=3.00,gamma_factor=2.00,0.79,1.06,0.00,0.47,26.00
+Polynomial PM,g05_30.1,"po3_blin(1/mu_max, 1/mu_max + 2)_gf2.5",poly_order=3.00,gamma_factor=2.50,0.13,0.00,0.00,0.32,83.00
+Polynomial PM,g05_30.2,"po6_blin(1/mu_max, 1/mu_max + 2)_gf0.5",poly_order=6.00,gamma_factor=0.50,0.56,0.00,0.00,0.72,61.00
+Polynomial PM,g05_30.3,"po10_blin(1/mu_max, 1/mu_max + 2)_gf1.0",poly_order=10.00,gamma_factor=1.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_30.4,"po3_blin(1/mu_max, 1/mu_max + 2)_gf1.5",poly_order=3.00,gamma_factor=1.50,0.16,0.00,0.00,0.49,90.00
+Polynomial PM,g05_30.5,"po10_blin(1/mu_max, 1/mu_max + 2)_gf3.0",poly_order=10.00,gamma_factor=3.00,1.29,1.12,0.00,0.72,1.00
+Polynomial PM,g05_30.6,"po5_blin(1/mu_max, 1/mu_max + 2)_gf1.0",poly_order=5.00,gamma_factor=1.00,1.11,1.13,0.00,0.68,14.00
+Polynomial PM,g05_30.7,"po6_blin(1/mu_max, 1/mu_max + 2)_gf1.5",poly_order=6.00,gamma_factor=1.50,0.67,0.56,0.00,0.47,6.00
+Polynomial PM,g05_30.8,"po6_blin(1/mu_max, 1/mu_max + 2)_gf3.5",poly_order=6.00,gamma_factor=3.50,1.28,1.11,0.00,0.73,12.00
+Polynomial PM,g05_30.9,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,2.87,2.79,0.56,1.54,0.00
+Polynomial PM,g05_40.0,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,1.72,1.87,0.62,0.80,0.00
+Polynomial PM,g05_40.1,"po3_blin(1/mu_max, 1/mu_max + 2)_gf2.5",poly_order=3.00,gamma_factor=2.50,0.69,0.98,0.00,0.39,21.00
+Polynomial PM,g05_40.2,"po3_blin(1/mu_max, 1/mu_max + 2)_gf3.5",poly_order=3.00,gamma_factor=3.50,0.58,0.98,0.00,0.50,41.00
+Polynomial PM,g05_40.3,"po3_blin(1/mu_max, 1/mu_max + 2)_gf5.0",poly_order=3.00,gamma_factor=5.00,1.26,1.26,0.00,0.69,14.00
+Polynomial PM,g05_40.4,"po4_blin(1/mu_max, 1/mu_max + 2)_gf1.0",poly_order=4.00,gamma_factor=1.00,0.01,0.00,0.00,0.06,99.00
+Polynomial PM,g05_40.5,"po3_blin(1/mu_max, 1/mu_max + 2)_gf1.0",poly_order=3.00,gamma_factor=1.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_40.6,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.5",poly_order=10.00,gamma_factor=0.50,0.80,0.81,0.00,0.35,8.00
+Polynomial PM,g05_40.7,"po3_blin(1/mu_max, 1/mu_max + 2)_gf1.0",poly_order=3.00,gamma_factor=1.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_40.8,"po5_blin(1/mu_max, 1/mu_max + 2)_gf2.5",poly_order=5.00,gamma_factor=2.50,0.68,0.97,0.00,0.47,26.00
+Polynomial PM,g05_40.9,"po3_blin(1/mu_max, 1/mu_max + 2)_gf1.0",poly_order=3.00,gamma_factor=1.00,0.36,0.00,0.00,0.90,86.00
+Polynomial PM,g05_5.0,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_5.1,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_5.2,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_5.3,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_5.4,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_5.5,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_5.6,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_5.7,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_5.8,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_5.9,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,0.00,0.00,0.00,0.00,100.00
+Polynomial PM,g05_50.0,"po10_blin(1/mu_max, 1/mu_max + 2)_gf3.5",poly_order=10.00,gamma_factor=3.50,1.24,1.21,0.00,0.62,3.00
+Polynomial PM,g05_50.1,"po7_blin(1/mu_max, 1/mu_max + 2)_gf5.0",poly_order=7.00,gamma_factor=5.00,0.70,0.62,0.00,0.31,2.00
+Polynomial PM,g05_50.2,"po4_blin(1/mu_max, 1/mu_max + 2)_gf3.0",poly_order=4.00,gamma_factor=3.00,0.20,0.20,0.00,0.14,13.00
+Polynomial PM,g05_50.3,"po3_blin(1/mu_max, 1/mu_max + 2)_gf6.0",poly_order=3.00,gamma_factor=6.00,0.72,0.61,0.00,0.23,1.00
+Polynomial PM,g05_50.4,"po4_blin(1/mu_max, 1/mu_max + 2)_gf3.0",poly_order=4.00,gamma_factor=3.00,0.45,0.42,0.00,0.25,9.00
+Polynomial PM,g05_50.5,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,3.26,3.61,0.60,1.43,0.00
+Polynomial PM,g05_50.6,"po10_blin(1/mu_max, 1/mu_max + 2)_gf0.0",poly_order=10.00,gamma_factor=0.00,2.28,2.07,1.24,0.85,0.00
+Polynomial PM,g05_50.7,"po3_blin(1/mu_max, 1/mu_max + 2)_gf4.5",poly_order=3.00,gamma_factor=4.50,0.82,0.83,0.00,0.50,1.00
+Polynomial PM,g05_50.8,"po3_blin(1/mu_max, 1/mu_max + 2)_gf2.5",poly_order=3.00,gamma_factor=2.50,0.45,0.40,0.00,0.19,2.00
+Polynomial PM,g05_50.9,"po3_blin(1/mu_max, 1/mu_max + 2)_gf5.0",poly_order=3.00,gamma_factor=5.00,0.79,0.99,0.00,0.28,5.00
+q-SHIL,g05_10.0,"glin(0,10.0)",,,0.05,0.00,0.00,0.50,99.00
+q-SHIL,g05_10.1,"glin(0,10.0)",,,3.43,4.76,0.00,2.15,28.00
+q-SHIL,g05_10.2,"glin(0,10.0)",,,0.95,0.00,0.00,1.91,80.00
+q-SHIL,g05_10.3,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_10.4,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_10.5,"glin(0,10.0)",,,3.18,4.55,0.00,3.45,48.00
+q-SHIL,g05_10.6,"glin(0,10.0)",,,1.50,0.00,0.00,2.15,67.00
+q-SHIL,g05_10.7,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_10.8,"glin(0,10.0)",,,0.24,0.00,0.00,1.04,95.00
+q-SHIL,g05_10.9,"glin(0,10.0)",,,0.52,0.00,0.00,1.78,91.00
+q-SHIL,g05_20.0,"glin(0,10.0)",,,0.32,0.00,0.00,0.97,89.00
+q-SHIL,g05_20.1,"glin(0,10.0)",,,0.91,0.00,0.00,1.43,65.00
+q-SHIL,g05_20.2,"glin(0,10.0)",,,1.04,1.22,0.00,0.44,15.00
+q-SHIL,g05_20.3,"glin(0,10.0)",,,1.46,1.22,0.00,0.83,9.00
+q-SHIL,g05_20.4,"glin(0,10.0)",,,0.42,0.00,0.00,0.58,65.00
+q-SHIL,g05_20.5,"glin(0,10.0)",,,1.33,1.20,0.00,1.10,27.00
+q-SHIL,g05_20.6,"glin(0,10.0)",,,1.18,1.20,0.00,0.17,2.00
+q-SHIL,g05_20.7,"glin(0,10.0)",,,1.86,1.25,0.00,1.01,6.00
+q-SHIL,g05_20.8,"glin(0,10.0)",,,0.65,0.00,0.00,0.83,58.00
+q-SHIL,g05_20.9,"glin(0,10.0)",,,1.34,1.22,0.00,1.13,36.00
+q-SHIL,g05_30.0,"glin(0,10.0)",,,1.97,2.13,0.00,0.86,6.00
+q-SHIL,g05_30.1,"glin(0,10.0)",,,1.37,1.61,0.00,0.41,1.00
+q-SHIL,g05_30.2,"glin(0,10.0)",,,1.37,1.62,0.00,0.67,2.00
+q-SHIL,g05_30.3,"glin(0,10.0)",,,1.56,1.64,0.00,0.98,22.00
+q-SHIL,g05_30.4,"glin(0,10.0)",,,1.43,1.64,0.00,0.76,16.00
+q-SHIL,g05_30.5,"glin(0,10.0)",,,1.48,1.69,0.56,0.45,0.00
+q-SHIL,g05_30.6,"glin(0,10.0)",,,1.59,1.69,0.00,0.79,5.00
+q-SHIL,g05_30.7,"glin(0,10.0)",,,1.04,1.11,0.00,1.15,42.00
+q-SHIL,g05_30.8,"glin(0,10.0)",,,1.28,1.11,0.56,0.60,0.00
+q-SHIL,g05_30.9,"glin(0,10.0)",,,0.92,0.56,0.56,0.73,0.00
+q-SHIL,g05_40.0,"glin(0,10.0)",,,0.93,0.93,0.31,0.33,0.00
+q-SHIL,g05_40.1,"glin(0,10.0)",,,1.20,1.31,0.33,0.50,0.00
+q-SHIL,g05_40.2,"glin(0,10.0)",,,0.76,0.33,0.33,0.51,0.00
+q-SHIL,g05_40.3,"glin(0,10.0)",,,1.61,1.58,0.95,0.49,0.00
+q-SHIL,g05_40.4,"glin(0,10.0)",,,0.96,0.94,0.00,0.38,4.00
+q-SHIL,g05_40.5,"glin(0,10.0)",,,0.87,0.65,0.00,0.50,1.00
+q-SHIL,g05_40.6,"glin(0,10.0)",,,0.90,0.98,0.00,0.58,1.00
+q-SHIL,g05_40.7,"glin(0,10.0)",,,1.22,0.93,0.93,0.62,0.00
+q-SHIL,g05_40.8,"glin(0,10.0)",,,1.45,1.61,0.00,0.59,2.00
+q-SHIL,g05_40.9,"glin(0,10.0)",,,1.25,0.96,0.32,0.49,0.00
+q-SHIL,g05_5.0,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_5.1,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_5.2,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_5.3,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_5.4,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_5.5,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_5.6,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_5.7,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_5.8,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_5.9,"glin(0,10.0)",,,0.00,0.00,0.00,0.00,100.00
+q-SHIL,g05_50.0,"glin(0,10.0)",,,0.97,0.81,0.00,0.56,3.00
+q-SHIL,g05_50.1,"glin(0,10.0)",,,0.72,0.42,0.21,0.58,0.00
+q-SHIL,g05_50.2,"glin(0,10.0)",,,0.98,1.02,0.00,0.73,3.00
+q-SHIL,g05_50.3,"glin(0,10.0)",,,1.40,1.43,0.61,0.59,0.00
+q-SHIL,g05_50.4,"glin(0,10.0)",,,0.90,0.63,0.21,0.51,0.00
+q-SHIL,g05_50.5,"glin(0,10.0)",,,1.01,0.80,0.20,0.55,0.00
+q-SHIL,g05_50.6,"glin(0,10.0)",,,1.30,1.24,0.62,0.30,0.00
+q-SHIL,g05_50.7,"glin(0,10.0)",,,1.08,1.24,0.41,0.28,0.00
+q-SHIL,g05_50.8,"glin(0,10.0)",,,1.29,1.40,0.20,0.46,0.00
+q-SHIL,g05_50.9,"glin(0,10.0)",,,1.01,0.79,0.20,0.41,0.00
+q-PDC,g05_10.0,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_10.1,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_10.2,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_10.3,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_10.4,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_10.5,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.04,gamma_factor=0.04,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_10.6,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_10.7,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_10.8,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_10.9,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_20.0,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.4,gamma_factor=0.40,,1.69,1.19,0.00,1.60,27.00
+q-PDC,g05_20.1,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.32,gamma_factor=0.32,,0.43,0.00,0.00,0.77,72.00
+q-PDC,g05_20.2,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.36,gamma_factor=0.36,,1.67,1.22,0.00,1.44,25.00
+q-PDC,g05_20.3,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.36,gamma_factor=0.36,,1.02,1.22,0.00,0.83,29.00
+q-PDC,g05_20.4,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.2,gamma_factor=0.20,,0.33,0.00,0.00,0.54,73.00
+q-PDC,g05_20.5,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.28,gamma_factor=0.28,,0.77,1.20,0.00,0.70,41.00
+q-PDC,g05_20.6,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.16,gamma_factor=0.16,,0.78,1.20,0.00,0.69,40.00
+q-PDC,g05_20.7,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.28,gamma_factor=0.28,,1.15,1.25,0.00,0.83,26.00
+q-PDC,g05_20.8,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.08,gamma_factor=0.08,,0.96,1.27,0.00,0.63,27.00
+q-PDC,g05_20.9,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.4,gamma_factor=0.40,,1.13,1.22,0.00,0.98,30.00
+q-PDC,g05_30.0,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.84,gamma_factor=0.84,,3.54,3.19,0.00,1.63,2.00
+q-PDC,g05_30.1,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.4,gamma_factor=0.40,,2.43,2.69,0.00,0.98,3.00
+q-PDC,g05_30.2,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf1.28,gamma_factor=1.28,,4.81,4.86,0.00,1.63,2.00
+q-PDC,g05_30.3,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf1.28,gamma_factor=1.28,,4.58,4.37,0.00,1.62,1.00
+q-PDC,g05_30.4,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.36,gamma_factor=0.36,,3.01,3.28,0.00,1.20,4.00
+q-PDC,g05_30.5,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,3.16,3.37,0.56,0.93,0.00
+q-PDC,g05_30.6,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.08,gamma_factor=0.08,,3.08,3.39,0.00,0.88,1.00
+q-PDC,g05_30.7,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.08,gamma_factor=0.08,,3.74,3.89,0.00,1.29,1.00
+q-PDC,g05_30.8,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.32,gamma_factor=0.32,,3.09,3.33,0.00,1.07,1.00
+q-PDC,g05_30.9,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.52,gamma_factor=0.52,,2.97,2.79,0.00,1.27,1.00
+q-PDC,g05_40.0,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,3.67,3.74,0.62,1.34,0.00
+q-PDC,g05_40.1,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,3.95,4.26,1.64,0.94,0.00
+q-PDC,g05_40.2,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,3.76,3.92,1.31,1.04,0.00
+q-PDC,g05_40.3,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,3.78,3.79,1.58,1.00,0.00
+q-PDC,g05_40.4,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.12,gamma_factor=0.12,,3.02,3.12,0.00,1.19,1.00
+q-PDC,g05_40.5,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.52,gamma_factor=0.52,,3.29,3.23,0.00,1.21,1.00
+q-PDC,g05_40.6,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,4.11,4.56,0.65,1.27,0.00
+q-PDC,g05_40.7,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.08,gamma_factor=0.08,,4.29,4.32,0.00,1.40,1.00
+q-PDC,g05_40.8,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.4,gamma_factor=0.40,,4.11,4.19,0.00,1.22,1.00
+q-PDC,g05_40.9,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.36,gamma_factor=0.36,,3.58,3.82,0.00,1.39,1.00
+q-PDC,g05_5.0,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_5.1,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_5.2,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_5.3,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_5.4,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_5.5,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_5.6,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_5.7,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_5.8,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_5.9,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,0.00,0.00,0.00,0.00,100.00
+q-PDC,g05_50.0,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,4.27,4.23,2.02,1.09,0.00
+q-PDC,g05_50.1,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,3.83,3.95,1.46,1.04,0.00
+q-PDC,g05_50.2,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.32,gamma_factor=0.32,,3.78,3.78,0.00,1.43,1.00
+q-PDC,g05_50.3,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,4.24,4.49,0.61,1.28,0.00
+q-PDC,g05_50.4,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,3.66,3.77,0.63,1.35,0.00
+q-PDC,g05_50.5,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,4.55,4.82,1.00,1.36,0.00
+q-PDC,g05_50.6,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,4.14,4.25,1.66,1.14,0.00
+q-PDC,g05_50.7,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.36,gamma_factor=0.36,,3.93,3.93,0.00,1.31,1.00
+q-PDC,g05_50.8,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,3.69,3.61,1.20,1.15,0.00
+q-PDC,g05_50.9,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.0,gamma_factor=0.00,,3.75,3.75,0.40,1.44,0.00
