@@ -1,5 +1,4 @@
 #%% Import
-import sys
 import os
 import time
 import numpy as np
@@ -7,12 +6,13 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import seaborn as sns
 
-# Go back one directory to import custom modules
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import potts_sim
 from potts_utils import parse_graph
 from cim_sim import run_cim_from_graph
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_FIGURES = os.path.join(_HERE, "figures")
+os.makedirs(_FIGURES, exist_ok=True)
 
 
 def plot_phase_with_wraparound(ax, t, phase, max_num_to_plot=None, **kwargs):
@@ -81,7 +81,7 @@ seed = 2
 # Load a coupling graph
 #file_path = "graphs/band/band50_3_antiferro.col"
 #file_path = "graphs/gset/G5.col"
-file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "graphs/g05/g05_20.0.col")
+file_path = os.path.join(_HERE, "graphs/g05/g05_20.0.col")
 num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max = parse_graph(file_path)
 opt_cut = opt_cut_dict.get(num_states, 0)
 
@@ -449,7 +449,7 @@ for j, (model_key, display_name, letter, ylabel) in enumerate(bottom_models):
     axC.set_xlabel("Time")
 
 plt.tight_layout()
-plt.savefig("dynamics_figure.pdf", bbox_inches='tight')
+plt.savefig(os.path.join(_FIGURES, "dynamics_figure.pdf"), bbox_inches='tight')
 plt.show()
 
 #%% Similar figure, but individual figure for each model
@@ -518,7 +518,7 @@ for model_key, title in top_figures:
     ax_cut.set_yticks(np.arange(50, opt_cut + 5, 10))
 
     fig.tight_layout()
-    fig.savefig(f"dynamics_{model_key.lower()}.png", bbox_inches="tight")
+    fig.savefig(os.path.join(_FIGURES, f"dynamics_{model_key.lower()}.png"), bbox_inches="tight")
     plt.close(fig)
 
 bottom_figures = [
@@ -580,6 +580,6 @@ for model_key, title, is_phase_plot in bottom_figures:
     ax_cut.set_yticks(np.arange(50, opt_cut + 5, 10))
 
     fig.tight_layout()
-    fig.savefig(f"dynamics_{model_key.lower()}.png", bbox_inches="tight")
+    fig.savefig(os.path.join(_FIGURES, f"dynamics_{model_key.lower()}.png"), bbox_inches="tight")
     plt.close(fig)
 

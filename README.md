@@ -145,9 +145,10 @@ potts_sim/
 ├── merge_parquet.py           # Merges result files from separate jobs
 ├── plot_benchmark.py          # Benchmark result visualisation
 ├── plot_convergence.py        # Convergence analysis plots
+├── dynamics_figure.py         # Generates dynamics figures, outputs to figures/
 ├── submit_template.sh         # LSF job submission template
 ├── graphs/                    # Input graphs in DIMACS .col format (G-set + g05)
-├── figures/                   # Publication figures and generation scripts
+├── figures/                   # Publication figures (PDF and PNG outputs)
 ├── configs/                   # YAML experiment configurations
 ├── best_hyperparams/          # Saved optimal hyperparameters per model/graph
 ├── rudy_to_dimacs.sh          # Converts Rudy-format graphs to DIMACS .col
