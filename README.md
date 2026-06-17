@@ -10,7 +10,7 @@ The repository implements and benchmarks five analog Potts machine (PM) models (
 
 ## System Requirements
 
-**Operating system:** Linux or macOS. Tested on Linux (Arch, kernel 7.x) with Python 3.14 and GCC 16. macOS should work with Clang and Homebrew OpenMPI, but has not been formally tested.
+**Operating system:** Linux or macOS. Tested on Linux (Arch, kernel 7.x) with Python 3.14 and GCC 16, and on AlmaLinux 9.8 (DTU HPC cluster). macOS should work with Clang and Homebrew OpenMPI, but has not been formally tested.
 
 **Software dependencies:**
 
