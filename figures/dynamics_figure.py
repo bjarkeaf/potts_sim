@@ -81,7 +81,7 @@ seed = 2
 # Load a coupling graph
 #file_path = "graphs/band/band50_3_antiferro.col"
 #file_path = "graphs/gset/G5.col"
-file_path = "../graphs/g05/g05_20.0.col"
+file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "graphs/g05/g05_20.0.col")
 num_vertices, num_edges, edges, opt_cut_dict, opt_energy_dict, mu_max = parse_graph(file_path)
 opt_cut = opt_cut_dict.get(num_states, 0)
 
