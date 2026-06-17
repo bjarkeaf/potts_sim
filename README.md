@@ -133,18 +133,15 @@ The optional argument is the number of MPI ranks to assume for the estimate. Omi
 python run_potts_sweep.py --config configs/YOUR_CONFIG.yaml --plot_schedules
 ```
 
-### HPC cluster (LSF)
+### Multi-core and HPC
+
+The sweep parallelises with MPI. To use multiple cores, prefix the command with `mpirun`:
 
 ```bash
-# Edit submit_template.sh: set your email, core count, walltime, and config path
-bsub < submit_template.sh
-
-# Monitor job
-bstat
-tail -f logs/driver.<JOBID>.out
+mpirun -n 8 python run_potts_sweep.py --config configs/YOUR_CONFIG.yaml
 ```
 
-Results are written as Parquet files to `results/` and can be merged with `merge_parquet.py`.
+On HPC clusters, wrap this in your scheduler's job script (e.g. LSF, SLURM). A template LSF script is provided in `submit_template.sh`. Results are written as Parquet files to `results/`.
 
 ## Repository Structure
 
