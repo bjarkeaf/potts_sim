@@ -54,6 +54,7 @@ build/
 results/*
 !results/.gitkeep
 !results/paper/
+!results/paper/*.parquet
 logs/*
 !logs/.gitkeep
 plots/*

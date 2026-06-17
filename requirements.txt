@@ -21,6 +21,6 @@ pybind11>=2.13
 
 # MPI parallelisation (requires a system MPI installation, e.g. OpenMPI)
 # On HPC clusters this is typically provided via an environment module.
-# For local single-process runs mpi4py is optional -- the code falls back
+# For local single-process runs, mpi4py is optional. The code falls back
 # gracefully when MPI is unavailable.
 mpi4py>=4.0

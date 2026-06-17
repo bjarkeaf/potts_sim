@@ -1,6 +1,7 @@
 #%% Import
 import sys
 import os
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -9,10 +10,55 @@ import seaborn as sns
 # Go back one directory to import custom modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import potts_sim  # Import the custom module
+import potts_sim
 from potts_utils import parse_graph
 from cim_sim import run_cim_from_graph
-from test_bench import execute_model, plot_phase_with_wraparound
+
+
+def plot_phase_with_wraparound(ax, t, phase, max_num_to_plot=None, **kwargs):
+    if phase.ndim == 1:
+        phase = phase[:, np.newaxis]
+    if max_num_to_plot is None:
+        max_num_to_plot = phase.shape[1]
+    for i in range(min(max_num_to_plot, phase.shape[1])):
+        t_plot = np.copy(t)
+        phase_plot = np.copy(phase[:, i])
+        jumps = np.where(np.abs(np.diff(phase_plot)) > np.pi)[0]
+        for idx in jumps[::-1]:
+            t_cross = t_plot[idx + 1]
+            delta = phase_plot[idx + 1] - phase_plot[idx]
+            if delta > 0:
+                b0, b1 = -np.pi, np.pi
+            else:
+                b0, b1 = np.pi, -np.pi
+            t_plot = np.insert(t_plot, idx + 1, [t_cross, t_cross, t_cross])
+            phase_plot = np.insert(phase_plot, idx + 1, [b0, np.nan, b1])
+        ax.plot(t_plot, phase_plot, **kwargs)
+
+
+def execute_model(name, run_func, T, dt, num_vertices, num_states, edges, opt_cut, noise_factor, seed, *extra_args):
+    num_steps = int(np.floor(T / dt))
+    last_only = num_steps * num_vertices > 1.8e8
+    if name == "CIM":
+        last_only = num_steps > 1e5
+    kwargs = dict(
+        return_continuous_states=True,
+        return_discrete_states=True,
+        return_cut_value=True,
+        return_best_only=False,
+        return_last_only=last_only
+    )
+    start = time.time()
+    res = run_func(T, dt, num_vertices, num_states, edges, noise_factor, seed, *extra_args, **kwargs)
+    duration = time.time() - start
+    cuts = np.array(res["cut_value"])
+    last_c = cuts[0] if last_only else cuts.max()
+    pct = 100 * (last_c - opt_cut) / opt_cut
+    print(f"{name} best cut = {last_c} (opt {opt_cut}, diff {last_c - opt_cut}), pct {pct:.2f}%")
+    print(f"Time per step: {duration * 1e6 / num_steps:.2f} μs\n")
+    res["dt"] = dt
+    res["num_steps"] = num_steps
+    return res
 
 # Apply theme
 sns.set_theme(style="white")

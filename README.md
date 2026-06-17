@@ -18,12 +18,12 @@ The repository implements and benchmarks five analog Potts machine (PM) models (
 |---|---|---|
 | Python | 3.14 | 3.10+ should work |
 | GCC or Clang | GCC 16 | Required to build the C++ extension |
-| OpenMPI | 5.0.6 | Required for multi-process sweeps; optional for single-process runs |
-| setuptools | 70+ | Installed via pip; required to build the C++ extension |
+| OpenMPI | 5.0.6 | Required for multi-process sweeps, optional for single-process runs |
+| setuptools | 70+ | Installed via pip, required to build the C++ extension |
 | pybind11 | 2.13+ | Installed via pip |
 | numpy | 2.x | |
 | pandas | 2.x | |
-| numba | 0.60+ | Required for the CIM model; installed via pip |
+| numba | 0.60+ | Required for the CIM model, installed via pip |
 | mpi4py | 4.0 | Optional for local single-process runs |
 
 Full Python dependency list is in `requirements.txt`. No special hardware is required.
@@ -111,6 +111,8 @@ python run_potts_sweep.py --config configs/YOUR_CONFIG.yaml
 python run_potts_sweep.py --config configs/YOUR_CONFIG.yaml --estimate_wall_time 72
 ```
 
+The optional argument is the number of MPI ranks to assume for the estimate. Omit it to use the current MPI size (1 for a local run).
+
 ### Visualise parameter schedules
 
 ```bash
@@ -138,7 +140,7 @@ potts_sim/
 ├── build_potts_sim.py         # Builds the C++ extension via pybind11
 ├── potts_utils.py             # Graph parsing (DIMACS) and eigenvalue utilities
 ├── cim_sim.py                 # Coherent Ising Machine simulator wrapper
-├── run_potts_sweep.py         # Main entry point; MPI sweep runner
+├── run_potts_sweep.py         # Main entry point, MPI sweep runner
 ├── save_best_hyperparams.py   # Extracts best hyperparameters from a result file
 ├── merge_parquet.py           # Merges result files from separate jobs
 ├── plot_benchmark.py          # Benchmark result visualisation
@@ -148,8 +150,11 @@ potts_sim/
 ├── figures/                   # Publication figures and generation scripts
 ├── configs/                   # YAML experiment configurations
 ├── best_hyperparams/          # Saved optimal hyperparameters per model/graph
-├── results/                   # Output Parquet files (gitignored)
-└── logs/                      # Job stdout/stderr logs (gitignored)
+├── rudy_to_dimacs.sh          # Converts Rudy-format graphs to DIMACS .col
+├── results/
+│   └── paper/                 # Final result Parquet files used in the paper
+├── logs/                      # Job stdout/stderr logs
+└── plots/                     # Generated plot output
 ```
 
 ## Configuration
