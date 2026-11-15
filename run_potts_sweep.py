@@ -9,6 +9,7 @@ import functools
 import itertools
 import hashlib
 import json
+import platform
 import shutil
 import pandas as pd
 import glob
@@ -2321,6 +2322,34 @@ CHECKPOINT_INTERVAL_S = 15 * 60
 TASK_KEY_COLUMNS = ['graph', 'model', 'param_id', 'T', 'dt', 'seed']
 
 
+def environment_info():
+    """Machine and software details for run_info, to help explain result differences between clusters."""
+    info = {}
+    try:
+        info['hostname'] = platform.node()
+    except Exception:
+        pass
+    try:
+        with open('/proc/cpuinfo') as f:
+            for line in f:
+                if line.startswith('model name'):
+                    info['cpu_model'] = line.split(':', 1)[1].strip()
+                    break
+    except Exception:
+        pass
+    try:
+        info['python_version'] = platform.python_version()
+        info['numpy_version'] = np.__version__
+        info['pandas_version'] = pd.__version__
+    except Exception:
+        pass
+    for key, env_var in [('cluster', 'VSC_INSTITUTE_CLUSTER'), ('slurm_job_id', 'SLURM_JOB_ID'),
+                         ('pbs_job_id', 'PBS_JOBID'), ('lsf_job_id', 'LSB_JOBID')]:
+        if os.environ.get(env_var):
+            info[key] = os.environ[env_var]
+    return info
+
+
 def task_key(graph, model, param_id, T, dt, seed):
     # T and dt are part of the key because convergence sweeps vary them under one param_id
     return (graph, model, param_id, float(T), float(dt), int(seed))
@@ -2637,7 +2666,8 @@ def main():
             'num_graphs': len(graph_files),
             'num_ranks': size,
             'assumed_time_per_step_us': assumed_time_per_step_us,
-            'estimated_runtime_seconds': expected_runtime_sec
+            'estimated_runtime_seconds': expected_runtime_sec,
+            **environment_info()
         }
         
         if not early_exit:
@@ -2898,7 +2928,8 @@ def main():
             'assumed_time_per_step_us': assumed_time_per_step_us,
             'estimated_runtime_seconds': expected_runtime_sec,
             'actual_time_per_step_us': avg_time_per_step_us,
-            'actual_walltime_seconds': total_walltime
+            'actual_walltime_seconds': total_walltime,
+            **environment_info()
         }
         
         # Save the updated run_info with actual metrics
