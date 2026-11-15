@@ -1,0 +1,42 @@
+# Reproduction check for a new cluster: reruns the ER50 (g05) success-rate benchmark for
+# three models at their success-rate-optimal hyperparameters from the 260123_g05 sweep.
+# Compare the results against results/paper/results_260123_g05.parquet at the same param_ids.
+
+# General configuration
+num_runs: 100  # Number of different seeds to run per parameter set
+graph_path: "graphs/g05/"  # Directory, file, or multiple directories/files
+out_dir: "results/"  # Directory to save results
+
+# Wall time estimation
+assumed_time_per_step_us: 25 # Assumed time between steps in microseconds
+
+hyperparam_table: "../best_hyperparams/260123_g05.csv"
+
+# Global simulation parameters (can be overridden per model)
+T: 100         # Total simulation time
+dt: 1e-2       # Time step
+num_states: 3  # Number of Potts states
+noise_factor: 1e-4  # Noise scaling
+
+# Model settings as in configs/260123_g05.yaml; swept hyperparameters come from the table
+models:
+  NEC:
+    T: 5e3
+    dt: 1e-2
+    alpha_rate: [1e-2]
+    initial_alpha: "-mu_max"  # Will be evaluated for each graph
+    gamma_schedule:
+      prototype: "lin(0,1)"
+
+  POLYNOMIAL:
+    T: 1000
+    dt: 1e-3
+    beta_schedule: ["lin(1/mu_max, 1/mu_max + 2)"]
+    gamma_schedule:
+      based_on: "beta_schedule"
+
+  CIM:
+    T: 5000
+    dt: 1e-2
+    alpha: [-50]
+    beta_schedule: ["lin(0,0.005)"]
