@@ -8,6 +8,8 @@ import argparse
 import functools
 import itertools
 import hashlib
+import json
+import shutil
 import pandas as pd
 import glob
 import re
@@ -2315,6 +2317,57 @@ def plot_config_schedules(config, graph_files, out_dir, config_basename):
     
     return index_path
 
+CHECKPOINT_INTERVAL_S = 15 * 60
+TASK_KEY_COLUMNS = ['graph', 'model', 'param_id', 'T', 'dt', 'seed']
+
+
+def task_key(graph, model, param_id, T, dt, seed):
+    # T and dt are part of the key because convergence sweeps vary them under one param_id
+    return (graph, model, param_id, float(T), float(dt), int(seed))
+
+
+def sweep_fingerprint(config, graph_files, hyperparam_table):
+    """Hash of everything that determines the task set, so a checkpoint is only reused for the same sweep."""
+    h = hashlib.md5()
+    h.update(json.dumps(config, sort_keys=True, default=str).encode())
+    h.update(repr(sorted(graph_files)).encode())
+    h.update(repr(sorted(hyperparam_table.items()) if hyperparam_table else None).encode())
+    return h.hexdigest()
+
+
+def prepare_checkpoint_dir(ckpt_dir, fingerprint):
+    """Create the checkpoint directory, or validate an existing one and return its completed task keys."""
+    fingerprint_file = os.path.join(ckpt_dir, 'fingerprint.txt')
+    if not os.path.isdir(ckpt_dir):
+        os.makedirs(ckpt_dir)
+        with open(fingerprint_file, 'w') as f:
+            f.write(fingerprint)
+        return set()
+
+    stored = None
+    if os.path.exists(fingerprint_file):
+        with open(fingerprint_file) as f:
+            stored = f.read().strip()
+    if stored != fingerprint:
+        raise RuntimeError(
+            f"Checkpoint directory {ckpt_dir} belongs to a different sweep (config, graphs or "
+            f"hyperparam table changed). Delete it to start over, or restore the original config to resume.")
+
+    done = set()
+    for part in glob.glob(os.path.join(ckpt_dir, '*.parquet')):
+        df = pd.read_parquet(part, columns=TASK_KEY_COLUMNS)
+        done.update(task_key(*row) for row in df.itertuples(index=False))
+    return done
+
+
+def write_checkpoint_part(ckpt_dir, name, rows):
+    # Write then rename, so a job killed mid-write never leaves a truncated part file behind
+    path = os.path.join(ckpt_dir, name)
+    tmp_path = path + '.tmp'
+    pd.DataFrame(rows).to_parquet(tmp_path, index=False)
+    os.replace(tmp_path, path)
+
+
 def main():
     # Initialize MPI or dummy
     if use_mpi:
@@ -2559,12 +2612,28 @@ def main():
             else:
                 sys.exit(0)
         
+        done_keys = set()
+        ckpt_dir = os.path.join(out_dir, f"checkpoints_{config_basename}")
+        if not early_exit:
+            try:
+                done_keys = prepare_checkpoint_dir(
+                    ckpt_dir, sweep_fingerprint(config, graph_files, hyperparam_table))
+            except RuntimeError as e:
+                print(f"Error: {e}")
+                if use_mpi:
+                    comm.Abort(1)
+                else:
+                    sys.exit(1)
+            if done_keys:
+                print(f"Resuming from checkpoint: {len(done_keys)} of {len(tasks)} tasks already completed")
+
         # Save run configuration
         run_info = {
             'timestamp': datetime.now().isoformat(),
             'git_revision': get_git_revision(),
             'config_file': args.config,
             'num_tasks': len(tasks),
+            'resumed_tasks': len(done_keys),
             'num_graphs': len(graph_files),
             'num_ranks': size,
             'assumed_time_per_step_us': assumed_time_per_step_us,
@@ -2581,7 +2650,10 @@ def main():
             'config': config,
             'num_runs': num_runs,
             'num_tasks': 0 if early_exit else len(tasks),
-            'hyperparam_table': hyperparam_table
+            'hyperparam_table': hyperparam_table,
+            'done_keys': done_keys,
+            'ckpt_dir': ckpt_dir,
+            'run_token': f"{datetime.now():%Y%m%d-%H%M%S}-{os.getpid()}"
         }
     else:
         broadcast_data = None
@@ -2604,6 +2676,9 @@ def main():
     config = broadcast_data['config']
     num_runs = broadcast_data['num_runs']
     hyperparam_table = broadcast_data['hyperparam_table']
+    done_keys = broadcast_data['done_keys']
+    ckpt_dir = broadcast_data['ckpt_dir']
+    run_token = broadcast_data['run_token']
 
     # Each rank computes only its own tasks using deterministic indexing
     computation_start_time = time.time()
@@ -2676,6 +2751,10 @@ def main():
 
             for param_set in cached['param_sets']:
                 for seed in range(num_runs):
+                    # Completed tasks are skipped before taking an index, so resumed work stays balanced across ranks
+                    if done_keys and task_key(graph_name, model_name, param_set['id'],
+                                              param_set['T'], param_set['dt'], seed) in done_keys:
+                        continue
                     if global_idx % size == rank:
                         my_tasks.append({
                             'graph_path': graph_file,
@@ -2697,15 +2776,27 @@ def main():
     last_print_time = processing_start_time
     last_print_task = 0
     total_steps_processed = 0
-    
+    last_flush_time = processing_start_time
+    part_idx = 0
+
+    def flush_results():
+        nonlocal local_results, last_flush_time, part_idx
+        if local_results:
+            write_checkpoint_part(ckpt_dir, f"rank{rank}_{run_token}_part{part_idx}.parquet", local_results)
+            local_results = []
+            part_idx += 1
+        last_flush_time = time.time()
+
     for i, task in enumerate(my_tasks):
         try:
             graph = load_graph(task['graph_path'])
             task['graph'] = graph
             del task['graph_path']
-            
+
             result = run_task(**task)
             local_results.append(result)
+            if time.time() - last_flush_time >= CHECKPOINT_INTERVAL_S:
+                flush_results()
             
             # Track steps for performance metrics
             task_steps = int(np.floor(task['T'] / task['dt']))
@@ -2753,20 +2844,9 @@ def main():
     local_computation_time = computation_end_time - computation_start_time
     #local_time_per_step_us = (local_computation_time * 1e6) / total_steps_processed if total_steps_processed > 0 else 0
     
-    # Convert results to DataFrame
-    if local_results:
-        local_df = pd.DataFrame(local_results)
-    else:
-        # Create empty DataFrame with expected columns if no results
-        local_df = pd.DataFrame()
-    
-    # Store local results to disk (useful for recovery if job fails)
-    local_out = os.path.join(out_dir, f"results_rank{rank}_{config_basename}.parquet")
-    if not local_df.empty:
-        local_df.to_parquet(local_out, index=False)
-    
-    # Gather all DataFrames and performance metrics at rank 0
-    all_dfs = comm.gather(local_df, root=0)
+    flush_results()
+
+    # Gather performance metrics at rank 0, which also waits for every rank's final flush
     all_steps_processed = comm.gather(total_steps_processed, root=0)
     all_computation_times = comm.gather(local_computation_time, root=0)
     
@@ -2783,25 +2863,25 @@ def main():
             # Calculate average across all ranks
             avg_time_per_step_us = (sum(all_computation_times) * 1e6) / total_steps
         
-        # Filter out empty DataFrames and concatenate
-        all_dfs = [df for df in all_dfs if not df.empty]
-        if all_dfs:
-            combined_df = pd.concat(all_dfs, ignore_index=True)
-            
+        # Merge all checkpoint parts, including those from earlier interrupted runs of this sweep
+        part_files = sorted(glob.glob(os.path.join(ckpt_dir, '*.parquet')))
+        if part_files:
+            combined_df = pd.concat([pd.read_parquet(f) for f in part_files], ignore_index=True)
+            # Duplicates only arise if two jobs wrote to the same checkpoint concurrently
+            num_rows = len(combined_df)
+            combined_df = combined_df.drop_duplicates(subset=TASK_KEY_COLUMNS, keep='first')
+            if len(combined_df) < num_rows:
+                print(f"Warning: dropped {num_rows - len(combined_df)} duplicate task results "
+                      f"(another job may have been writing to {ckpt_dir})")
+
             # Save the combined results
             combined_out = os.path.join(out_dir, f"results_{config_basename}.parquet")
             combined_df.to_parquet(combined_out, index=False)
-            
+
             print(f"Saved combined results with {len(combined_df)} rows to {combined_out}")
-            
-            # Clean up individual rank result files
-            rank_files = glob.glob(os.path.join(out_dir, f"results_rank*_{config_basename}.parquet"))
-            for file in rank_files:
-                try:
-                    os.remove(file)
-                except OSError as e:
-                    print(f"Warning: Could not remove {file}: {e}")
-            print(f"Cleaned up {len(rank_files)} individual rank result files")
+
+            shutil.rmtree(ckpt_dir)
+            print(f"Removed checkpoint directory {ckpt_dir} ({len(part_files)} part files)")
         else:
             print("Warning: No results were collected from any rank")
         
@@ -2811,6 +2891,7 @@ def main():
             'git_revision': get_git_revision(),
             'config_file': args.config,
             'num_tasks': len(tasks),
+            'resumed_tasks': len(done_keys),
             'num_graphs': len(graph_files),
             'num_ranks': size,
             'total_steps_processed': total_steps,
