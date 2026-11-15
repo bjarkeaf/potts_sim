@@ -2337,6 +2337,7 @@ def main():
         parser.add_argument('--dry_run', action='store_true',
                            help='Preview hyperparameter loading without running simulations')
         args = parser.parse_args()
+        early_exit = False
 
         # Load configuration
         with open(args.config, 'r') as f:
@@ -2408,8 +2409,7 @@ def main():
             print_hyperparam_summary(config, graph_files, hyperparam_table)
             if use_mpi:
                 # Signal all ranks to exit
-                tasks = []  # Empty task list signals exit
-                out_dir = None
+                early_exit = True
             else:
                 sys.exit(0)
 
@@ -2419,8 +2419,7 @@ def main():
             # Exit without running simulations
             if use_mpi:
                 # Signal all ranks to exit
-                tasks = []  # Empty task list signals exit
-                out_dir = None
+                early_exit = True
             else:
                 sys.exit(0)
         
@@ -2556,8 +2555,7 @@ def main():
             print("Walltime estimation completed. Exiting without running sweep.")
             if use_mpi:
                 # Signal all ranks to exit
-                tasks = []  # Empty task list signals exit
-                out_dir = None
+                early_exit = True
             else:
                 sys.exit(0)
         
@@ -2573,15 +2571,16 @@ def main():
             'estimated_runtime_seconds': expected_runtime_sec
         }
         
-        run_info_file = os.path.join(out_dir, f"run_info_{config_basename}.yaml")
-        with open(run_info_file, 'w') as f:
-            yaml.dump(run_info, f)
-        
+        if not early_exit:
+            run_info_file = os.path.join(out_dir, f"run_info_{config_basename}.yaml")
+            with open(run_info_file, 'w') as f:
+                yaml.dump(run_info, f)
+
         broadcast_data = {
             'graph_files': graph_files,
             'config': config,
             'num_runs': num_runs,
-            'num_tasks': len(tasks),
+            'num_tasks': 0 if early_exit else len(tasks),
             'hyperparam_table': hyperparam_table
         }
     else:
