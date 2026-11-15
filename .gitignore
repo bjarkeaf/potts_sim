@@ -68,10 +68,8 @@ CLAUDE.md
 .claude/
 plans/
 
-# Development/iteration configs (keep only final 260123_*, 260128_*, and 0_* test configs)
-configs/2[0-9][0-9][0-9][0-9][0-9]_*.yaml
-!configs/260123_*.yaml
-!configs/260128_*.yaml
+# Development/iteration configs (configs/*.yaml are tracked)
+configs/dev/
 configs/not_main_results/
 
 # Demo band graphs (not used in paper)
