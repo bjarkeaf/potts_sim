@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
-import numpy as np
 import os
+
+# Each MPI rank is a single-threaded worker. A multithreaded BLAS (used by the numba CIM kernels)
+# would start a thread pool per rank and oversubscribe the node, so it must be limited before numpy loads.
+for _var in ('OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'FLEXIBLAS_NUM_THREADS'):
+    os.environ.setdefault(_var, '1')
+
+import numpy as np
 import sys
 import time
 import yaml
