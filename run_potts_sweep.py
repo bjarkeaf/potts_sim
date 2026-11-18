@@ -646,6 +646,15 @@ def parse_param_id(param_id, model_type):
 
     return params
 
+def expand_sim_values(raw):
+    """Expand a T or dt setting (number, numeric string such as '1e-3', range string, or list) to floats."""
+    if isinstance(raw, list):
+        return expand_param_values(raw)
+    if isinstance(raw, str):
+        return expand_param_values([raw])
+    return [float(raw)]
+
+
 def expand_param_values(param_values, is_schedule=False):
     """
     Expands parameter values, handling:
@@ -2066,9 +2075,13 @@ def sanitize_filename(name):
         name = name.replace(char, '_')
     return name
 
-def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
+def visualize_schedules(graph, model_type, param_set, T, dt, out_dir, num_states=3):
     """Generate visualizations of schedules for a parameter set"""
-    import matplotlib.pyplot as plt # Only import matplotlib if needed
+    import matplotlib # Only import matplotlib if needed
+    # Plots are only written to file. Interactive backends such as QtAgg leak memory per figure here,
+    # which exhausts RAM over the hundreds of plots in a full config.
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
     num_steps = int(np.floor(T / dt))
     mu_max = graph['mu_max']
     
@@ -2078,8 +2091,10 @@ def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
         'np': np,
         'num_vertices': graph['num_vertices'],
         'num_edges': graph['num_edges'],
-        'num_states': param_set.get('num_states', 3),
-        'gamma_th': (256/27)**(1/4)  # Add gamma_th constant
+        'num_states': num_states,
+        'gamma_th': (256/27)**(1/4),
+        'T': T,
+        'dt': dt
     }
     
     # Add model-specific parameters to environment
@@ -2251,14 +2266,14 @@ def visualize_schedules(graph, model_type, param_set, T, dt, out_dir):
     sanitized_model = sanitize_filename(model_type.name)
     sanitized_graph = sanitize_filename(graph['name'])
     
-    filename = f"{sanitized_model}_{sanitized_id}_{sanitized_graph}.png"
+    filename = f"{sanitized_model}_{sanitized_id}_T{T:g}_dt{dt:g}_{sanitized_graph}.png"
     filepath = os.path.join(out_dir, filename)
     fig.savefig(filepath, dpi=100, bbox_inches='tight')
     plt.close(fig)
     
     return filepath
 
-def plot_config_schedules(config, graph_files, out_dir, config_basename):
+def plot_config_schedules(config, graph_files, out_dir, config_basename, hyperparam_table=None):
     """Plot all schedules in a configuration by generating visualizations"""
 
     # Create output directory
@@ -2281,23 +2296,23 @@ def plot_config_schedules(config, graph_files, out_dir, config_basename):
             # Get model-specific simulation parameters
             sim_params = get_model_specific_params(config, model_name)
             
-            # Generate all parameter sets for this model
-            param_sets = generate_param_sets(model_type, model_params, sim_params['T'], sim_params['dt'])
-            
-            # Generate visualizations for each parameter set
-            for param_set in param_sets:
-                filepath = visualize_schedules(
-                    graph, model_type, param_set, 
-                    sim_params['T'], sim_params['dt'], 
-                    plot_schedule_dir
-                )
-                
-                results.append({
-                    'graph': graph['name'],
-                    'model': model_type.name,
-                    'param_id': param_set['id'],
-                    'visualization': filepath
-                })
+            num_states = sim_params['num_states']
+            num_states = int(num_states[0] if isinstance(num_states, list) else num_states)
+            hyperparams_from_csv = (hyperparam_table or {}).get((model_name, graph['name']))
+
+            for T in expand_sim_values(sim_params['T']):
+                for dt in expand_sim_values(sim_params['dt']):
+                    for param_set in generate_param_sets(model_type, model_params, T, dt, hyperparams_from_csv):
+                        filepath = visualize_schedules(graph, model_type, param_set, T, dt,
+                                                       plot_schedule_dir, num_states)
+                        results.append({
+                            'graph': graph['name'],
+                            'model': model_type.name,
+                            'param_id': param_set['id'],
+                            'T': T,
+                            'dt': dt,
+                            'visualization': filepath
+                        })
     
     # Create an HTML index file for easy viewing
     index_path = os.path.join(plot_schedule_dir, "index.html")
@@ -2313,7 +2328,7 @@ def plot_config_schedules(config, graph_files, out_dir, config_basename):
             for result in model_results:
                 rel_path = os.path.basename(result['visualization'])
                 f.write(f"<div><h3>{result['param_id']}</h3>\n")
-                f.write(f"<p>Graph: {result['graph']}</p>\n")
+                f.write(f"<p>Graph: {result['graph']}, T = {result['T']:g}, dt = {result['dt']:g}</p>\n")
                 f.write(f"<img src='{rel_path}' style='max-width:800px;'><br>\n")
                 f.write("</div>\n")
         
@@ -2503,7 +2518,7 @@ def main():
 
         # If schedule plot is requested, do that and exit
         if args.plot_schedules:
-            plot_config_schedules(config, graph_files, out_dir, config_basename)
+            plot_config_schedules(config, graph_files, out_dir, config_basename, hyperparam_table)
             # Exit without running simulations
             if use_mpi:
                 # Signal all ranks to exit
