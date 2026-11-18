@@ -16,15 +16,16 @@ The repository implements and benchmarks five analog Potts machine (PM) models (
 
 | Dependency | Version tested | Notes |
 |---|---|---|
-| Python | 3.14 | 3.10+ should work |
+| Python | 3.11, 3.14 | 3.10+ should work |
 | GCC or Clang | GCC 16 | Required to build the C++ extension |
 | OpenMPI | 5.0.6 | Required for multi-process sweeps, optional for single-process runs |
 | setuptools | 70+ | Installed via pip, required to build the C++ extension |
 | pybind11 | 2.13+ | Installed via pip |
-| numpy | 2.x | |
-| pandas | 2.x | |
-| numba | 0.60+ | Required for the CIM model, installed via pip |
-| mpi4py | 4.0 | Optional for local single-process runs |
+| numpy | 1.26, 2.x | |
+| pandas | 2.1, 2.3 | |
+| scipy | 1.11+ | Required by numba for the CIM model's matrix products |
+| numba | 0.59+ | Required for the CIM model, installed via pip |
+| mpi4py | 3.1, 4.0 | Optional for local single-process runs |
 
 Full Python dependency list is in `requirements.txt`. No special hardware is required.
 

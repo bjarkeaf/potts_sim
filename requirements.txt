@@ -1,8 +1,8 @@
 # Core numerical / data
-numpy>=2.0
+numpy>=1.26
 pandas>=2.0
 pyarrow>=16.0
-scipy>=1.13
+scipy>=1.11
 
 # Plotting
 matplotlib>=3.9
@@ -13,7 +13,7 @@ cycler>=0.12
 pyyaml>=6.0
 
 # JIT compilation
-numba>=0.60
+numba>=0.59
 
 # C++ extension build (requires a C++ compiler and setuptools)
 setuptools>=70.0
@@ -23,4 +23,4 @@ pybind11>=2.13
 # On HPC clusters this is typically provided via an environment module.
 # For local single-process runs, mpi4py is optional. The code falls back
 # gracefully when MPI is unavailable.
-mpi4py>=4.0
+mpi4py>=3.1
