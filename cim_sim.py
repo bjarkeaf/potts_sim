@@ -127,8 +127,8 @@ def _run_cim_njit(T, dt, num_vertices, num_states,
     
     # For tracking best solution
     best_step = 0
-    best_energy = float('inf')
-    best_cut_value = -float('inf')
+    best_energy = np.inf
+    best_cut_value = -np.inf
     best_continuous_state = np.zeros(num_spins)
     best_discrete_state = np.zeros(num_vertices, dtype=np.int64)
     
