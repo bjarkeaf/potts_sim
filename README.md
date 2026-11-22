@@ -146,7 +146,7 @@ The sweep parallelises with MPI. To use multiple cores, prefix the command with 
 mpirun -n 8 python run_potts_sweep.py --config configs/YOUR_CONFIG.yaml
 ```
 
-On HPC clusters, wrap this in your scheduler's job script (e.g. LSF, SLURM), using the launcher the cluster recommends (e.g. `mpirun`, `srun` or `mympirun`), which takes the number of ranks from the job allocation. A template LSF script is provided in `submit_template.sh`. Run from the repo root. Results are written as Parquet files to `results/`.
+On HPC clusters, wrap this in your scheduler's job script (e.g. LSF, SLURM), using the launcher the cluster recommends (e.g. `mpirun`, `srun` or `mympirun`), which takes the number of ranks from the job allocation. Templates are provided for Slurm (`submit_template_slurm.sh`, submitted as `sbatch submit_template_slurm.sh configs/YOUR_CONFIG.yaml`) and LSF (`submit_template.sh`). Run from the repo root. Results are written as Parquet files to `results/`.
 
 Each MPI rank runs one simulation at a time on one core, and the script limits BLAS libraries to one thread per rank itself, so no thread settings are needed in the job script.
 
@@ -168,6 +168,7 @@ potts_sim/
 ├── dynamics_figure.py         # Generates dynamics figures, outputs to figures/
 ├── reproduce_figures.sh       # Regenerates all paper figures from results/paper/
 ├── submit_template.sh         # LSF job submission template
+├── submit_template_slurm.sh   # Slurm job submission template
 ├── graphs/                    # Input graphs in DIMACS .col format (G-set + g05)
 ├── figures/                   # Publication figures (PDF and PNG outputs)
 ├── configs/                   # YAML experiment configurations
