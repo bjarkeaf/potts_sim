@@ -1,13 +1,24 @@
 import numpy as np
 from numba import njit
 import pandas as pd
+from scipy.sparse import coo_matrix, csr_matrix, issparse
 from potts_utils import parse_graph
 
 # FUNCTIONS
 @njit
-def update_O12_tanh(X, alpha, beta, J, H, dt, noise_factor):
+def csr_matvec(indptr, indices, data, x):
+    out = np.zeros(len(indptr) - 1)
+    for i in range(len(indptr) - 1):
+        s = 0.0
+        for k in range(indptr[i], indptr[i + 1]):
+            s += data[k] * x[indices[k]]
+        out[i] = s
+    return out
+
+@njit
+def update_O12_tanh(X, alpha, beta, J_indptr, J_indices, J_data, H, dt, noise_factor):
     sign_X = np.sign(X)
-    dXdt = -X + np.tanh(alpha * X + beta * (np.dot(J,sign_X) + H))
+    dXdt = -X + np.tanh(alpha * X + beta * (csr_matvec(J_indptr, J_indices, J_data, sign_X) + H))
     X += dXdt * dt
     if noise_factor != 0:
         X += np.random.normal(0,np.sqrt(dt),size=len(X)) * noise_factor # noise
@@ -61,37 +72,40 @@ def get_cim_matrices(num_vertices, num_states, edges, B=18/5, zeta=0.6):
     Returns:
     --------
     tuple
-        (J, H) matrices for CIM simulation
+        (J, H): J as a scipy CSR matrix (it is very sparse for graph problems) and H as an array
     """
-    
+
     num_spins = num_vertices * num_states
 
     A = 1. # We're scanning the ratio B/A (the prefactors of the soft constraints. See https://arxiv.org/abs/2505.08796 eq.11-12), so we can set A=1.
-    
-    J = np.zeros((num_spins,num_spins),dtype=np.float64)
+
+    rows, cols, vals = [], [], []
     H = np.zeros(num_spins,dtype=np.float64)
-    
+
     for v in range(num_vertices):
         for i in range(num_states):
             for j in range(num_states):
                 if i != j:
                     idx0 = i*num_vertices + v
                     idx1 = j*num_vertices + v
-                    J[idx0,idx1] += (-A) * 0.25
-                    J[idx1,idx0] += (-A) * 0.25
+                    rows += [idx0, idx1]; cols += [idx1, idx0]; vals += [(-A) * 0.25, (-A) * 0.25]
         for i in range(num_states):
             idx = i*num_vertices + v
             H[idx] = (-A) * (num_states/2-1)
-    
+
     for u,v in edges.T:
         for i in range(num_states):
             idx0 = i*num_vertices + u
             idx1 = i*num_vertices + v
-            J[idx0,idx1] += (-B) * 0.25
-            J[idx1,idx0] += (-B) * 0.25
+            rows += [idx0, idx1]; cols += [idx1, idx0]; vals += [(-B) * 0.25, (-B) * 0.25]
             H[idx0] += (-B) * 0.25
             H[idx1] += (-B) * 0.25
-    
+
+    # Duplicate (row, col) entries are summed, matching the += accumulation of a dense matrix
+    J = coo_matrix((vals, (rows, cols)), shape=(num_spins, num_spins)).tocsr()
+    J.sum_duplicates()
+    J.sort_indices()
+
     H *= zeta # (This is an emprical rescaling factor. It turns out you have to set this to 0.6 (as explained in https://arxiv.org/abs/2505.08796).)
     return J, H
 
@@ -101,7 +115,7 @@ def _run_cim_njit(T, dt, num_vertices, num_states,
                  edges, noise_factor, seed,
                  alpha,
                  beta_schedule,
-                 J, H,
+                 J_indptr, J_indices, J_data, H,
                  return_full_history):
     """JIT-compiled implementation of CIM simulation"""
     # Setup
@@ -140,7 +154,7 @@ def _run_cim_njit(T, dt, num_vertices, num_states,
     # Main simulation loop
     for step in range(num_steps):
         # Update spin amplitudes
-        X = update_O12_tanh(X, alpha, beta_schedule[step], J, H, dt, noise_factor)
+        X = update_O12_tanh(X, alpha, beta_schedule[step], J_indptr, J_indices, J_data, H, dt, noise_factor)
         
         # Calculate discrete states, energy, and cut value
         discrete_states = amps_to_states(X, num_vertices, num_states)
@@ -201,13 +215,17 @@ def run_cim(T, dt, num_vertices, num_states,
     
     # Only request full history if not using best_only or last_only
     return_full_history = not (return_best_only or return_last_only)
-    
+
+    J = J if issparse(J) else csr_matrix(J)
+    J = J.tocsr()
+
     # Run the JIT-compiled simulation
     (all_continuous_states, all_discrete_states, all_energy, all_cut_value,
      best_continuous_state, best_discrete_state, best_energy, best_cut_value, best_step,
      last_continuous_state, last_discrete_states, last_energy, last_cut_value) = \
-        _run_cim_njit(T, dt, num_vertices, num_states, edges, noise_factor, seed, 
-                      alpha, beta_schedule, J, H, 
+        _run_cim_njit(T, dt, num_vertices, num_states, edges, noise_factor, seed,
+                      alpha, beta_schedule,
+                      J.indptr.astype(np.int64), J.indices.astype(np.int64), J.data.astype(np.float64), H,
                       return_full_history)
     
     # Prepare return values based on flags
