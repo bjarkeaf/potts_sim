@@ -45,6 +45,7 @@ Install system-level dependencies (required before pip):
 - **Linux (Debian/Ubuntu):** `sudo apt install gcc libopenmpi-dev python3-dev`
 - **Linux (Arch):** `sudo pacman -S gcc openmpi`
 - **macOS:** `brew install open-mpi`
+- **HPC cluster (no root access):** load a Python, a GCC compiler and an MPI implementation from the cluster's module system instead, all from the same toolchain generation, before creating the virtual environment. Load the same modules in every job script. If `pip` cannot build `mpi4py` against the loaded MPI, use the cluster's `mpi4py` module and create the virtual environment with `python -m venv --system-site-packages potts-env`.
 
 Install Python dependencies:
 
@@ -59,6 +60,8 @@ python build_potts_sim.py build_ext --inplace
 ```
 
 This produces `potts_sim.cpython-*.so` in the repo root, which is imported by the Python scripts. The build uses `-march=native`, so the compiled binary is CPU-specific and floating-point results may differ slightly across machines.
+
+On a cluster, build on the compute nodes the jobs will run on (for example in an interactive job), because a binary built on a newer CPU than the compute nodes fails with `Illegal instruction`. If you run on several node types or clusters, build separately for each, for example in separate checkouts.
 
 Verify the build succeeded:
 
@@ -85,6 +88,7 @@ Rank 0: Processing 60 tasks
 Rank 0: Completed 1/60 tasks | Runtime: 0:00:00 | ETA: 0:00:00 | ...
 ...
 Saved combined results with 60 rows to results/results_0_local_test.parquet
+Removed checkpoint directory results/checkpoints_0_local_test (1 part files)
 Finished sweep in 0:00:07
 ```
 
@@ -142,7 +146,11 @@ The sweep parallelises with MPI. To use multiple cores, prefix the command with 
 mpirun -n 8 python run_potts_sweep.py --config configs/YOUR_CONFIG.yaml
 ```
 
-On HPC clusters, wrap this in your scheduler's job script (e.g. LSF, SLURM). A template LSF script is provided in `submit_template.sh`. Results are written as Parquet files to `results/`.
+On HPC clusters, wrap this in your scheduler's job script (e.g. LSF, SLURM), using the launcher the cluster recommends (e.g. `mpirun`, `srun` or `mympirun`), which takes the number of ranks from the job allocation. A template LSF script is provided in `submit_template.sh`. Run from the repo root. Results are written as Parquet files to `results/`.
+
+Each MPI rank runs one simulation at a time on one core, and the script limits BLAS libraries to one thread per rank itself, so no thread settings are needed in the job script.
+
+Finished simulations are checkpointed to `results/checkpoints_<config name>/` every 15 minutes. If a job is killed, for example at its walltime limit, resubmitting the same command resumes from the checkpoint, also with a different number of ranks. A checkpoint is only reused if the config, graphs and hyperparameter table are unchanged. It is deleted once the final `results/results_<config name>.parquet` has been written.
 
 ## Repository Structure
 
