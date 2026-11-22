@@ -1,0 +1,58 @@
+# Range-finding pilot for the extended GSet benchmark, Max-3-Cut.
+# One representative graph per new group (G14 for G14-G17, G22 for G22-G26), coarse and wide
+# hyperparameter grids, 10 runs per point. All other settings are copied from 260123_gset_max-3-cut.yaml.
+# The production sweep ranges for the extended benchmark are chosen from where these optima fall.
+
+num_runs: 10
+graph_path: [graphs/gset/G14.col, graphs/gset/G22.col]
+out_dir: results/
+assumed_time_per_step_us: 400
+T: 100
+dt: 1e-2
+num_states: 3
+noise_factor: 1e-4
+models:
+  NEC:
+    T: 5e3
+    dt: 1e-2
+    alpha_rate: [1e-2]
+    r_target: [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
+    initial_alpha: -mu_max
+    gamma_schedule:
+      prototype: lin(0,1)
+      factor: [0.25, 0.5, 1, 2, 4, 8, 16, 32]
+  QPDC:
+    T: 1000
+    dt: 1e-3
+    poly_order: [2*num_states - 1]
+    beta_schedule: [const(1/(1+num_edges/num_vertices))]
+    gamma_schedule:
+      prototype: linspan(0, T)
+      factor: [0, 0.05, 0.1, 0.2, 0.4, 0.8, 1.6, 3.2]
+  FIXED_AMPLITUDE:
+    T: 1000
+    dt: 1e-3
+    gamma_schedule: ['lin(0,10.0)']
+  POLYNOMIAL:
+    T: 1000
+    dt: 1e-3
+    poly_order: [3, 5, 7, 9, 11]
+    beta_schedule: ['lin(1/mu_max, 1/mu_max + 2)']
+    gamma_schedule:
+      based_on: beta_schedule
+      factor: [0, 0.25, 0.5, 1, 2, 4, 8]
+  SIGMOID:
+    T: 2000
+    dt: 1e-3
+    alpha: [-80, -60, -40, -20, 0]
+    beta_schedule: ['lin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)']
+    gamma_schedule:
+      based_on: beta_schedule
+      factor: [0, 0.25, 0.5, 1, 2, 4, 8]
+  CIM:
+    T: 1000
+    dt: 1e-2
+    alpha: [-50]
+    beta_schedule: ['lin(0,0.01)']
+    B_num_vertices: [50, 100, 200, 400, 800, 1600]
+    zeta: [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
