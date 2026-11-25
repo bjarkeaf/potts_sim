@@ -1,0 +1,54 @@
+# Extended GSet benchmark (G22-26, Max-4-Cut), stage 1: seeds 0-9 on wide grids set from the pilot
+# (results_261122_gset-pilot_*). Stage 2 adds seeds 10-99 (first_seed: 10, num_runs: 100) on the points
+# near each graph's optimum. Stage 2 must reuse these exact range strings so parameter ids match when merging.
+# All other settings are copied from 260123_gset_max-4-cut.yaml.
+
+num_runs: 10
+graph_path: [graphs/gset/G22.col, graphs/gset/G23.col, graphs/gset/G24.col, graphs/gset/G25.col,
+  graphs/gset/G26.col]
+out_dir: results/
+assumed_time_per_step_us: 200
+T: 100
+dt: 1e-2
+num_states: 4
+noise_factor: 1e-4
+models:
+  NEC:
+    T: 5e3
+    dt: 1e-2
+    poly_order: [4]
+    alpha_rate: [1e-2]
+    r_target: 0.75:0.25:3.5
+    initial_alpha: -mu_max
+    gamma_schedule:
+      prototype: lin(0,1)
+      factor: [0, 0.1, 0.25, 0.5, 1, 2, 4]
+  FIXED_AMPLITUDE:
+    T: 1000
+    dt: 1e-3
+    gamma_schedule: ['lin(0,10.0)']
+  POLYNOMIAL:
+    T: 1000
+    dt: 1e-3
+    poly_order: '4:2:18'
+    beta_schedule: ['lin(1/mu_max, 1/mu_max + 2)']
+    gamma_schedule: {based_on: beta_schedule, factor: '0:0.1:0.9'}
+  QPDC:
+    T: 1000
+    dt: 1e-3
+    poly_order: [2*num_states - 1]
+    beta_schedule: [const(1/(1+num_edges/num_vertices))]
+    gamma_schedule: {prototype: 'linspan(0, T)', factor: '0:0.1:1.6'}
+  SIGMOID:
+    T: 2000
+    dt: 1e-3
+    alpha: -100:10:-10
+    beta_schedule: ['lin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)']
+    gamma_schedule: {based_on: beta_schedule, factor: '0:0.25:2'}
+  CIM:
+    T: 1000
+    dt: 1e-2
+    alpha: [-50]
+    beta_schedule: ['lin(0,0.02)']
+    B_num_vertices: 100:100:1600
+    zeta: 0.5:0.05:1.1
