@@ -189,6 +189,7 @@ Key fields:
 | Field | Description |
 |---|---|
 | `num_runs` | Independent simulation runs per parameter combination |
+| `first_seed` | Optional, default 0. Runs only seeds `first_seed` to `num_runs`-1, so a sweep can be split into seed ranges whose results merge into one run |
 | `graph_path` | List of DIMACS graph files |
 | `num_states` | Number of Potts states (3 for Max-3-Cut, 4 for Max-4-Cut) |
 | `T` / `dt` | Simulation duration and time step |

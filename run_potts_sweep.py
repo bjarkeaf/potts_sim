@@ -318,7 +318,7 @@ def print_hyperparam_summary(config, graph_files, hyperparam_table):
         print("Global Parameters (from YAML, override hyperparam table):")
         print(f"  T: {config.get('T', 'default')}")
         print(f"  dt: {config.get('dt', 'default')}")
-        print(f"  num_runs: {config.get('num_runs', 100)}")
+        print(f"  num_runs: {config.get('num_runs', 100)}, first_seed: {config.get('first_seed', 0)}")
         print(f"  num_states: {config.get('num_states', 3)}")
         print(f"  noise_factor: {config.get('noise_factor', 1e-4)}")
         print()
@@ -482,7 +482,7 @@ def print_hyperparam_summary(config, graph_files, hyperparam_table):
 
         # Summary
         print("Summary:")
-        num_runs = config.get('num_runs', 100)
+        num_runs = int(config.get('num_runs', 100)) - int(config.get('first_seed', 0))
         total_tasks = total_param_sets * num_runs
 
         print(f"  Total parameter sets: {total_param_sets}")
@@ -2451,6 +2451,14 @@ def main():
         
         # Extract general parameters
         num_runs = int(config.get('num_runs', 100))
+        # Seeds are first_seed..num_runs-1, so a sweep can be split into seed ranges that merge into one run
+        first_seed = int(config.get('first_seed', 0))
+        if not 0 <= first_seed < num_runs:
+            print(f"Error: first_seed ({first_seed}) must be in [0, num_runs) with num_runs = {num_runs}")
+            if use_mpi:
+                comm.Abort(1)
+            else:
+                sys.exit(1)
         graph_path_spec = config.get('graph_path', 'graphs/')
         out_dir = config.get('out_dir', 'results/')
         assumed_time_per_step_us = config.get('assumed_time_per_step_us', 100)
@@ -2581,7 +2589,7 @@ def main():
                             param_set['num_steps'] = int(np.floor(T / dt))
 
                             # For each parameter set, add tasks for all seeds
-                            for seed in range(num_runs):
+                            for seed in range(first_seed, num_runs):
                                 tasks.append({
                                     'graph_path': graph_file,
                                     'model_type': model_type,
@@ -2801,7 +2809,7 @@ def main():
             cached = param_sets_cache[cache_key]
 
             for param_set in cached['param_sets']:
-                for seed in range(num_runs):
+                for seed in range(int(config.get('first_seed', 0)), num_runs):
                     # Completed tasks are skipped before taking an index, so resumed work stays balanced across ranks
                     if done_keys and task_key(graph_name, model_name, param_set['id'],
                                               param_set['T'], param_set['dt'], seed) in done_keys:
