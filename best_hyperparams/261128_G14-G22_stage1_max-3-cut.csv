@@ -1,0 +1,13 @@
+Model,Graph,param_id,Hyperparameter 1,Hyperparameter 2,Mean rel. gap (%),Median rel. gap (%),Min rel. gap (%),Std rel. gap (%),Success rate (%)
+CIM,G14,"a-50.0_Bnv350.0_z0.45000000000000007_blin(0,0.01)",B_num_vertices=350.00,zeta=0.45,0.49,0.51,0.35,0.07,0.00
+CIM,G22,"a-50.0_Bnv900.0_z0.6000000000000001_blin(0,0.01)",B_num_vertices=900.00,zeta=0.60,0.15,0.15,0.07,0.06,0.00
+FIXED_AMPLITUDE,G14,"glin(0,10.0)",,,3.05,3.03,2.69,0.23,0.00
+FIXED_AMPLITUDE,G22,"glin(0,10.0)",,,2.23,2.20,1.99,0.15,0.00
+NEC,G14,ar1.00e-02_rt1.0_ia-mu_max_gpf16.0,gamma_factor=16.00,r_target=1.00,0.76,0.70,0.57,0.15,0.00
+NEC,G22,ar1.00e-02_rt0.75_ia-mu_max_gpf56.0,gamma_factor=56.00,r_target=0.75,0.40,0.40,0.40,0.01,0.00
+POLYNOMIAL,G14,"po7_blin(1/mu_max, 1/mu_max + 2)_gf3.0",poly_order=7.00,gamma_factor=3.00,1.63,1.73,1.00,0.26,0.00
+POLYNOMIAL,G22,"po3_blin(1/mu_max, 1/mu_max + 2)_gf2.5",poly_order=3.00,gamma_factor=2.50,1.26,1.21,1.07,0.18,0.00
+QPDC,G14,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.02,gamma_factor=0.02,,1.95,1.91,1.65,0.24,0.00
+QPDC,G22,po2*num_states - 1_bconst(1/(1+num_edges/num_vertices))_gpf0.5,gamma_factor=0.50,,4.53,4.50,4.26,0.21,0.00
+SIGMOID,G14,"a-20.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf1.0",gamma_factor=1.00,alpha=-20.00,1.32,1.32,1.32,0.00,0.00
+SIGMOID,G22,"a-40.0_blin((1-alpha)/mu_max, (1-alpha)/mu_max + 20)_gf4.0",gamma_factor=4.00,alpha=-40.00,1.04,1.00,0.93,0.11,0.00
